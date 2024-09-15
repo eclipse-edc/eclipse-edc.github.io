@@ -20,7 +20,10 @@ to deliver innovative solutions for data exchange networks.
 {{< /blocks/cover >}}
 
 {{< blocks/section color="300" type="row" >}}
-<div class="logo-container">
+<div class="text-center">
+<h2>Backed by Leading Companies</h2>
+</div>
+<div class="pt-5 logo-container">
 <div><img height="80" src="images/logos/amadeus.logo.svg"></div>
 <div><img height="60" src="images/logos/aws.logo.svg"></div>
 <div><img height="80" src="images/logos/bmw.logo.svg"></div>
