@@ -19,7 +19,7 @@ to deliver innovative solutions for data exchange networks.
 <img height="500px" width="600px" src="images/edc.schematic.svg">
 {{< /blocks/cover >}}
 
-{{< blocks/section color="300" type="row" >}}
+{{< blocks/section color="white" type="row" >}}
 <div class="text-center">
 <h2>Backed by Leading Companies</h2>
 </div>
