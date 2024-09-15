@@ -127,7 +127,7 @@ prism_syntax_highlighting = false
 
 [params.copyright]
 authors = "Eclipse Contributors | [Vector art by Freepik](https://www.freepik.com)"
-from_year = 2018
+from_year = 2021
 
 # User interface configuration
 [params.ui]

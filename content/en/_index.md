@@ -20,6 +20,17 @@ to deliver innovative solutions for data exchange networks.
 {{< /blocks/cover >}}
 
 {{< blocks/section color="300" type="row" >}}
+<div class="logo-container">
+<div><img height="80" src="images/logos/amadeus.logo.svg"></div>
+<div><img height="60" src="images/logos/aws.logo.svg"></div>
+<div><img height="80" src="images/logos/bmw.logo.svg"></div>
+<div><img height="60" src="images/logos/fraunhofer.logo.svg"></div>
+<div><img height="60" src="images/logos/google.logo.svg"></div>
+<div><img height="60" src="images/logos/huawei.logo.svg"></div>
+<div><img height="60" src="images/logos/microsoft.logo.svg"></div>
+<div><img height="60" src="images/logos/sap.logo.svg"></div>
+</div>
+
 {{< /blocks/section >}}
 
 {{< blocks/section color="dark" type="row" >}}

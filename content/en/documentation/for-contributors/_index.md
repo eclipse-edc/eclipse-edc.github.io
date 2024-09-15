@@ -1,6 +1,5 @@
 ---
-title: For Contributors
-description: What do your user need to know to develop with EDC?
+title: Contributors Manual
 weight: 30
 ---
 

@@ -1,38 +1,7 @@
 ---
-title: For Adopters
-description: What does your user need to know to try your project?
+title: Adopters Manual
 weight: 20
 ---
-
-Many organizations face the challenge of securely sharing data with their partners or other trusted third parties. In
-the past, this has been the realm of proprietary EDI solutions. EDC is an alternative to these systems built on the
-concept of [dataspaces](https://dataspace.eclipse.org/). EDC is a set of components that enable developers to create dataspaces using the following
-building blocks:
-
-- **Identity service** for managing and verifying organizational credentials using [DIDs](https://www.w3.org/TR/did-core/)
-  and [W3C Verifiable Credentials](https://www.w3.org/TR/vc-data-model/) or OAuth2 tokens.
-- **Catalog service** for publishing and securing assets that can be shared with other organizations.
-- **Negotiation service** for the automated creation and processing of data usage agreements that grant access to data.
-- **Data transfer and monitoring services** for automatically initiating and managing data transfers using off-the-shelf
-  protocols such as `HTTP`, `Kafka`, cloud object storage, or virtually any other technology.
-
-EDC is designed to serve a range of use cases, including large AI data sets, API access, supply-chain data processing,
-and research data sharing.
-
-EDC components are standards-based and implement the [Dataspace Protocol Specification](https://github.com/eclipse-dataspace-protocol-base/DataspaceProtocol)
-and [Decentralized Claims Protocol Specification](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol).
-
-## What EDC is not
-
-EDC is not a data processing platform, integration framework, or messaging bus. EDC is also not a prepackaged system or
-application. Rather, it is a toolbox for building customized distributions. As a generic toolbox, EDC:
-
-- Does not ship an installable distribution; those are provided by downstream projects that customize EDC to their
-  needs.
-- Does not contain use case-specific features; those are added through EDC's *modularity and extension system* (more on
-  that below).
-- Does not provide infrastructure for storing, processing, or moving data; EDC integrates with third-party *data planes*
-  to provide these services.
 
 ## The Samples
 

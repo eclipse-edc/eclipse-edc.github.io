@@ -10,4 +10,45 @@ $enable-shadows: false;
 $primary: #046EFA;
 $secondary: #E4E6F0;
 $dark: #2A2C34;
+$success: #1A8754;
+$primary-bg-subtle-dark: #3c3f44;
+
+.block-text-container {
+  display: grid;
+  grid-template-columns: auto;
+  justify-content: center;
+}
+
+.block-text {
+  display: grid;
+  max-width: 600px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.logo-container {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+
+  grid-template-columns: repeat(4, max-content);
+
+  @media screen and (max-width: 1024px) {
+    grid-template-columns: repeat(3, max-content);
+  }
+
+  @media screen and (max-width: 720px) {
+    grid-template-columns: max-content;
+  }
+
+  gap: 2rem;
+  column-gap: 4rem;
+  & > div {
+    text-align: center;
+  }
+}
+
+
+
 
