@@ -1,0 +1,46 @@
+# Decision Records
+
+## Project-wide
+
+- [2022-02-10 Code Coverage](2022-02-10-code-coverage/)
+- [2022-02-11 CodeQL](2022-02-11-codeql/)
+- [2022-03-11 Story Issues](2022-03-11-story-issues/)
+- [2022-07-06 Release Automation](2022-07-06-release-automation/)
+- [2022-08-11 Versioning and Artifacts](2022-08-11-versioning_and_artifacts/)
+- [2022-10-10 Naming Conventions](2022-10-10-naming-conventions/)
+- [2022-10-20 Trust Framework Adoption Repository](2022-10-20-trust-framework-adoption-repository/)
+- [2022-10-21 Gradle Version Catalogs](2022-10-21-gradle-versioncatalogs/)
+- [2022-11-28 Release Management](2022-11-28-release-management/)
+- [2023-01-26 Release Process](2023-01-26-release-process/)
+- [2023-02-10 Nightly Builds](2023-02-10-nightly-builds/)
+- [2023-03-15 Repository Split](2023-03-15_repository_split/)
+- [2023-03-31 Version Catalog per Component](2023-03-31-version-catalog-per-component/)
+- [2023-05-17 Release Process](2023-05-17-release-process/)
+- [2023-05-23 Java 17 Baseline](2023-05-23-java-17-baseline/)
+- [2023-05-25 Template Repository](2023-05-25-template-repository/)
+- [2023-06-19 New Issue Triage Process](2023-06-19-new-issue-triage-process/)
+- [2023-06-19 Onboarding Contributors](2023-06-19-onboarding-contributors/)
+- [2023-07-06 Committer Retirements](2023-07-06-committer-retirement/)
+- [2023-09-06 Identity and Trust](2023-09-06-identity-trust/)
+- [2023-09-12 Publishing from GitHub](2023-09-12-publishing_from_github/)
+- [2024-04-19 Separating Release process of Technology repos](2024-04-19-tech-repo-split/)
+- [2024-05-27 EDC Maturity Levels and Deprecation Policy](2024-05-27-maturity-levels-deprecation-policy/)
+- [2024-07-17 Bootstrapping SQL Databases](2024-07-17-bootstrap-sql-database/)
+- [2024-08-13 Technology Repositories Release](2024-08-13-technology-repos-release/)
+- [2024-08-24 New Release process](./2024-08-26-new-release-process/)
+
+## Repository-specific
+
+- [Connector](../../docs/submodule/Connector/docs/developer/decision-records/)
+- [Data Dashboard](../../docs/submodule/DataDashboard/docs/developer/decision-records/)
+- [Federated Catalog](../../docs/submodule/FederatedCatalog/docs/developer/decision-records/)
+- [Gradle Plugins](../../docs/submodule/GradlePlugins/docs/developer/decision-records/)
+- [Identity Hub](../../docs/submodule/IdentityHub/docs/developer/decision-records/)
+- [Minimum Viable Dataspace](../../docs/submodule/MinimumViableDataspace/docs/developer/decision-records/)
+- [Registration Service](../../docs/submodule/RegistrationService/docs/developer/decision-records/)
+- [Runtime Metamodel](../../docs/submodule/Runtime-Metamodel/docs/developer/decision-records/)
+- [Technology AWS](../../docs/submodule/Technology-AWS/docs/developer/decision-records/)
+- [Technology Azure](../../docs/submodule/Technology-Azure/docs/developer/decision-records/)
+- [Technology GCP](../../docs/submodule/Technology-GCP/docs/developer/decision-records/)
+- [Trust Framework Adoption](../../docs/submodule/TrustFrameworkAdoption/docs/developer/decision-records/)
+
