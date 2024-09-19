@@ -237,7 +237,7 @@ principles](../../contributing/coding-principles.md).
 A frequent subject of critique in pull requests is logging. Spurious and very verbose log lines like "Entering/Leaving
 method X" or "Performing action Z" should be avoided because they pollute the log output and don't contribute any value.
 
-Please find detailed information about logging [here](../../logging.md).
+Please find detailed information about logging [here](logging.md).
 
 ### 5.2 Testing best practices
 

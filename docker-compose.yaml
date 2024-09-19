@@ -3,7 +3,7 @@ version: "3.8"
 services:
 
   site:
-    image: docsy/docsy-example
+    image: eclipse-edc/eclipse-edc.github.io
     build:
       context: .
     command: server

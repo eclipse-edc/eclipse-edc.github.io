@@ -14,7 +14,6 @@ EDC provides highly customizable components for creating control planes, data pl
 and federated data catalogs. Backed by leading companies and cloud providers, EDC gives developers the tools they need
 to deliver innovative solutions for data exchange networks.
 </p>
-<p class="lead mt-5"><b>Site still under construction, please refer to <a href="https://eclipse-edc.github.io/docs">https://eclipse-edc.github.io/docs</a> for currently released documentation.</b></p>
 
 <img height="500px" width="600px" src="images/edc.schematic.svg">
 {{< /blocks/cover >}}
