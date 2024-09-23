@@ -1,0 +1,47 @@
+name: update autodoc
+
+on:
+  schedule:
+    - cron: "0 6 * * 01" # every monday at 6 am (UTC)
+  workflow_dispatch:
+
+jobs:
+  sync-autodoc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: download autodoc markdowns
+        run: |
+          destination=content/en/documentation/autodoc
+          wget https://raw.githubusercontent.com/eclipse-edc/Connector/refs/heads/gh-pages/autodoc/autodoc.md -O ${destination}/connector.md
+          wget https://raw.githubusercontent.com/eclipse-edc/IdentityHub/refs/heads/gh-pages/autodoc/autodoc.md -O ${destination}/identity-hub.md
+          wget https://raw.githubusercontent.com/eclipse-edc/FederatedCatalog/refs/heads/gh-pages/autodoc/autodoc.md -O ${destination}/federated-catalog.md
+          
+          sed -i "1s;^;---\n title: Connector\n weight: 10\n---\n\n;" ${destination}/connector.md
+          sed -i "1s;^;---\n title: Identity-Hub\n weight: 20\n---\n\n;" ${destination}/identity-hub.md
+          sed -i "1s;^;---\n title: Federated-Catalog\n weight: 30\n---\n\n;" ${destination}/federated-catalog.md
+
+      - run: |
+          git config user.name "eclipse-edc-bot"
+          git config user.email "edc-bot@eclipse.org"
+          
+          git checkout -b update-autodoc
+          
+          git add .
+          git commit -m "docs: update autodoc markdowns"
+          
+          git push origin update-autodoc
+
+      - name: Create pull request
+        uses: thomaseizinger/create-pull-request@1.4.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          head: update-autodoc
+          base: main
+          title: "docs: update autodoc"
+          reviewers: ${{ github.actor }}
+          body: |-
+            This PR updates autodoc to the latest released versions.
