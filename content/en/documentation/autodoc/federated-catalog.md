@@ -6,7 +6,7 @@
 EDC Autodoc Manifest
 ====================
 
-Module `org.eclipse.edc:connector-runtime:0.9.0`
+Module `org.eclipse.edc:connector-runtime:0.9.1`
 ------------------------------------------------
 
 _Categories: None_
@@ -26,7 +26,7 @@ _None_
 ##### Referenced (injected) services:
 - `org.eclipse.edc.connector.dataplane.selector.spi.store.DataPlaneInstanceStore` (required)
 
-Module `Crawler services:0.9.0`
+Module `Crawler services:0.9.1`
 -------------------------------
 _org.eclipse.edc:crawler-spi_
 
@@ -37,7 +37,7 @@ _Categories: None_
   - `org.eclipse.edc.crawler.spi.TargetNodeDirectory`
 
 ### Extensions
-Module `org.eclipse.edc:federated-catalog-api:0.9.0`
+Module `org.eclipse.edc:federated-catalog-api:0.9.1`
 ----------------------------------------------------
 
 _Categories: None_
@@ -66,7 +66,7 @@ _None_
 - `org.eclipse.edc.transform.spi.TypeTransformerRegistry` (required)
 - `org.eclipse.edc.spi.system.apiversion.ApiVersionService` (required)
 
-Module `org.eclipse.edc:federated-catalog-cache-sql:0.9.0`
+Module `org.eclipse.edc:federated-catalog-cache-sql:0.9.1`
 ----------------------------------------------------------
 
 _Categories: None_
@@ -99,7 +99,7 @@ _None_
 - `org.eclipse.edc.sql.QueryExecutor` (required)
 - `org.eclipse.edc.sql.bootstrapper.SqlSchemaBootstrapper` (required)
 
-Module `org.eclipse.edc:federated-catalog-core:0.9.0`
+Module `org.eclipse.edc:federated-catalog-core:0.9.1`
 -----------------------------------------------------
 
 _Categories: None_
@@ -159,7 +159,7 @@ _None_
 - `org.eclipse.edc.spi.monitor.Monitor` (required)
 - `org.eclipse.edc.transform.spi.TypeTransformerRegistry` (required)
 
-Module `Catalog services:0.9.0`
+Module `Catalog services:0.9.1`
 -------------------------------
 _org.eclipse.edc:federated-catalog-spi_
 
@@ -169,7 +169,7 @@ _Categories: None_
   - `org.eclipse.edc.catalog.spi.FederatedCatalogCache`
 
 ### Extensions
-Module `org.eclipse.edc:target-node-directory-sql:0.9.0`
+Module `org.eclipse.edc:target-node-directory-sql:0.9.1`
 --------------------------------------------------------
 
 _Categories: None_

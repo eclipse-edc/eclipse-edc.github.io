@@ -6,7 +6,7 @@
 EDC Autodoc Manifest
 ====================
 
-Module `org.eclipse.edc:api-configuration:0.9.0`
+Module `org.eclipse.edc:api-configuration:0.9.1`
 ------------------------------------------------
 
 _Categories: None_
@@ -35,7 +35,7 @@ _None_
 - `org.eclipse.edc.spi.types.TypeManager` (required)
 - `org.eclipse.edc.spi.system.apiversion.ApiVersionService` (required)
 
-Module `org.eclipse.edc:credential-watchdog:0.9.0`
+Module `org.eclipse.edc:credential-watchdog:0.9.1`
 --------------------------------------------------
 
 _Categories: None_
@@ -66,7 +66,7 @@ _None_
 - `org.eclipse.edc.identityhub.spi.store.CredentialStore` (required)
 - `org.eclipse.edc.transaction.spi.TransactionContext` (required)
 
-Module `org.eclipse.edc:did-api:0.9.0`
+Module `org.eclipse.edc:did-api:0.9.1`
 --------------------------------------
 
 _Categories: None_
@@ -91,7 +91,7 @@ _None_
 - `org.eclipse.edc.identithub.spi.did.DidDocumentService` (required)
 - `org.eclipse.edc.identityhub.spi.AuthorizationService` (required)
 
-Module `Identity Hub DID services:0.9.0`
+Module `Identity Hub DID services:0.9.1`
 ----------------------------------------
 _org.eclipse.edc:did-spi_
 
@@ -103,7 +103,7 @@ _Categories: None_
   - `org.eclipse.edc.identithub.spi.did.store.DidResourceStore`
 
 ### Extensions
-Module `org.eclipse.edc:identity-hub-core:0.9.0`
+Module `org.eclipse.edc:identity-hub-core:0.9.1`
 ------------------------------------------------
 
 _Categories: None_
@@ -176,7 +176,7 @@ _None_
 - `org.eclipse.edc.identityhub.spi.participantcontext.ParticipantContextService` (required)
 - `org.eclipse.edc.jwt.signer.spi.JwsSignerProvider` (required)
 
-Module `org.eclipse.edc:identity-hub-credentials-store-sql:0.9.0`
+Module `org.eclipse.edc:identity-hub-credentials-store-sql:0.9.1`
 -----------------------------------------------------------------
 
 _Categories: None_
@@ -209,7 +209,7 @@ _None_
 - `org.eclipse.edc.identityhub.store.sql.credentials.CredentialStoreStatements` (optional)
 - `org.eclipse.edc.sql.bootstrapper.SqlSchemaBootstrapper` (required)
 
-Module `org.eclipse.edc:identity-hub-did:0.9.0`
+Module `org.eclipse.edc:identity-hub-did:0.9.1`
 -----------------------------------------------
 
 _Categories: None_
@@ -218,6 +218,20 @@ _Categories: None_
 _None_
 
 ### Extensions
+#### Class: `org.eclipse.edc.identityhub.did.defaults.DidDefaultServicesExtension`
+**Name:** "DID Default Services Extension"
+
+**Overview:** No overview provided.
+
+
+##### Configuration: _None_
+
+##### Provided services:
+- `org.eclipse.edc.identithub.spi.did.store.DidResourceStore`
+
+##### Referenced (injected) services:
+- `org.eclipse.edc.spi.query.CriterionOperatorRegistry` (required)
+
 #### Class: `org.eclipse.edc.identityhub.did.DidServicesExtension`
 **Name:** "DID Service Extension"
 
@@ -236,21 +250,7 @@ _None_
 - `org.eclipse.edc.spi.event.EventRouter` (required)
 - `org.eclipse.edc.keys.spi.KeyParserRegistry` (required)
 
-#### Class: `org.eclipse.edc.identityhub.did.defaults.DidDefaultServicesExtension`
-**Name:** "DID Default Services Extension"
-
-**Overview:** No overview provided.
-
-
-##### Configuration: _None_
-
-##### Provided services:
-- `org.eclipse.edc.identithub.spi.did.store.DidResourceStore`
-
-##### Referenced (injected) services:
-- `org.eclipse.edc.spi.query.CriterionOperatorRegistry` (required)
-
-Module `org.eclipse.edc:identity-hub-did-store-sql:0.9.0`
+Module `org.eclipse.edc:identity-hub-did-store-sql:0.9.1`
 ---------------------------------------------------------
 
 _Categories: None_
@@ -283,7 +283,7 @@ _None_
 - `org.eclipse.edc.identityhub.did.store.sql.DidResourceStatements` (optional)
 - `org.eclipse.edc.sql.bootstrapper.SqlSchemaBootstrapper` (required)
 
-Module `org.eclipse.edc:identity-hub-keypair-store-sql:0.9.0`
+Module `org.eclipse.edc:identity-hub-keypair-store-sql:0.9.1`
 -------------------------------------------------------------
 
 _Categories: None_
@@ -316,7 +316,7 @@ _None_
 - `org.eclipse.edc.identityhub.store.sql.keypair.KeyPairResourceStoreStatements` (optional)
 - `org.eclipse.edc.sql.bootstrapper.SqlSchemaBootstrapper` (required)
 
-Module `org.eclipse.edc:identity-hub-keypairs:0.9.0`
+Module `org.eclipse.edc:identity-hub-keypairs:0.9.1`
 ----------------------------------------------------
 
 _Categories: None_
@@ -343,7 +343,7 @@ _None_
 - `org.eclipse.edc.spi.event.EventRouter` (required)
 - `java.time.Clock` (required)
 
-Module `org.eclipse.edc:identity-hub-participantcontext-store-sql:0.9.0`
+Module `org.eclipse.edc:identity-hub-participantcontext-store-sql:0.9.1`
 ------------------------------------------------------------------------
 
 _Categories: None_
@@ -376,7 +376,7 @@ _None_
 - `org.eclipse.edc.identityhub.store.sql.participantcontext.ParticipantContextStoreStatements` (optional)
 - `org.eclipse.edc.sql.bootstrapper.SqlSchemaBootstrapper` (required)
 
-Module `org.eclipse.edc:identity-hub-participants:0.9.0`
+Module `org.eclipse.edc:identity-hub-participants:0.9.1`
 --------------------------------------------------------
 
 _Categories: None_
@@ -408,7 +408,7 @@ _None_
 - `org.eclipse.edc.spi.event.EventRouter` (required)
 - `org.eclipse.edc.identithub.spi.did.store.DidResourceStore` (required)
 
-Module `org.eclipse.edc:identityhub-api-authentication:0.9.0`
+Module `org.eclipse.edc:identityhub-api-authentication:0.9.1`
 -------------------------------------------------------------
 
 _Categories: None_
@@ -433,7 +433,7 @@ _None_
 - `org.eclipse.edc.identityhub.spi.participantcontext.ParticipantContextService` (required)
 - `org.eclipse.edc.spi.security.Vault` (required)
 
-Module `org.eclipse.edc:identityhub-api-authorization:0.9.0`
+Module `org.eclipse.edc:identityhub-api-authorization:0.9.1`
 ------------------------------------------------------------
 
 _Categories: None_
@@ -456,7 +456,7 @@ _None_
 ##### Referenced (injected) services:
 _None_
 
-Module `org.eclipse.edc:keypair-api:0.9.0`
+Module `org.eclipse.edc:keypair-api:0.9.1`
 ------------------------------------------
 
 _Categories: None_
@@ -482,7 +482,7 @@ _None_
 - `org.eclipse.edc.identityhub.spi.AuthorizationService` (required)
 - `org.eclipse.edc.spi.monitor.Monitor` (required)
 
-Module `org.eclipse.edc:local-did-publisher:0.9.0`
+Module `org.eclipse.edc:local-did-publisher:0.9.1`
 --------------------------------------------------
 
 _Categories: None_
@@ -512,7 +512,7 @@ _None_
 - `java.time.Clock` (required)
 - `org.eclipse.edc.spi.event.EventRouter` (required)
 
-Module `org.eclipse.edc:participant-context-api:0.9.0`
+Module `org.eclipse.edc:participant-context-api:0.9.1`
 ------------------------------------------------------
 
 _Categories: None_
@@ -538,7 +538,7 @@ _None_
 - `org.eclipse.edc.identityhub.spi.AuthorizationService` (required)
 - `org.eclipse.edc.spi.monitor.Monitor` (required)
 
-Module `org.eclipse.edc:presentation-api:0.9.0`
+Module `org.eclipse.edc:presentation-api:0.9.1`
 -----------------------------------------------
 
 _Categories: None_
@@ -570,7 +570,7 @@ _None_
 - `org.eclipse.edc.identityhub.spi.participantcontext.ParticipantContextService` (required)
 - `org.eclipse.edc.spi.system.apiversion.ApiVersionService` (required)
 
-Module `org.eclipse.edc:verifiable-credentials-api:0.9.0`
+Module `org.eclipse.edc:verifiable-credentials-api:0.9.1`
 ---------------------------------------------------------
 
 _Categories: None_
