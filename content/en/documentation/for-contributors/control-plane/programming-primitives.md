@@ -3,9 +3,7 @@ title: Programming Primitives
 weight: 10
 ---
 
-
 <!-- TOC -->
-* [Programming Primitives](#programming-primitives)
   * [1 State machines](#1-state-machines)
     * [1.1 Batch-size, sorting and tick-over timeout](#11-batch-size-sorting-and-tick-over-timeout)
     * [1.2 Database-level locking](#12-database-level-locking)

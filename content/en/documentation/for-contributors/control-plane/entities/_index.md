@@ -5,33 +5,30 @@ weight: 10
 
 
 <!-- TOC -->
-
-* [Entities](#entities)
-    * [1. Assets](#1-assets)
-    * [2. Policies](#2-policies)
-        * [2.1 Policy vs PolicyDefinition](#21-policy-vs-policydefinition)
-        * [2.2 Policy scopes and bindings](#22-policy-scopes-and-bindings)
-        * [2.3 Policy evaluation functions](#23-policy-evaluation-functions)
-        * [2.4 Example: binding an evaluation function](#24-example-binding-an-evaluation-function)
-        * [2.5 Advanced policy concepts](#25-advanced-policy-concepts)
-            * [2.5.1 Pre- and Post-Evaluators](#251-pre--and-post-evaluators)
-            * [2.5.2 Dynamic functions](#252-dynamic-functions)
-        * [2.6 Bundled policy functions](#26-bundled-policy-functions)
-            * [2.6.1 Contract expiration function](#261-contract-expiration-function)
-    * [3. Contract definitions](#3-contract-definitions)
-    * [4. Contract negotiations](#4-contract-negotiations)
-    * [5. Contract agreements](#5-contract-agreements)
-    * [6. Catalog](#6-catalog)
-    * [7 Transfer processes](#7-transfer-processes)
-        * [7.1 Transfer and data flows types](#71-transfer-and-data-flows-types)
-            * [7.1.1 Consumer Pull](#711-consumer-pull)
-            * [7.1.2 Provider Push](#712-provider-push)
-            * [7.1.2 Finite and Non-Finite Data](#712-finite-and-non-finite-data)
-        * [7.2 About Data Destinations](#72-about-data-destinations)
-        * [7.3 Transfer process callbacks](#73-transfer-process-callbacks)
-    * [8 Endpoint Data References](#8-endpoint-data-references)
-    * [9 Querying with `QuerySpec` and `Criterion`](#9-querying-with-queryspec-and-criterion)
-
+  * [1. Assets](#1-assets)
+  * [2. Policies](#2-policies)
+    * [2.1 Policy vs PolicyDefinition](#21-policy-vs-policydefinition)
+    * [2.2 Policy scopes and bindings](#22-policy-scopes-and-bindings)
+    * [2.3 Policy evaluation functions](#23-policy-evaluation-functions)
+    * [2.4 Example: binding an evaluation function](#24-example-binding-an-evaluation-function)
+    * [2.5 Advanced policy concepts](#25-advanced-policy-concepts)
+      * [2.5.1 Pre- and Post-Evaluators](#251-pre--and-post-evaluators)
+      * [2.5.2 Dynamic functions](#252-dynamic-functions)
+    * [2.6 Bundled policy functions](#26-bundled-policy-functions)
+      * [2.6.1 Contract expiration function](#261-contract-expiration-function)
+  * [3. Contract definitions](#3-contract-definitions)
+  * [4. Contract negotiations](#4-contract-negotiations)
+  * [5. Contract agreements](#5-contract-agreements)
+  * [6. Catalog](#6-catalog)
+  * [7 Transfer processes](#7-transfer-processes)
+    * [7.1 Transfer and data flows types](#71-transfer-and-data-flows-types)
+      * [7.1.1 Consumer Pull](#711-consumer-pull)
+      * [7.1.2 Provider Push](#712-provider-push)
+      * [7.1.2 Finite and Non-Finite Data](#712-finite-and-non-finite-data)
+    * [7.2 About Data Destinations](#72-about-data-destinations)
+    * [7.3 Transfer process callbacks](#73-transfer-process-callbacks)
+  * [8 Endpoint Data References](#8-endpoint-data-references)
+  * [9 Querying with `QuerySpec` and `Criterion`](#9-querying-with-queryspec-and-criterion)
 <!-- TOC -->
 
 ## 1. Assets
@@ -496,7 +493,7 @@ any API.
 
 Contract negotiations are asynchronous in nature. That means after initiating them, they become (potentially
 long-running) stateful processes that are advanced by an
-internal [state machine](./programming-primitives.md#1-state-machines).
+internal [state machine](../programming-primitives.md#1-state-machines).
 The current state of the negotiation can be queried and altered through the management API.
 
 Here's a diagram of the state machine applied to contract negotiations:
@@ -695,7 +692,7 @@ and construct the list of
 
 A `TransferProcess` is a record of the data sharing procedure between a _consumer_ and a _provider_. As they traverse
 through the system, they transition through several
-states ([`TransferProcessStates`](./programming-primitives.md#1-state-machines)).
+states ([`TransferProcessStates`](../programming-primitives.md#1-state-machines)).
 
 Once a contract is [negotiated](#4-contract-negotiations) and an [agreement](#5-contract-agreements) is reached, the
 consumer connector may send a transfer initiate request to start the transfer. In the course of doing that, both parties

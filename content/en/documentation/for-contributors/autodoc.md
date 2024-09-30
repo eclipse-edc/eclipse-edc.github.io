@@ -4,15 +4,15 @@ weight: 20
 ---
 
 <!-- TOC -->
-* [1. Introduction](#1-introduction)
-* [2. Module structure](#2-module-structure)
-* [3. Usage](#3-usage)
-  * [3.1 Add the plugin to the `buildscript` block of your `build.gradle.kts`:](#31-add-the-plugin-to-the-buildscript-block-of-your-buildgradlekts)
-  * [3.2 Apply the plugin to the project:](#32-apply-the-plugin-to-the-project)
-  * [3.3 Configure the plugin [optional]](#33-configure-the-plugin-optional)
-* [4. Merging the manifests](#4-merging-the-manifests)
-* [5. Rendering manifest files as Markdown or HTML](#5-rendering-manifest-files-as-markdown-or-html)
-* [6. Using published manifest files (MavenCentral)](#6-using-published-manifest-files-mavencentral)
+  * [1. Introduction](#1-introduction)
+  * [2. Module structure](#2-module-structure)
+  * [3. Usage](#3-usage)
+    * [3.1 Add the plugin to the `buildscript` block of your `build.gradle.kts`:](#31-add-the-plugin-to-the-buildscript-block-of-your-buildgradlekts)
+    * [3.2 Apply the plugin to the project:](#32-apply-the-plugin-to-the-project)
+    * [3.3 Configure the plugin [optional]](#33-configure-the-plugin-optional)
+  * [4. Merging the manifests](#4-merging-the-manifests)
+  * [5. Rendering manifest files as Markdown or HTML](#5-rendering-manifest-files-as-markdown-or-html)
+  * [6. Using published manifest files (MavenCentral)](#6-using-published-manifest-files-mavencentral)
 <!-- TOC -->
 
 ## 1. Introduction

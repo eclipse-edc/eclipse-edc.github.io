@@ -4,6 +4,29 @@ description: Explains how data, policies, access control, and transfers are mana
 weight: 30
 ---
 
+<!-- TOC -->
+  * [Management API](#management-api)
+  * [Catalogs, Datasets, and Offers](#catalogs-datasets-and-offers)
+  * [EDC Entities](#edc-entities)
+    * [Assets](#assets)
+      * [Understanding Expanded Assets](#understanding-expanded-assets)
+    * [Policies and Policy Definitions](#policies-and-policy-definitions)
+    * [Contract Definitions](#contract-definitions)
+  * [Catalog Generation](#catalog-generation)
+    * [Designing for Optimal Catalog Performance](#designing-for-optimal-catalog-performance)
+  * [Contract Negotiations](#contract-negotiations)
+    * [Working with Asynchronous Messaging and Events](#working-with-asynchronous-messaging-and-events)
+    * [Reliable Messaging](#reliable-messaging)
+  * [Transfer Processes](#transfer-processes)
+    * [Consumer Pull and Provider Push Transfers](#consumer-pull-and-provider-push-transfers)
+      * [The Role of the Data Plane](#the-role-of-the-data-plane)
+    * [Transfer Process States](#transfer-process-states)
+    * [Policy Monitor](#policy-monitor)
+  * [The Policy Engine](#the-policy-engine)
+    * [Policy Scopes and Bindings](#policy-scopes-and-bindings)
+    * [Designing for Optimal Policy Performance](#designing-for-optimal-policy-performance)
+<!-- TOC -->
+
 The control plane is responsible for assembling catalogs, creating contract agreements that grant access to data, managing data transfers, and monitoring usage policy compliance. Control plane operations are performed by interacting with the Management API. Consumer and provider control planes communicate using the Dataspace Protocol (DSP). This section provides an overview of how the control plane works and its key concepts.
 
 The main control plane operations are depicted below:
@@ -385,111 +408,3 @@ As with the contract negotiation state machine, custom code can react to transit
 ### Policy Monitor
 
 It may be desirable to conduct ongoing policy checks for non-finite transfer processes. Streaming data is a typical example where such checks may be needed. If a stream is active for a long duration (such as manufacturing data feed), the provider may want to check if the consumer is still a partner in good standing or has maintained an industry certification. The EDC *PolicyMonitor* can be embedded in the control plane or run in a standalone runtime to periodically check consumer credentials.
-
-## The Policy Engine
-
-EDC includes a policy engine for evaluating policy expressions. It's important to understand its design center, which takes a code-first approach. Unlike other policy engines that use a declarative language, the EDC policy engine executes code that is contributed as extensions called *policy functions*. If you are familiar with compiler design and visitors, you will quickly understand how the policy engine works. Internally, policy expressed as ODRL is deserialized into a POJO-based object tree (similar to an AST) and walked by the policy engine.
-
-Let's take one of the previous policy examples:
-
-```json
-{
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
-  "@type": "PolicyDefinition",
-  "policy": {
-    "@context": "http://www.w3.org/ns/odrl.jsonld",
-    "@id": "8c2ff88a-74bf-41dd-9b35-9587a3b95adf",
-    "duty": [
-      {
-        "target": "http://example.com/asset:12345",
-        "action": "use",
-        "constraint": {
-          "leftOperand": "headquarter_location",
-          "operator": "eq",
-          "rightOperand": "EU"
-        }
-      }
-    ]
-  }
-}
-```
-
-
-When policy constraint is reached during evaluation, the policy engine will dispatch to a function registered under the key `header_location`. Policy functions implement the `AtomicConstraintFunction` interface:
-
-```java
-@FunctionalInterface
-public interface AtomicConstraintFunction<R extends Rule> {
-
-    /**
-     * Performs the evaluation.
-     *
-     * @param operator the operation
-     * @param rightValue the right-side expression for the constraint
-     * @param rule the rule associated with the constraint
-     * @param context the policy context
-     */
-    boolean evaluate(Operator operator, Object rightValue, R rule, PolicyContext context);
-
-}
-```
-
-A function that evaluates the previous policy will look like the following snippet:
-
-```java
-public class TestPolicy implements AtomicConstraintFunction<Duty> {
-
-    public static final String HEADQUARTERS = "headquarters";
-
-    @Override
-    public boolean evaluate(Operator operator, Object rightValue, Duty rule, PolicyContext context) {
-        if (!(rightValue instanceof String)) {
-            context.reportProblem("Right-value expected to be String but was " + rightValue.getClass());
-            return false;
-        }
-        var headquarterLocation = (String) rightValue;
-        var participantAgent = context.getContextData(ParticipantAgent.class);
-
-        // No participant agent found in context
-        if (participantAgent == null) {
-            context.reportProblem("ParticipantAgent not found on PolicyContext");
-            return false;
-        }
-        var claim = participantAgent.getClaims().get(HEADQUARTERS);
-        if (claim == null) {
-            return false;
-        }
-        // ... evaluate claim and if the headquarters are in the EU, return true
-        return true;
-    }
-}
-
-```
-
-### Policy Scopes and Bindings
-
-In EDC, policy rules are bound to a specific context termed a *scope*. EDC defines numerous scopes, such as one for contract negotiations and provisioning of resources. To understand how scopes work, consider the following case, "to access data, a consumer must be a business partner in good standing":
-
-```json
-{
-  "constraint": {
-    "leftOperand": "BusinessPartner",
-    "operator": "eq",
-    "rightOperand": "active"
-  }
-}
-```
-
-In the above scenario, the provider EDC's policy engine should verify a partner credential when a request is made to initiate a contract negotiation. The business partner rule must be bound to the *contract negotiation scope* since policy rules are only evaluated for each scope they are bound to. However, validating a business partner credential may not be needed when data is provisioned if it has already been checked when starting a transfer process. To avoid an unnecessary check, do not bind the business partner rule to the *provision scope*. This will result in the rule being filtered and ignored during policy evaluation for that scope.
-
-The relationship between scopes, rules, and functions is shown in the following diagram:
-
-![Policy Scopes](policy-scopes.svg)
-
-Rules are bound to scopes, and unbound rules are filtered when the policy engine evaluates a particular scope. Functions are bound to rules *for a particular scope*. This means that separate functions can be associated with the same rule in different scopes.  Furthermore, scopes are hierarchical and denoted with a `DOT` notation. A rule bound to a parent context will be evaluated in child scopes.
-
-### Designing for Optimal Policy Performance
-
-Be careful when implementing policy functions, particularly those bound to the catalog request scope (`request.catalog`), which may involve evaluating a large set of policies in the course of a synchronous request. Policy functions should be efficient and avoid unnecessary remote communication. When a policy function makes a database call or invokes a back-office system (e.g., for a security check), consider introducing a caching layer to improve performance if testing indicates the function may be a bottleneck. This is less of a concern for policy scopes associated with asynchronous requests where latency is generally not an issue.

@@ -4,7 +4,6 @@ weight: 10
 ---
 
 <!-- TOC -->
-* [EDC Service Layers](#edc-service-layers)
   * [1. API controllers](#1-api-controllers)
     * [1.1 API contexts](#11-api-contexts)
     * [1.2 Registering controllers](#12-registering-controllers)

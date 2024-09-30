@@ -31,8 +31,8 @@ weight: 30
     - [5.2 Testing best practices](#52-testing-best-practices)
     - [5.3 Other best practices](#53-other-best-practices)
   - [6. Further concepts](#6-further-concepts)
-  _ [6.2 Autodoc](#62-autodoc)
-  _ [6.3 Adapting the Gradle build](#63-adapting-the-gradle-build)
+  _ [6.2 Autodoc](#61-autodoc)
+  _ [6.3 Adapting the Gradle build](#62-adapting-the-gradle-build)
   <!-- TOC -->
 
 ## 0. Intended audience

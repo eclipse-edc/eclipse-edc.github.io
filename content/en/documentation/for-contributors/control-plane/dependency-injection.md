@@ -5,7 +5,6 @@ weight: 20
 
 
 <!-- TOC -->
-* [Dependency Injection](#dependency-injection)
   * [1. Registering a service implementation](#1-registering-a-service-implementation)
     * [1.1 Use `@Provider` methods (recommended)](#11-use-provider-methods-recommended)
     * [1.2 Provide "defaults"](#12-provide-defaults)

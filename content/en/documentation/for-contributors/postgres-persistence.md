@@ -1,20 +1,20 @@
 ---
-title: EDC Data Persistence with PostgreSQL
+title: Data Persistence with PostgreSQL
 weight: 30
 ---
 
 <!-- TOC -->
-* [1. Configuring DataSources](#1-configuring-datasources)
-  * [1.2 Using custom datasource in stores](#12-using-custom-datasource-in-stores)
-* [2. SQL Statement abstraction](#2-sql-statement-abstraction)
-* [3. Querying PostgreSQL databases](#3-querying-postgresql-databases)
-  * [3.1 The canonical form](#31-the-canonical-form)
-  * [3.1 Translation Mappings](#31-translation-mappings)
-    * [3.1.1 Mapping primitive fields](#311-mapping-primitive-fields)
-    * [3.1.2 Mapping complex objects](#312-mapping-complex-objects)
-    * [Option 1: using foreign keys](#option-1-using-foreign-keys)
-    * [Option 2a: encoding the object](#option-2a-encoding-the-object)
-    * [Option 2b: encoding lists/arrays](#option-2b-encoding-listsarrays)
+  * [1. Configuring DataSources](#1-configuring-datasources)
+    * [1.2 Using custom datasource in stores](#12-using-custom-datasource-in-stores)
+  * [2. SQL Statement abstraction](#2-sql-statement-abstraction)
+  * [3. Querying PostgreSQL databases](#3-querying-postgresql-databases)
+    * [3.1 The canonical form](#31-the-canonical-form)
+    * [3.1 Translation Mappings](#31-translation-mappings)
+      * [3.1.1 Mapping primitive fields](#311-mapping-primitive-fields)
+      * [3.1.2 Mapping complex objects](#312-mapping-complex-objects)
+      * [Option 1: using foreign keys](#option-1-using-foreign-keys)
+      * [Option 2a: encoding the object](#option-2a-encoding-the-object)
+      * [Option 2b: encoding lists/arrays](#option-2b-encoding-listsarrays)
 <!-- TOC -->
 
 By default, the `in-memory` stores are provided by the dependency injection, the `sql` implementations can be used by
