@@ -14,7 +14,11 @@ weight: 10
     * [Examples](#examples)
 <!-- TOC -->
 
-EDC includes a policy engine for evaluating policy expressions. It's important to understand its design center, which takes a code-first approach. Unlike other policy engines that use a declarative language, the EDC policy engine executes code that is contributed as extensions called *policy functions*. If you are familiar with compiler design and visitors, you will quickly understand how the policy engine works. Internally, policy expressed as ODRL is deserialized into a POJO-based object tree (similar to an AST) and walked by the policy engine.
+EDC includes a policy engine for evaluating policy expressions. It's important to understand its design center, which
+takes a code-first approach. Unlike other policy engines that use a declarative language, the EDC policy engine executes
+code that is contributed as extensions called *policy functions*. If you are familiar with compiler design and visitors,
+you will quickly understand how the policy engine works. Internally, policy expressed as ODRL is deserialized into a
+POJO-based object tree (similar to an AST) and walked by the policy engine.
 
 Let's take one of the previous policy examples:
 
@@ -43,11 +47,12 @@ Let's take one of the previous policy examples:
 ```
 
 
-When policy constraint is reached during evaluation, the policy engine will dispatch to a function registered under the key `header_location`. Policy functions implement the `AtomicConstraintFunction` interface:
+When the policy constraint is reached during evaluation, the policy engine will dispatch to a function registered under
+the key `header_location`. Policy functions implement the `AtomicConstraintRuleFunction` interface:
 
 ```java
 @FunctionalInterface
-public interface AtomicConstraintFunction<R extends Rule> {
+public interface AtomicConstraintRuleFunction<R extends Rule, C extends PolicyContext> {
 
     /**
      * Performs the evaluation.
@@ -57,7 +62,7 @@ public interface AtomicConstraintFunction<R extends Rule> {
      * @param rule the rule associated with the constraint
      * @param context the policy context
      */
-    boolean evaluate(Operator operator, Object rightValue, R rule, PolicyContext context);
+    boolean evaluate(Operator operator, Object rightValue, R rule, C context);
 
 }
 ```
@@ -65,24 +70,19 @@ public interface AtomicConstraintFunction<R extends Rule> {
 A function that evaluates the previous policy will look like the following snippet:
 
 ```java
-public class TestPolicy implements AtomicConstraintFunction<Duty> {
+public class TestPolicy implements AtomicConstraintRuleFunction<Duty, ParticipantAgentPolicyContext> {
 
     public static final String HEADQUARTERS = "headquarters";
 
     @Override
-    public boolean evaluate(Operator operator, Object rightValue, Duty rule, PolicyContext context) {
-        if (!(rightValue instanceof String)) {
+    public boolean evaluate(Operator operator, Object rightValue, Duty rule, ParticipantAgentPolicyContext context) {
+        if (!(rightValue instanceof String headquarterLocation)) {
             context.reportProblem("Right-value expected to be String but was " + rightValue.getClass());
             return false;
         }
-        var headquarterLocation = (String) rightValue;
-        var participantAgent = context.getContextData(ParticipantAgent.class);
 
-        // No participant agent found in context
-        if (participantAgent == null) {
-            context.reportProblem("ParticipantAgent not found on PolicyContext");
-            return false;
-        }
+        var participantAgent = context.participantAgent();
+
         var claim = participantAgent.getClaims().get(HEADQUARTERS);
         if (claim == null) {
             return false;
@@ -91,12 +91,15 @@ public class TestPolicy implements AtomicConstraintFunction<Duty> {
         return true;
     }
 }
-
 ```
+
+Note that `PolicyContext` has its own hierarchy, that's tightly bound to the policy scope.
 
 ## Policy Scopes and Bindings
 
-In EDC, policy rules are bound to a specific context termed a *scope*. EDC defines numerous scopes, such as one for contract negotiations and provisioning of resources. To understand how scopes work, consider the following case, "to access data, a consumer must be a business partner in good standing":
+In EDC, policy rules are bound to a specific context termed a *scope*. EDC defines numerous scopes, such as one for
+contract negotiations and provisioning of resources. To understand how scopes work, consider the following case,
+"to access data, a consumer must be a business partner in good standing":
 
 ```json
 {
@@ -108,22 +111,35 @@ In EDC, policy rules are bound to a specific context termed a *scope*. EDC defin
 }
 ```
 
-In the above scenario, the provider EDC's policy engine should verify a partner credential when a request is made to initiate a contract negotiation. The business partner rule must be bound to the *contract negotiation scope* since policy rules are only evaluated for each scope they are bound to. However, validating a business partner credential may not be needed when data is provisioned if it has already been checked when starting a transfer process. To avoid an unnecessary check, do not bind the business partner rule to the *provision scope*. This will result in the rule being filtered and ignored during policy evaluation for that scope.
+In the above scenario, the provider EDC's policy engine should verify a partner credential when a request is made to
+initiate a contract negotiation. The business partner rule must be bound to the *contract negotiation scope* since
+policy rules are only evaluated for each scope they are bound to. However, validating a business partner credential
+may not be needed when data is provisioned if it has already been checked when starting a transfer process. To avoid an
+unnecessary check, do not bind the business partner rule to the *provision scope*. This will result in the rule being
+filtered and ignored during policy evaluation for that scope.
 
 The relationship between scopes, rules, and functions is shown in the following diagram:
 
 ![Policy Scopes](policy-scopes.svg)
 
-Rules are bound to scopes, and unbound rules are filtered when the policy engine evaluates a particular scope. Functions are bound to rules *for a particular scope*. This means that separate functions can be associated with the same rule in different scopes.  Furthermore, scopes are hierarchical and denoted with a `DOT` notation. A rule bound to a parent context will be evaluated in child scopes.
+Rules are bound to scopes, and unbound rules are filtered when the policy engine evaluates a particular scope. Scopes
+are bound to contexts, and functions are bound to rules *for a particular scope/context*. This means that separate
+functions can be associated with the same rule in different scopes. Furthermore, both scopes and contexts are hierarchical
+and denoted with a `DOT` notation. A rule bound to a parent context will be evaluated in child scopes.
 
 ### Designing for Optimal Policy Performance
 
-Be careful when implementing policy functions, particularly those bound to the catalog request scope (`request.catalog`), which may involve evaluating a large set of policies in the course of a synchronous request. Policy functions should be efficient and avoid unnecessary remote communication. When a policy function makes a database call or invokes a back-office system (e.g., for a security check), consider introducing a caching layer to improve performance if testing indicates the function may be a bottleneck. This is less of a concern for policy scopes associated with asynchronous requests where latency is generally not an issue.
+Be careful when implementing policy functions, particularly those bound to the catalog request scope (`request.catalog`),
+which may involve evaluating a large set of policies in the course of a synchronous request. Policy functions should be
+efficient and avoid unnecessary remote communication. When a policy function makes a database call or invokes a
+back-office system (e.g., for a security check), consider introducing a caching layer to improve performance if testing
+indicates the function may be a bottleneck. This is less of a concern for policy scopes associated with asynchronous
+requests where latency is generally not an issue.
 
 ## In Force Policy
 
-The InForce is an interoperable policy for specifying in force periods for contract agreements. An in force
-period can be defined as a __duration__ or a __fixed date__.
+The InForce is an interoperable policy for specifying in force periods for contract agreements. An in force period can
+be defined as a __duration__ or a __fixed date__.
 All dates must be expressed as UTC.
 
 ### Duration
@@ -272,5 +288,5 @@ defines a contact is not in force before `January 1, 2023`:
 - In-force policy with a fixed validity: [policy.inforce.fixed.json](./policy.inforce.fixed.json)
 - In-force policy with a relative validity duration: [policy.inforce.duration.json](./policy.inforce.duration.json)
 
-_Please note that the samples use the abbreviated prefix notation `"edc:inForceDate"` instead of the full
-namespace `"https://w3id.org/edc/v0.0.1/ns/inForceDate"`._
+_Please note that the samples use the abbreviated prefix notation `"edc:inForceDate"` instead of the full namespace 
+`"https://w3id.org/edc/v0.0.1/ns/inForceDate"`._
