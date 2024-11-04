@@ -4,13 +4,34 @@ description: Explains how to create distributions and design deployment architec
 weight: 70
 ---
 
+## Using Bills-of-Material (BOMs)
+
+In the Maven/Gradle world, _bills-of-material_ are meta-modules with the sole purpose of declaring dependencies onto other modules. This greatly reduces the number of dependencies a developer needs to declare. By simply referencing the BOM module, all transitive dependencies are also referenced. The Eclipse Dataspace Components project [declares several BOMs](https://search.maven.org/search?q=g:org.eclipse.edc%20AND%20bom). The most important ones are listed here:
+- `controlplane-base-bom`: base BOM for an EDC control plane without an `IdentityService` implementation. Attempting to run this directly will result in an exception
+- `controlplane-dcp-bom`: controlplane that uses [DCP](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol) as identity system
+- `dataplane-base-bom`: runnable data plane image that contains HTTP transfer pipelines
+
+**FederatedCatalog:**
+- `federatedcatalog-base-bom`: base BOM for FC modules. Does not contain any `IdentityService` implementation
+- `federatedcatalog-dcp-bom`: adds DCP to the FederatedCatalog base BOM
+
+
+**IdentityHub:**
+- `identityhub-base-bom`: base BOM for IdentityHub. No DCP modules included
+- `identityhub-bom`: default IdentityHub runtime image including DCP. Does not include/embed the SecureTokenService (STS).
+- `identityhub-with-sts-bom`: IdentityHub runtime that has a SecureTokenService (STS) embedded.
+
+In addition, most components also provide a `*-feature-sql-bom` BOM, which simply adds SQL persistence for all related entities, for example Assets, ContractDefinitions, etc. in the control plane BOM.
+
 ## Using the Basic Template Repository to Create Distributions
 
-The [Modules, Runtimes, and Components](Modules, Runtimes, and Components.md) chapter explained how EDC is built on a module system. Runtimes are assembled to create a *component* such as a control plane, a data plane, or an identity hub. EDC itself does not ship runtime distributions since it is the job of downstream projects to bundle features and capabilities that address the specific requirements of a dataspace or organization.  However, EDC provides the [Basic Template Repository](https://github.com/eclipse-edc/Template-Basic) to facilitate creating extensions and runtime distributions.
+The [Modules, Runtimes, and Components](../modules-runtimes-components/_index.md) chapter explained how EDC is built on a module system. Runtimes are assembled to create a *component* such as a control plane, a data plane, or an identity hub. EDC itself does not ship runtime distributions since it is the job of downstream projects to bundle features and capabilities that address the specific requirements of a dataspace or organization.  However, EDC provides the [Basic Template Repository](https://github.com/eclipse-edc/Template-Basic) to facilitate creating extensions and runtime distributions.
 
 The EDC Basic Template Repository can be forked and used as a starting point for building an EDC distribution. You will need to be familiar with Maven Repositories and [Gradle](https://gradle.org/). Once the repository is forked, custom extensions can be added and included in a runtime. The template is configured to create two runtime Docker images: a control plane and data plane. These images are designed to be deployed as separate processes, such as two Kubernetes `Replicasets`.
 
-> EDC distributions can be created using other build systems if they support Maven dependencies since EDC modules are released to Maven Central. Using Gradle as the build system for your distribution has several advantages. One is that the distribution project can incorporate [EDC Gradle Plugins](https://github.com/eclipse-edc/GradlePlugins)such as the Autodoc and Build plugins to automate and remove boilerplate tasks.
+> EDC distributions can be created using other build systems if they support Maven dependencies since EDC modules are released to Maven Central. Using Gradle as the build system for your distribution has several advantages. One is that the distribution project can incorporate [EDC Gradle Plugins](https://github.com/eclipse-edc/GradlePlugins) such as the Autodoc and Build plugins to automate and remove boilerplate tasks.
+
+Note: the template repository also leverages the BOM system.
 
 ## Deployment Architectures and Operations
 
