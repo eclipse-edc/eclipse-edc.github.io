@@ -4,36 +4,37 @@ weight: 30
 ---
 
 <!-- TOC -->
-
-- [Contributor Documentation](#contributor-documentation)
-  - [0. Intended audience](#0-intended-audience)
-  - [1. Getting started](#1-getting-started)
-    - [1.1 Prerequisites](#11-prerequisites)
-    - [1.2 Terminology](#12-terminology)
-    - [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
-  - [2. The control plane](#2-the-control-plane)
-    - [2.1 Entities](#21-entities)
-    - [2.2 Programming Primitives](#22-programming-primitives)
-    - [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
-    - [2.4 Extension model](#24-extension-model)
-    - [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
-    - [2.6 Service layers](#26-service-layers)
-    - [2.7 Policy Monitor](#27-policy-monitor)
-    - [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
-    - [3. (Postgre-)SQL persistence](#3-postgre-sql-persistence)
-  - [4. The data plane](#4-the-data-plane)
-    - [4.1 Data plane signaling](#41-data-plane-signaling)
-    - [4.2 Writing a custom data plane extension (sink/source)](#42-writing-a-custom-data-plane-extension-sinksource)
-    - [4.3 Writing a custom data plane (using only DPS)](#43-writing-a-custom-data-plane-using-only-dps)
-  - [5. Development best practices](#5-development-best-practices)
-    - [5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#51-writing-unit--component--integration--api--endtoend-tests)
-    - [5.1 Coding best practices](#51-coding-best-practices)
-    - [5.2 Testing best practices](#52-testing-best-practices)
-    - [5.3 Other best practices](#53-other-best-practices)
-  - [6. Further concepts](#6-further-concepts)
-  _ [6.2 Autodoc](#61-autodoc)
-  _ [6.3 Adapting the Gradle build](#62-adapting-the-gradle-build)
-  <!-- TOC -->
+  * [0. Intended audience](#0-intended-audience)
+  * [1. Getting started](#1-getting-started)
+    * [1.1 Prerequisites](#11-prerequisites)
+    * [1.2 Terminology](#12-terminology)
+    * [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
+  * [2. The control plane](#2-the-control-plane)
+    * [2.1 Entities](#21-entities)
+    * [2.2 Programming Primitives](#22-programming-primitives)
+    * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
+    * [2.4 Extension model](#24-extension-model)
+    * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
+    * [2.6 Service layers](#26-service-layers)
+    * [2.7 Policy Monitor](#27-policy-monitor)
+    * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
+    * [3. (Postgre-)SQL persistence](#3-postgre-sql-persistence)
+  * [4. The data plane](#4-the-data-plane)
+    * [4.1 Data plane signaling](#41-data-plane-signaling)
+    * [4.2 Writing a custom data plane extension (sink/source)](#42-writing-a-custom-data-plane-extension-sinksource)
+    * [4.3 Writing a custom data plane (using only DPS)](#43-writing-a-custom-data-plane-using-only-dps)
+  * [5. Development best practices](#5-development-best-practices)
+    * [5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#51-writing-unit--component--integration--api--endtoend-tests)
+    * [5.1 Coding best practices](#51-coding-best-practices)
+    * [5.2 Testing best practices](#52-testing-best-practices)
+    * [5.3 Other best practices](#53-other-best-practices)
+  * [6. Further concepts](#6-further-concepts)
+    * [6.1 Autodoc](#61-autodoc)
+    * [6.2 Adapting the Gradle build](#62-adapting-the-gradle-build)
+    * [6.3 The EDC Release process](#63-the-edc-release-process)
+      * [6.3.1 Releasing "core" modules](#631-releasing-core-modules)
+      * [6.3.2 Releasing "technology" modules](#632-releasing-technology-modules)
+<!-- TOC -->
 
 ## 0. Intended audience
 
@@ -208,14 +209,16 @@ information about it and other topics such as data plane self-registration and p
 ### 4.2 Writing a custom data plane extension (sink/source)
 
 The EDC Data Plane is build on top of the *Data Plane Framework (DPF)*, which can be used for building custom data planes.
- The framework has extensibility points for supporting different data sources and sinks (e.g., S3, HTTP, Kafka) and can perform direct streaming between different source and sink types.
+ The framework has extensibility points for supporting different data sources and sinks (e.g., S3, HTTP, Kafka) and can 
+perform direct streaming between different source and sink types.
 
 Detailed documentation about writing a custom data plane extension can be found [here](./data-plane/data-plane-extensions.md).
 
 
 ### 4.3 Writing a custom data plane (using only DPS)
 
-Since the communication between control plane and data plane is well defined in the [DPS](#41-data-plane-signaling) protocol, it's possible to write a data plane from scratch (without using EDC and [DPF](./data-plane/data-plane-extensions.md#2-the-data-plane-framework)) and make it work with the EDC control plane.
+Since the communication between control plane and data plane is well-defined in the [DPS](#41-data-plane-signaling) protocol, it's possible 
+to write a data plane from scratch (without using EDC and [DPF](./data-plane/data-plane-extensions.md#2-the-data-plane-framework)) and make it work with the EDC control plane.
 
 Detailed documentation about writing a custom data plane be found [here](./data-plane/custom-data-plane.md).
 
@@ -226,13 +229,12 @@ Detailed documentation about writing a custom data plane be found [here](./data-
 
 test pyramid... Like any other project, EDC has established a set of recommendations and rules that contributors must
 adhere to in order to guarantee a smooth collaboration with the project. Note that familiarity with our [formal
-contribution guidelines](../../../CONTRIBUTING.md) is assumed. There additional recommendations we have compiled that
+contribution guidelines](./guidelines) is assumed. There additional recommendations we have compiled that
 are relevant when deploying and administering EDC instances.
 
 ### 5.1 Coding best practices
 
-Code should be written to conform with the EDC [style guide](../../contributing/styleguide.md) and our [coding
-principles](../../contributing/coding-principles.md).
+Code should be written to conform with the EDC [style guide](./guidelines/styleguide).
 
 A frequent subject of critique in pull requests is logging. Spurious and very verbose log lines like "Entering/Leaving
 method X" or "Performing action Z" should be avoided because they pollute the log output and don't contribute any value.
@@ -243,7 +245,7 @@ Please find detailed information about logging [here](logging.md).
 
 Every class in the EDC code base should have a test class that verifies the correct functionality of the code.
 
-Detailed information about testing can be found [here](../../testing.md).
+Detailed information about testing can be found [here](./testing.md).
 
 ### 5.3 Other best practices
 

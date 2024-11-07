@@ -2,28 +2,6 @@
 
 This repository contains project-wide documentation.
 
-## GitHub Pages
-
-The documentation files of all EDC repositories are provided with [GitHub Pages](https://docs.github.com/en/pages).
-
-The pages are deployed from the `/docs` subdirectory to <https://eclipse-edc.github.io/docs>.
-
-### Local Deployment
-
-If you want to add content or change configurations, please refer to the [official Docsify documentation](https://docsify.js.org/).
-
-For a local deployment, install [Node.js](https://nodejs.org/), check out this repository, and run Docsify:
-```commandline
-$ git clone https://github.com/eclipse-edc/docs.git
-$ cd docs
-$ npm i docsify-cli -g
-$ docsify serve docs
-```
-
-## Contributing
-
-See [how to contribute](CONTRIBUTING.md).
-
 ## Running the website locally
 
 Building and running the site locally requires a recent `extended` version of [Hugo](https://gohugo.io).
@@ -42,7 +20,7 @@ container, the container runs with a volume bound to the root folder.
 1. Build the docker image
 
    ```bash
-   docker compose up --build`
+   docker compose up --build
    ```
 
 2. Verify that the service is working.

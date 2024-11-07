@@ -3,20 +3,18 @@ title: Writing tests
 weight: 40
 ---
 
-
 <!-- TOC -->
-* [Writing Tests](#writing-tests)
-    * [1. Adding EDC test fixtures](#1-adding-edc-test-fixtures)
-    * [2. Controlling test verbosity](#2-controlling-test-verbosity)
-    * [3. Definition and distinction](#3-definition-and-distinction)
-    * [4. Integration Tests](#4-integration-tests)
-        * [4.1 TL;DR](#41-tldr)
-        * [4.2 When to use them](#42-when-to-use-them)
-        * [4.3 Coding Guidelines](#43-coding-guidelines)
-        * [4.4 Running integration tests locally](#44-running-integration-tests-locally)
-        * [4.5 Running them in the CI pipeline](#45-running-them-in-the-ci-pipeline)
-        * [4.6 Do's and Don'ts](#46-dos-and-donts)
-    * [5. Running an EDC instance from a JUnit test (End2End tests)](#5-running-an-edc-instance-from-a-junit-test-end2end-tests)
+  * [1. Adding EDC test fixtures](#1-adding-edc-test-fixtures)
+  * [2. Controlling test verbosity](#2-controlling-test-verbosity)
+  * [3. Definition and distinction](#3-definition-and-distinction)
+  * [4. Integration Tests](#4-integration-tests)
+    * [4.1 TL;DR](#41-tldr)
+    * [4.2 When to use them](#42-when-to-use-them)
+    * [4.3 Coding Guidelines](#43-coding-guidelines)
+    * [4.4 Running integration tests locally](#44-running-integration-tests-locally)
+    * [4.5 Running them in the CI pipeline](#45-running-them-in-the-ci-pipeline)
+    * [4.6 Do's and Don'ts](#46-dos-and-donts)
+  * [5. Running an EDC instance from a JUnit test (End2End tests)](#5-running-an-edc-instance-from-a-junit-test-end2end-tests)
 <!-- TOC -->
 
 ## 1. Adding EDC test fixtures
