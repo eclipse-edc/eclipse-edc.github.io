@@ -5,7 +5,7 @@
 
 Module `api-configuration`
 --------------------------
-**Artifact:** org.eclipse.edc:api-configuration:0.10.0
+**Artifact:** org.eclipse.edc:api-configuration:0.10.1
 
 **Categories:** _None_
 
@@ -35,7 +35,7 @@ _None_
 
 Module `credential-watchdog`
 ----------------------------
-**Artifact:** org.eclipse.edc:credential-watchdog:0.10.0
+**Artifact:** org.eclipse.edc:credential-watchdog:0.10.1
 
 **Categories:** _None_
 
@@ -67,7 +67,7 @@ _None_
 
 Module `did-api`
 ----------------
-**Artifact:** org.eclipse.edc:did-api:0.10.0
+**Artifact:** org.eclipse.edc:did-api:0.10.1
 
 **Categories:** _None_
 
@@ -94,7 +94,7 @@ _None_
 Module `did-spi`
 ----------------
 **Name:** Identity Hub DID services
-**Artifact:** org.eclipse.edc:did-spi:0.10.0
+**Artifact:** org.eclipse.edc:did-spi:0.10.1
 
 **Categories:** _None_
 
@@ -106,7 +106,7 @@ Module `did-spi`
 ### Extensions
 Module `identity-hub-core`
 --------------------------
-**Artifact:** org.eclipse.edc:identity-hub-core:0.10.0
+**Artifact:** org.eclipse.edc:identity-hub-core:0.10.1
 
 **Categories:** _None_
 
@@ -180,7 +180,7 @@ _None_
 
 Module `identity-hub-credentials-store-sql`
 -------------------------------------------
-**Artifact:** org.eclipse.edc:identity-hub-credentials-store-sql:0.10.0
+**Artifact:** org.eclipse.edc:identity-hub-credentials-store-sql:0.10.1
 
 **Categories:** _None_
 
@@ -214,7 +214,7 @@ _None_
 
 Module `identity-hub-did`
 -------------------------
-**Artifact:** org.eclipse.edc:identity-hub-did:0.10.0
+**Artifact:** org.eclipse.edc:identity-hub-did:0.10.1
 
 **Categories:** _None_
 
@@ -257,7 +257,7 @@ _None_
 
 Module `identity-hub-did-store-sql`
 -----------------------------------
-**Artifact:** org.eclipse.edc:identity-hub-did-store-sql:0.10.0
+**Artifact:** org.eclipse.edc:identity-hub-did-store-sql:0.10.1
 
 **Categories:** _None_
 
@@ -291,7 +291,7 @@ _None_
 
 Module `identity-hub-keypair-store-sql`
 ---------------------------------------
-**Artifact:** org.eclipse.edc:identity-hub-keypair-store-sql:0.10.0
+**Artifact:** org.eclipse.edc:identity-hub-keypair-store-sql:0.10.1
 
 **Categories:** _None_
 
@@ -325,7 +325,7 @@ _None_
 
 Module `identity-hub-keypairs`
 ------------------------------
-**Artifact:** org.eclipse.edc:identity-hub-keypairs:0.10.0
+**Artifact:** org.eclipse.edc:identity-hub-keypairs:0.10.1
 
 **Categories:** _None_
 
@@ -355,7 +355,7 @@ _None_
 
 Module `identity-hub-participantcontext-store-sql`
 --------------------------------------------------
-**Artifact:** org.eclipse.edc:identity-hub-participantcontext-store-sql:0.10.0
+**Artifact:** org.eclipse.edc:identity-hub-participantcontext-store-sql:0.10.1
 
 **Categories:** _None_
 
@@ -389,7 +389,7 @@ _None_
 
 Module `identity-hub-participants`
 ----------------------------------
-**Artifact:** org.eclipse.edc:identity-hub-participants:0.10.0
+**Artifact:** org.eclipse.edc:identity-hub-participants:0.10.1
 
 **Categories:** _None_
 
@@ -397,24 +397,6 @@ Module `identity-hub-participants`
 _None_
 
 ### Extensions
-#### Class: `org.eclipse.edc.identityhub.participantcontext.ParticipantContextCoordinatorExtension`
-**Name:** "ParticipantContext Extension"
-
-**Overview:** No overview provided.
-
-
-### Configuration_None_
-
-#### Provided services
-_None_
-
-#### Referenced (injected) services
-- `org.eclipse.edc.identithub.spi.did.DidDocumentService` (required)
-- `org.eclipse.edc.identityhub.spi.keypair.KeyPairService` (required)
-- `java.time.Clock` (required)
-- `org.eclipse.edc.spi.event.EventRouter` (required)
-- `org.eclipse.edc.identityhub.spi.participantcontext.ParticipantContextService` (required)
-
 #### Class: `org.eclipse.edc.identityhub.participantcontext.ParticipantContextExtension`
 **Name:** "ParticipantContext Extension"
 
@@ -437,9 +419,27 @@ _None_
 - `org.eclipse.edc.identithub.spi.did.store.DidResourceStore` (required)
 - `org.eclipse.edc.identityhub.spi.participantcontext.StsAccountProvisioner` (required)
 
+#### Class: `org.eclipse.edc.identityhub.participantcontext.ParticipantContextCoordinatorExtension`
+**Name:** "ParticipantContext Extension"
+
+**Overview:** No overview provided.
+
+
+### Configuration_None_
+
+#### Provided services
+_None_
+
+#### Referenced (injected) services
+- `org.eclipse.edc.identithub.spi.did.DidDocumentService` (required)
+- `org.eclipse.edc.identityhub.spi.keypair.KeyPairService` (required)
+- `java.time.Clock` (required)
+- `org.eclipse.edc.spi.event.EventRouter` (required)
+- `org.eclipse.edc.identityhub.spi.participantcontext.ParticipantContextService` (required)
+
 Module `identityhub-api-authentication`
 ---------------------------------------
-**Artifact:** org.eclipse.edc:identityhub-api-authentication:0.10.0
+**Artifact:** org.eclipse.edc:identityhub-api-authentication:0.10.1
 
 **Categories:** _None_
 
@@ -465,7 +465,7 @@ _None_
 
 Module `identityhub-api-authorization`
 --------------------------------------
-**Artifact:** org.eclipse.edc:identityhub-api-authorization:0.10.0
+**Artifact:** org.eclipse.edc:identityhub-api-authorization:0.10.1
 
 **Categories:** _None_
 
@@ -489,7 +489,7 @@ _None_
 
 Module `keypair-api`
 --------------------
-**Artifact:** org.eclipse.edc:keypair-api:0.10.0
+**Artifact:** org.eclipse.edc:keypair-api:0.10.1
 
 **Categories:** _None_
 
@@ -516,7 +516,7 @@ _None_
 
 Module `local-did-publisher`
 ----------------------------
-**Artifact:** org.eclipse.edc:local-did-publisher:0.10.0
+**Artifact:** org.eclipse.edc:local-did-publisher:0.10.1
 
 **Categories:** _None_
 
@@ -547,7 +547,7 @@ _None_
 
 Module `participant-context-api`
 --------------------------------
-**Artifact:** org.eclipse.edc:participant-context-api:0.10.0
+**Artifact:** org.eclipse.edc:participant-context-api:0.10.1
 
 **Categories:** _None_
 
@@ -574,7 +574,7 @@ _None_
 
 Module `presentation-api`
 -------------------------
-**Artifact:** org.eclipse.edc:presentation-api:0.10.0
+**Artifact:** org.eclipse.edc:presentation-api:0.10.1
 
 **Categories:** _None_
 
@@ -607,7 +607,7 @@ _None_
 
 Module `sts-account-provisioner`
 --------------------------------
-**Artifact:** org.eclipse.edc:sts-account-provisioner:0.10.0
+**Artifact:** org.eclipse.edc:sts-account-provisioner:0.10.1
 
 **Categories:** _None_
 
@@ -634,7 +634,7 @@ Module `sts-account-provisioner`
 
 Module `sts-account-service-local`
 ----------------------------------
-**Artifact:** org.eclipse.edc:sts-account-service-local:0.10.0
+**Artifact:** org.eclipse.edc:sts-account-service-local:0.10.1
 
 **Categories:** _None_
 
@@ -659,7 +659,7 @@ _None_
 
 Module `sts-account-service-remote`
 -----------------------------------
-**Artifact:** org.eclipse.edc:sts-account-service-remote:0.10.0
+**Artifact:** org.eclipse.edc:sts-account-service-remote:0.10.1
 
 **Categories:** _None_
 
@@ -690,7 +690,7 @@ _None_
 
 Module `verifiable-credentials-api`
 -----------------------------------
-**Artifact:** org.eclipse.edc:verifiable-credentials-api:0.10.0
+**Artifact:** org.eclipse.edc:verifiable-credentials-api:0.10.1
 
 **Categories:** _None_
 
