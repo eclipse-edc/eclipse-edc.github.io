@@ -4,6 +4,31 @@ description: Details how to add customizations, features, and new capabilities t
 weight: 70
 ---
 
+<!-- TOC -->
+  * [The EDC Module System](#the-edc-module-system)
+  * [Extension Basics](#extension-basics)
+    * [SPI: Service Provider Interface](#spi-service-provider-interface)
+    * [Providing and Injecting Services](#providing-and-injecting-services)
+    * [Service Registries](#service-registries)
+    * [Configuration](#configuration)
+    * [Extension Loading](#extension-loading)
+  * [Extension Services](#extension-services)
+    * [Default Services](#default-services)
+    * [Creating Custom APIs and Controllers](#creating-custom-apis-and-controllers)
+      * [Authentication](#authentication)
+    * [Events](#events)
+    * [Monitor](#monitor)
+      * [Default Console Monitor](#default-console-monitor)
+      * [Custom Monitor](#custom-monitor)
+      * [Using the monitor](#using-the-monitor)
+    * [Transactions and DataSources](#transactions-and-datasources)
+    * [Validation](#validation)
+    * [Serialization](#serialization)
+    * [HTTP Dispatching](#http-dispatching)
+    * [Secrets Handling and the Vault](#secrets-handling-and-the-vault)
+    * [Documenting Extensions](#documenting-extensions)
+<!-- TOC -->
+
 This chapter covers adding custom features and capabilities to an EDC runtime by creating extensions.  Features can be wide-ranging, from a specific data validation or policy function to integration with an identity system.  We will focus on common extension use cases, for example, implementing specific dataspace requirements. For more complex features and in-depth treatment, refer to the [Contributor documentation]().
 
 > This chapter requires a thorough knowledge of Java and modern build systems such as [Gradle](https://gradle.org/) and [Maven](https://maven.apache.org). As you read through this chapter, it will be helpful to consult the extensions contained in the [EDC Samples repository](https://github.com/eclipse-edc/Samples).
@@ -301,9 +326,28 @@ The EDC eventing system is a powerful way to add capabilities to a runtime. All 
 
 To receive an event, register and `EventSubscriber` with the `org.eclipse.edc.spi.event.EventRouter`. Events can be received either synchronously or asynchronously. Synchronous listeners are useful when executed transactionally in combination with the event operation. For example, a listener may wish to record audit information when an `AssetUpdated` event is emitted. The transaction and asset update should be rolled back if the record operation fails. Asynchronous listeners are invoked in the context of a different thread. They are useful when a listener takes a long time to complete and is fire-and-forget.
 
-### The Monitor
+### Monitor
 
-EDC does not directly use a logging framework. Log output should instead be sent to the `Monitor`, which will forward it to a configured sink. By default, the Monitor sends output to the console, which can be piped to another destination in a production environment. Alternatively, a custom `Monitor` implementation can be configured. The best way to obtain a reference to the `Monitor` is to inject it:
+EDC does not directly use a logging framework. Log output should instead be sent to the `Monitor`, which will forward it
+to a configured sink.
+
+#### Default Console Monitor
+
+By default, the Monitor sends output to the console, which can be piped to another destination in a production environment.
+The default console monitor can be configured through command line args:
+- `--log-level=<DEBUG|INFO|WARNING|SEVERE>`: logs will be filtered and only the ones with the level selected or one of
+  the next ones will be shown. DEFAULT: `INFO`
+- `--no-color`: coloured logs will be disabled. DEFAULT: enabled.
+
+#### Custom Monitor
+
+Alternatively, a custom `Monitor` implementation can be provided an implementation of the `MonitorExtension` that will
+need to be registered at runtime.
+
+#### Using the monitor
+
+The provided `Monitor` instance is available on the `ServiceContext` object by using the `getMonitor()` method, or it
+could be injected as well:
 
 ```java
 public class SampleExtension implements ServiceExtension {
@@ -334,7 +378,7 @@ public class SampleExtension implements ServiceExtension {
 }
 ```
 
-### Transactions and Datasources
+### Transactions and DataSources
 
 EDC uses transactional operations when persisting data to stores that support them such as the Postgres-backed implementations. Transaction code blocks are written using the `TransactionContext`, which can be injected:
 

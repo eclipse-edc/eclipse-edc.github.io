@@ -7,8 +7,7 @@ A comprehensive and consistent way of logging is a crucial pillar for operabilit
 
 ## Logging component
 
-Logs must only be produced using the `Monitor` service, 
-which offers 4 different log levels:
+Logs must only be produced using the `Monitor` service, which offers 4 different log levels:
 
 ### `severe` 
 > Error events that might lead the application to abort or still allow it to continue running.
