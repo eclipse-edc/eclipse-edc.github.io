@@ -12,17 +12,21 @@ weight: 20
   * [2. Injecting a service](#2-injecting-a-service)
     * [2.1 Use `@Inject` to declare dependencies (recommended)](#21-use-inject-to-declare-dependencies-recommended)
     * [2.2 Use `@Requires` to declare dependencies](#22-use-requires-to-declare-dependencies)
-  * [3. Extension initialization sequence](#3-extension-initialization-sequence)
-  * [4. Testing extension classes](#4-testing-extension-classes)
-  * [5. Advanced concepts: default providers](#5-advanced-concepts-default-providers)
-    * [5.1 Fallbacks versus extensibility](#51-fallbacks-versus-extensibility)
-    * [5.2 Fallback implementations](#52-fallback-implementations)
-    * [5.3 Extensibility](#53-extensibility)
-    * [5.4 Deep-dive into extension lifecycle management](#54-deep-dive-into-extension-lifecycle-management)
-    * [5.5 Example 1 - provider method](#55-example-1---provider-method)
-    * [5.6 Example 2 - default provider method](#56-example-2---default-provider-method)
-    * [5.7 Usage guidelines when using default providers](#57-usage-guidelines-when-using-default-providers)
-  * [6. Limitations](#6-limitations)
+  * [3. Injecting configuration values](#3-injecting-configuration-values)
+    * [3.1 Value injection](#31-value-injection)
+    * [3.2 Config object injection](#32-config-object-injection)
+    * [3.3. Handling dependent configuration](#33-handling-dependent-configuration)
+  * [4. Extension initialization sequence](#4-extension-initialization-sequence)
+  * [5. Testing extension classes](#5-testing-extension-classes)
+  * [6. Advanced concepts: default providers](#6-advanced-concepts-default-providers)
+    * [6.1 Fallbacks versus extensibility](#61-fallbacks-versus-extensibility)
+    * [6.2 Fallback implementations](#62-fallback-implementations)
+    * [6.3 Extensibility](#63-extensibility)
+    * [6.4 Deep-dive into extension lifecycle management](#64-deep-dive-into-extension-lifecycle-management)
+    * [6.5 Example 1 - provider method](#65-example-1---provider-method)
+    * [6.6 Example 2 - default provider method](#66-example-2---default-provider-method)
+    * [6.7 Usage guidelines when using default providers](#67-usage-guidelines-when-using-default-providers)
+  * [7. Limitations](#7-limitations)
 <!-- TOC -->
 
 ## 1. Registering a service implementation
@@ -214,10 +218,160 @@ potentially result in a skewed initialization order, and in further consequence,
 > while `@Inject(required=false)` allows for nullable dependencies, `@Requires` has no such option and the service
 > dependency must be resolved by explicitly allowing it to be optional: `context.getService(FooStore.class, true)`.
 
-## 3. Extension initialization sequence
+## 3. Injecting configuration values
+
+Most extension classes will require some sort of configuration values, for example a connection string to a third-party
+service, some timeout value for a scheduled task etc. The classic EDC way is to read them from the
+`ServiceExtensionContext`:
+
+```java
+
+@Override
+public void initialize(ServiceExtensionContext context) {
+    var requiredValue = context.getConfig().getString("some.required.value");
+    var optionalValue = context.getConfig().getLong("some.optional.value", "default-foo-bar");
+}
+```
+
+### 3.1 Value injection
+
+However, configuration values can also be injected into the extension class. Thus, the code sample above can be
+rewritten as:
+
+```java
+public class SomeExtension implements ServiceExtension {
+
+    @Setting(description = "your description", key = "some.required.value", required = true)
+    private String requiredValue;
+
+    @Setting(description = "your description", key = "some.optional.value", required = false, defaultValue = "default-foo-bar")
+    private long optionalValue;
+}
+```
+
+It should be noted, that configuration injection happens during the dependency resolution phase of the runtime, which is
+_before_ the `initialize()` method is called. Further, the `required = false` attributed in the second annotation is not
+needed, because the presence of a `defaultValue` attribute implies that.
+
+If there was no `defaultValue`, and `required = false`, then the `optionalValue` would be `null` if the value is not
+configured.
+
+### 3.2 Config object injection
+
+Extensions with many config values can get hard to read at times - a good portion of the code is likely just reading and
+handling config values. For those cases there is an option to inject config values via a _configuration object_.
+
+Configuration objects are POJOs with no logic of their own, that are:
+
+- normal classes annotated with `@Settings` (plural), with a public default constructor and with fields annotated with
+  `@Setting`
+- record classes annotated with `@Settings`, where _all_ constructor arguments are annotated with `@Setting`
+
+for example:
+
+```java
+
+@Setting
+public class DatabaseConfig {
+    @Setting(description = "...", key = "db.url")
+    private String url;
+
+    @Setting(description = "...", key = "db.user")
+    private String dbUser;
+
+    @Setting(description = "...", key = "db.password")
+    private String dbPassword;
+
+    public DatabaseConfig() {
+        // only needed if there is another CTor as well
+    }
+}
+```
+
+This is equivalent to the following (more condensed) version:
+
+```java
+
+public record DatabaseConfig(@Setting(description = "...", key = "db.url") String url,
+                             @Setting(description = "...", key = "db.user") String dbUser,
+                             @Setting(description = "...", key = "db.password") String dbPassword) {
+}
+```
+
+in the EDC code base we tend to favor the record variant, because it is less verbose, but either variant will work. To
+use the config object in an extension, simply inject it like this:
+
+```java
+public class SomeExtension implements ServiceExtension {
+    @Configuration
+    private DatabaseConfig databaseConfig;
+}
+```
+
+It should be noted, that configuration objects **cannot be nested**, and **cannot be declared optional explicitly**.
+They are regarded as optional if all their nested properties are optional or have a default value, and are regarded
+mandatory if there is one or more properties that are mandatory.
+
+As a general rule of thumb, we recommend using configuration objects when there are **5 or more** related configuration
+values.
+
+### 3.3. Handling dependent configuration
+
+There might be situations where a configuration value depends on another configuration value, or either one of two must
+be present, etc. We call that _dependent configuration values_.
+
+In those cases it is recommended to declare the configuration values a `required = false`, and implement custom logic in
+the `initialize()` method of the extension:
+
+```java
+public class SomeExtension implements ServiceExtension {
+
+    @Setting(description = "your description", key = "some.value1", required = false)
+    private String value1;
+
+    @Setting(description = "your description", key = "some.value2", required = false)
+    private long value2;
+
+    @Override
+    public void initialize(ServiceExtensionContext context) {
+        // assume value2 is mandatory if value1 is present
+        if (value1 != null && value2 == null) {
+            throw new EdcException("...");
+        }
+
+        //else continue intialization
+    }
+}
+```
+
+Another slightly more complex situation may surface if a configuration value is only required if
+a [default service](#12-provide-defaults) is used at runtime:
+
+```java
+public class SomeExtension implements ServiceExtension {
+
+    @Setting(description = "your description", key = "some.value1", required = false)
+    private String value1;
+
+    @Setting(description = "your description", key = "some.value2", required = false)
+    private long value2;
+
+    @Provider(isDefault = true)
+    public SomeService defaultService() {
+        if (value1 == null || value2 == null) {
+            throw new EdcException("...");
+        }
+        return new DefaultSomeService(value1, value2);
+    }
+}
+```
+
+Note that in this case the exception is thrown during extension initialization rather than during dependency resolution.
+
+## 4. Extension initialization sequence
 
 The extension loading mechanism uses a two-pass procedure to resolve dependencies. First, all implementations of
-of `ServiceExtension` are instantiated using their public default constructor, and sorted using a topological sort
+`ServiceExtension` are instantiated using their public default constructor, and sorted using a topological sort
 algorithm based on their dependency graph. Cyclic dependencies would be reported in this stage.
 
 Second, the extension is initialized by setting all fields annotated with `@Inject` and by calling its `initialize()`
@@ -225,7 +379,7 @@ method. This implies that every extension can assume that by the time its `initi
 dependencies are already registered with the context, because the extension(s) providing them were ordered at previous
 positions in the list, and thus have already been initialized.
 
-## 4. Testing extension classes
+## 5. Testing extension classes
 
 To test classes using the `@Inject` annotation, use the appropriate JUnit extension `@DependencyInjectionExtension`:
 
@@ -248,19 +402,19 @@ class FooMaintenanceExtensionTest {
 }
 ```
 
-## 5. Advanced concepts: default providers
+## 6. Advanced concepts: default providers
 
 In this chapter we will use the term "default provider" and "default provider method" synonymously to refer to a method
 annotated with `@Provider(isDefault=true)`. Similarly, "provider", "provider method" or "factory method" refer to
 methods annotated with just `@Provider`.
 
-### 5.1 Fallbacks versus extensibility
+### 6.1 Fallbacks versus extensibility
 
 Default provider methods are intended to provide fallback implementations for services rather than to achieve
 extensibility - that is what extensions are for. There is a subtle but important semantic difference between _fallback
 implementations_ and _extensibility_:
 
-### 5.2 Fallback implementations
+### 6.2 Fallback implementations
 
 Fallbacks are meant as safety net, in case developers forget or don't want to add a specific implementation for a
 service. It is there so as not to end up _without_ an implementation for a service interface. A good example for this
@@ -271,7 +425,7 @@ environments. Typically, fallbacks should not have any dependencies onto other s
 > Default-provided services, even though they are on the classpath, only get instantiated if there is no other
 > implementation.
 
-### 5.3 Extensibility
+### 6.3 Extensibility
 
 In contrast, _extensibility_ refers to the possibility of swapping out one implementation of a service for another by
 choosing the respective module at compile time. Each implementation must therefore be contained in its own java module,
@@ -287,7 +441,7 @@ extension.
 
 > Provided services get instantiated only if they are on the classpath, but always get instantiated.
 
-### 5.4 Deep-dive into extension lifecycle management
+### 6.4 Deep-dive into extension lifecycle management
 
 Generally speaking every extension goes through these lifecycle stages during loading:
 
@@ -299,7 +453,7 @@ Due to the fact that default provider methods act a safety net, they only get in
 the same service type. However, what may be a bit misleading is the fact that they typically get invoked _during the
 `inject` phase_. The following section will demonstrate this.
 
-### 5.5 Example 1 - provider method
+### 6.5 Example 1 - provider method
 
 Recall that `@Provider` methods get invoked regardless, and after the `initialze` phase. That means, assuming both
 extensions are on the classpath, the extension that declares the provider method (= `ExtensionA`) will get fully
@@ -328,7 +482,7 @@ done regardless whether another extension _actually injects a `SomeService`_. Af
 and by the time it goes through its `inject` phase, the injected `SomeService` is already in the context, so the
 `SomeService` field gets resolved properly.
 
-### 5.6 Example 2 - default provider method
+### 6.6 Example 2 - default provider method
 
 Methods annotated with `@Provider(isDefault=true)` only get invoked if there is no other provider method for that
 service, and at the time when the corresponding `@Inject` is resolved. Modifying example 1 slightly we get:
@@ -371,7 +525,7 @@ situation the previous example:
 Because there is no explicit ordering in how the `@Inject` fields are resolved, the order may depend on several factors,
 like the Java version or specific JVM used, the classloader and/or implementation of reflection used, etc.
 
-### 5.7 Usage guidelines when using default providers
+### 6.7 Usage guidelines when using default providers
 
 From the previous sections and the examples demonstrated above we can derive a few important guidelines:
 
@@ -382,7 +536,7 @@ From the previous sections and the examples demonstrated above we can derive a f
 - do not provide and inject the same service in one extension
 - rule of thumb: unless you know exactly what you're doing and why you need them - don't use them!
 
-## 6. Limitations
+## 7. Limitations
 
 - Only available in `ServiceExtension`: services can only be injected into `ServiceExtension` objects at this time as
   they are the main hook points for plugins, and they have a clearly defined interface. All subsequent object creation
