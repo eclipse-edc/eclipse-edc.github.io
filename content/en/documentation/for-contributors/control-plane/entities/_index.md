@@ -14,6 +14,9 @@ weight: 10
     * [2.5 Advanced policy concepts](#25-advanced-policy-concepts)
       * [2.5.1 Pre- and Post-Evaluators](#251-pre--and-post-evaluators)
       * [2.5.2 Dynamic functions](#252-dynamic-functions)
+      * [2.5.3 Policy Validation and Evaluation Plan](#253-policy-validation-and-evaluation-plan)
+        * [2.5.3.1 Policy Validation](#2531-policy-validation)
+        * [2.5.3.1 Policy Evaluation Plan](#2532-policy-evaluation-plan)
     * [2.6 Bundled policy functions](#26-bundled-policy-functions)
       * [2.6.1 Contract expiration function](#261-contract-expiration-function)
   * [3. Contract definitions](#3-contract-definitions)
@@ -404,6 +407,150 @@ Let's revisit our headquarter policy from earlier and change it a little:
 
 This means two things. One, our policy has changed its semantics: now we require the headquarter to be in the EU, or to
 have more than 5000 employees.
+
+#### 2.5.3 Policy Validation and Evaluation Plan
+
+By default ODRL policies are validated only in their structure (e.g. fields missing). In the latest
+version of EDC an additional layer of validation has been introduced which leverages the `PolicyEngine` configuration in the `runtime` as described [above](#22-policy-scopes-and-bindings)
+in order to have a more domain-specific validation. 
+
+Two APIs were added currently under `v3.1alpha`: 
+
+- Validate
+- Evaluation Plan
+
+#### 2.5.3.1 Policy Validation
+
+Given an input ODRL policy the `PolicyEngine` can check potential issues that might arise in
+the evaluation phase: 
+
+- a `leftOperand` or an `action` that is not bound to a scope.
+- a `leftOperand` that is not bound to a function in the `PolicyEngine`.
+
+Let's take this policy as example:
+
+```json
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "PolicyDefinition",
+	"@id": "2",
+  "policy": {
+    "@context": "http://www.w3.org/ns/odrl.jsonld",
+    "@type": "Set",
+    "permission": [
+      {
+        "action": "use",
+        "constraint": {
+          "or": [
+            {
+              "leftOperand": "headquarter.location",
+              "operator": "eq",
+              "rightOperand": "EU"
+            }         
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+
+> Since we are using `@vocab` the `leftOperand` `headquarter.location`  is default to `edc` namespace.
+
+
+and let's assume that we didn't make any bindings, the output of the validation might look like this:
+
+```json
+{
+  "@type": "PolicyValidationResult",
+  "isValid": false,
+  "errors": [
+    "leftOperand 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' is not bound to any scopes: Rule { Permission constraints: [Or constraint: [Constraint 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' EQ 'EU']] } ",
+    "left operand 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' is not bound to any functions: Rule { Permission constraints: [Or constraint: [Constraint 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' EQ 'EU']] }"
+  ],
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+    "edc": "https://w3id.org/edc/v0.0.1/ns/",
+    "odrl": "http://www.w3.org/ns/odrl/2/"
+  }
+}
+```
+
+Since the `leftOperand` is not bound to a scope and there is no function associated to it within any scope, we can deduce that the constraint will be filtered during evaluation.
+
+The kind validation can be either be called using the `/v3.1alpha/policydefinitions/{id}/validate` or can be
+enabled by default on policy definition creation.
+
+> The settings is `edc.policy.validation.enabled`
+
+#### 2.5.3.2 Policy Evaluation Plan
+
+Even if the validation phase of a policy is successful, it might happen that evaluation of a `Policy` does not behave as expected if the `PolicyEngine`
+was not configured properly.
+
+For example if a function has bindings only to a `leftOperand` in the `catalog` scope but the desired behavior is to run the policy function also in the `contract.negotiation` and in the `transfer.process` ones.
+In those scenario the new evaluation plan API has been introduce to get an overview of all the steps that the `PolicyEngine` will take while evaluating a `Policy` within a scope without actually running the evaluation.
+
+By using the same policy example, we could run an evaluation plan for the `contract.negotiation` scope:
+
+```http request
+POST https://controlplane-host:port/management/v3.1alpha/policydefinitions/2/evaluationplan
+Content-Type: application/json
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "policyScope": "contract.negotiation"
+}
+```
+
+which gives this output:
+
+```json
+{
+  "@type": "PolicyEvaluationPlan",
+  "preValidators": [],
+  "permissionSteps": {
+    "@type": "PermissionStep",
+    "isFiltered": false,
+    "filteringReasons": [],
+    "ruleFunctions": [],
+    "constraintSteps": {
+      "@type": "OrConstraintStep",
+      "constraintSteps": {
+        "@type": "AtomicConstraintStep",
+        "isFiltered": true,
+        "filteringReasons": [
+          "leftOperand 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' is not bound to scope 'contract.negotiation'",
+          "leftOperand 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' is not bound to any function within scope 'contract.negotiation'"
+        ],
+        "functionParams": [
+          "'https://w3id.org/edc/v0.0.1/ns/headquarter.location'",
+          "EQ",
+          "'EU'"
+        ]
+      }
+    },
+    "dutySteps": []
+  },
+  "prohibitionSteps": [],
+  "obligationSteps": [],
+  "postValidators": [],
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+    "edc": "https://w3id.org/edc/v0.0.1/ns/",
+    "odrl": "http://www.w3.org/ns/odrl/2/"
+  }
+}
+```
+
+which outlines two issues that would cause the constraint to be filtered out during the evaluation within the `contract.negotiation` scope: 
+
+- the `headquarter.location` has no binding in the `RuleBindingRegistry` within `contract.negotiation` 
+- the `headquarter.location` has no function bound within `contract.negotiation` 
+
 
 ### 2.6 Bundled policy functions
 
