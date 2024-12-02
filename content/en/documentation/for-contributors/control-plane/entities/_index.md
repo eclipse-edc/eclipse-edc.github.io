@@ -421,7 +421,7 @@ Two APIs were added currently under `v3.1alpha`:
 
 #### 2.5.3.1 Policy Validation
 
-Given an input ODRL policy the `PolicyEngine` can check potential issues that might arise in
+Given an input ODRL policy, the `PolicyEngine` checks potential issues that might arise in
 the evaluation phase: 
 
 - a `leftOperand` or an `action` that is not bound to a scope.
