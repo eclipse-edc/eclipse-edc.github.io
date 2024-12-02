@@ -483,7 +483,7 @@ Since the `leftOperand` is not bound to a scope and there is no function associa
 The kind validation can be called using the `/v3.1alpha/policydefinitions/{id}/validate` or can be
 enabled by default on policy definition creation.
 
-> The settings is `edc.policy.validation.enabled`
+> The settings is `edc.policy.validation.enabled` and is set to `false` by default
 
 #### 2.5.3.2 Policy Evaluation Plan
 
