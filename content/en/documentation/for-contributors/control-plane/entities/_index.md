@@ -491,7 +491,7 @@ Even if the validation phase of a policy is successful, it might happen that eva
 was not configured properly.
 
 For example if a function has bindings only to a `leftOperand` in the `catalog` scope but the desired behavior is to run the policy function also in the `contract.negotiation` and in the `transfer.process` ones.
-In those scenario the new evaluation plan API has been introduce to get an overview of all the steps that the `PolicyEngine` will take while evaluating a `Policy` within a scope without actually running the evaluation.
+In those scenarios, the new API called the "evaluation plan API" has been introduced to get an overview of all the steps that the `PolicyEngine` will take while evaluating a `Policy` within a scope without actually running the evaluation.
 
 By using the same policy example, we could run an evaluation plan for the `contract.negotiation` scope:
 
