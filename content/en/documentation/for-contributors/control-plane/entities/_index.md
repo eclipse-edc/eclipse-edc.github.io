@@ -460,7 +460,7 @@ Let's take this policy as example:
 > Since we are using `@vocab`, the `leftOperand` `headquarter.location` vaule defaults to the `edc` namespace, i.e. will get transformed during JSON-LD expansion to `"https://w3id.org/edc/v0.0.1/ns/headquarter.location"`
 
 
-and let's assume that we didn't make any bindings, the output of the validation might look like this:
+and let's assume that we didn't bind the policy to any function or scope, the output of the validation might look like this:
 
 ```json
 {
