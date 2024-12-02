@@ -490,7 +490,7 @@ enabled by default on policy definition creation.
 Even if the validation phase of a policy is successful, it might happen that evaluation of a `Policy` does not behave as expected if the `PolicyEngine`
 was not configured properly.
 
-For example if a function has bindings only to a `leftOperand` in the `catalog` scope but the desired behavior is to run the policy function also in the `contract.negotiation` and in the `transfer.process` ones.
+One suche example would be if a function is bound only to a `leftOperand` in the `catalog` scope, but the desired behavior is to execute the policy function also in the `contract.negotiation` and in the `transfer.process` scopes.
 In those scenarios, the new API called the "evaluation plan API" has been introduced to get an overview of all the steps that the `PolicyEngine` will take while evaluating a `Policy` within a scope without actually running the evaluation.
 
 By using the same policy example, we could run an evaluation plan for the `contract.negotiation` scope:
