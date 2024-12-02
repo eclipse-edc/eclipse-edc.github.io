@@ -480,7 +480,7 @@ and let's assume that we didn't bind the policy to any function or scope, the ou
 
 Since the `leftOperand` is not bound to a scope and there is no function associated to it within any scope, we can deduce that the constraint will be filtered during evaluation.
 
-The kind validation can be either be called using the `/v3.1alpha/policydefinitions/{id}/validate` or can be
+The kind validation can be called using the `/v3.1alpha/policydefinitions/{id}/validate` or can be
 enabled by default on policy definition creation.
 
 > The settings is `edc.policy.validation.enabled`
