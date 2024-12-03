@@ -22,9 +22,6 @@ weight: 30
       * [The Role of the Data Plane](#the-role-of-the-data-plane)
     * [Transfer Process States](#transfer-process-states)
     * [Policy Monitor](#policy-monitor)
-  * [The Policy Engine](#the-policy-engine)
-    * [Policy Scopes and Bindings](#policy-scopes-and-bindings)
-    * [Designing for Optimal Policy Performance](#designing-for-optimal-policy-performance)
 <!-- TOC -->
 
 The control plane is responsible for assembling catalogs, creating contract agreements that grant access to data, managing data transfers, and monitoring usage policy compliance. Control plane operations are performed by interacting with the Management API. Consumer and provider control planes communicate using the Dataspace Protocol (DSP). This section provides an overview of how the control plane works and its key concepts.
@@ -41,9 +38,14 @@ EDC is designed to handle all general forms of data. It's important to note that
 
 ## Management API
 
-The Management API is a RESTful interface for client applications to interact with the control plane. All client operations described in this section use the Management API. We won't cover the API in detail here since there is an OpenAPI definition. The API can be secured using an authentication key or third-party OAuth2 identity provider, but it is important to note that it should never be exposed over the Internet or other non-trusted networks.
+The Management API is a RESTful interface for client applications to interact with the control plane. All client
+operations described in this section use the Management API. We won't cover the API in detail here since there is an
+OpenAPI definition. The API can be secured using an authentication key or third-party OAuth2 identity provider, but it
+is important to note that it should never be exposed over the Internet or other non-trusted networks.
 
-[TODO: Management API Link]
+The openapi documentation is available following this link:
+https://eclipse-edc.github.io/Connector/openapi/management-api/
+
 ## Catalogs, Datasets, and Offers
 
 A data provider uses its control plane to publish a data catalog that other dataspace participants access. Catalog requests are made using DSP (HTTP POST). The control plane will return a response containing a [DCAT Catalog](https://www.w3.org/TR/vocab-dcat-3/)  The following is an example response with some sections omitted for brevity:

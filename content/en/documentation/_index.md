@@ -46,6 +46,5 @@ application. Rather, it is a toolbox for building customized distributions. As a
 ## What Next?
 
 If you are new to EDC, start with the [Adopters Manual](for-adopters). If you are an experienced EDC developer and
-want to take a deep-dive into the codebase, see the [Contributors Manual](for-contributors).   
-
+want to take a deep-dive into the codebase, see the [Contributors Manual](for-contributors).
 
