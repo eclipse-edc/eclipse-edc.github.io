@@ -1,0 +1,39 @@
+name: Check Dead Links
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-deadlinks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install markdown-link-check
+        run: npm install -g markdown-link-check
+
+      - name: Find and Check Links in Markdown Files
+        run: |
+          FILES=$(find . -type f -name "*.md")
+          if [ -z "$FILES" ]; then
+            echo "No Markdown files found. Skipping link check."
+            exit 0
+          fi
+          for file in $FILES; do
+            echo "Checking links in $file"
+            markdown-link-check "$file" --quiet --output=json > "${file}.links.json"
+            if grep -q '"status" *: *[45][0-9][0-9]' "${file}.links.json"; then
+              echo "Broken links found in $file"
+              exit 1
+            fi
+          done
+        shell: bash
