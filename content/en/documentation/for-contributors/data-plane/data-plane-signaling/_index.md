@@ -4,7 +4,6 @@ weight: 20
 ---
 
 <!-- TOC -->
-* [The Data Plane Signaling interface](#the-data-plane-signaling-interface)
   * [1. `DataAddress` and `EndpointDataReference`](#1-dataaddress-and-endpointdatareference)
   * [2. Signaling protocol messages and API endpoints](#2-signaling-protocol-messages-and-api-endpoints)
     * [2.1 `START`](#21-start)
