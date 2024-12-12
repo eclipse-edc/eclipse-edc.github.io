@@ -47,7 +47,7 @@ The Data Plane is responsible for executing data transfers, which are managed by
 data using specialized technology such as a messaging system or data integration platform. EDC includes the *Data Plane
 Framework (DPF)* for building custom Data Planes. Alternatively, a Data Plane can be built using other languages or
 technologies and integrated with the EDC Control Plane by implementing
-the [Data Plane Signaling API](../for-contributors/data-plane/data-plane-signaling/_index.md).
+the [Data Plane Signaling API](/documentation/for-contributors/data-plane/data-plane-signaling/).
 
 ### Federated Catalog
 
