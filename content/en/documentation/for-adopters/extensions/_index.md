@@ -232,59 +232,69 @@ If another extension implements CustomService, `SampleExtension.initializeDefaul
 
 ### Creating Custom APIs and Controllers
 
-Extensions may create custom APIs or ingress points with JAX-RS controllers. This is done by creating a *web context* and registering JAX-RS resource under that context. A web context is a port and path mapping under which the controller will be registered. For example, a context with a port and path set to `9191` and `custom-api` respectively may expose a controller annotated with `@PATH("custom-resources")` at:
+Extensions may create custom APIs or ingress points with JAX-RS controllers. This is done by creating a *web context*
+and registering JAX-RS resource under that context. A web context is a port and path mapping under which the controller
+will be registered. For example, a context with a port and path set to `9191` and `custom-api` respectively may expose
+a controller annotated with `@PATH("custom-resources")` at:
 
 `https:9191//localhost/custom-api/custom-resources`
 
-Web contexts enable deployments to segment where APIs are exposed. Operational infrastructure may restrict management APIs to an internal network while another API may be available over the public internet.
+Web contexts enable deployments to segment where APIs are exposed. Operational infrastructure may restrict management
+APIs to an internal network while another API may be available over the public internet.
 
 EDC includes convenience classes for configuring a web context:
 
 ```java
 public class SampleExtension implements ServiceExtension {
 
+    @Configuration
+    private CustomApiConfiguration apiConfiguration;
+    
     @Inject
     private WebServer webServer;
 
 	@Inject
-    private WebServiceConfigurer configurer;
+    private PortMappingRegistry portMappingRegistry;
 
     @Inject
     private WebService webService;
 
 	public void initialize(ServiceExtensionContext context) {
-		var settings = WebServiceSettings.Builder.newInstance()
-				.contextAlias("custom-context")
-				.defaultPath("/custom-context-path")
-				.defaultPort(9191)
-				.name("Custom API")
-				.apiConfigKey("web.http.custom-context")
-				.build();
+        var portMapping = new PortMapping("custom-context", apiConfiguration.port(), apiConfiguration.path());
+        portMappingRegistry.register(portMapping);
 
-        var config = context.getConfig("web.http.custom-context");
-        configurer.configure(config, webServer, settings);
-
-		webService.registerResource("custom-context", new CustomResourceController();
+		webService.registerResource("custom-context", new CustomResourceController());
         webService.registerResource("custom-context", new CustomExceptionMapper());
 	}
+
+    @Settings
+    record CustomApiConfiguration(
+            @Setting(key = "web.http.custom-context.port", description = "Port for custom-context api context", defaultValue = 54321)
+            int port,
+            @Setting(key = "web.http.custom-context.path", description = "Path for custom-context api context", defaultValue = "/custom/path")
+            String path
+    ) {
+
+    }
 }
 ```
 
-Let's break down the above sample. The `WebServer` is responsible for creating and managing `HTTP/S` contexts. The `WebServiceConfigurer` takes a settings object and applies it to the `WebServer` to create a web context.  In the above example, the context alias is `custom-context`, which will be used later to register JAX-RS controllers. The default path and port are also set and will be used if the deployment does not provide override values as part of the runtime configuration. The settings, runtime configuration, and web server instance are then passed to the `configurer`, which registers the `HTTP/S` context.
+Let's break down the above sample:
+- The `PortMappingRegistry` is responsible to keep track of all the different API contexts around the runtime
+- The `CustomApiConfiguration` object takes care to parse the settings accordingly.
 
 The default port and path can be overridden by configuration settings using the `web.http.custom-context` config key:
-
 ```
 web.http.custom-context.path=/override-path
 web.http.custom-context.port=9292
 ```
 
-Note that the `web.http` prefix is used as a convention but is not strictly required.
-
-Once a web context is created, JAX-RS controllers, interceptors, and other resources can be registered with the `WebService` under the web context alias. EDC uses [Eclipse Jersey](https://eclipse-ee4j.github.io/jersey/) and supports its standard features:
+Once a web context is created, JAX-RS controllers, interceptors, and other resources can be registered with the
+`WebService` under the web context alias. EDC uses [Eclipse Jersey](https://eclipse-ee4j.github.io/jersey/) and supports
+its standard features:
 
 ```java
-webService.registerResource("custom-context", new CustomResourceController();
+webService.registerResource("custom-context", new CustomResourceController());
 webService.registerResource("custom-context", new CustomExceptionMapper());
 ```
 

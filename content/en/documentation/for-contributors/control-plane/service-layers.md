@@ -63,26 +63,28 @@ To register a new _context_, it needs to be configured first:
 
 ```java
 
+@Configuration
+private YourContextApiConfiguration apiConfiguration;
 @Inject
 private WebService webService;
 @Inject
-private WebServiceConfigurer configurer;
+private PortMappingRegistry portMappingRegistry;
 @Inject
 private WebServer webServer;
 
 @Override
 public void initialize(ServiceExtensionContext context) {
+    portMappingRegistry.register(new PortMapping("yourcontext", apiConfiguration.port(), apiConfiguration.path()));
+}
 
-    var defaultConfig = WebServiceSettings.Builder.newInstance()
-            .apiConfigKey("web.http.yourcontext")
-            .contextAlias("yourcontext")
-            .defaultPath("/api/some")
-            .defaultPort(10080)
-            .useDefaultContext(false)
-            .name("Some new API")
-            .build();
-    var config = context.getConfig("web.http.yourcontext"); //reads web.http.yourcontext.[port|path] from the configuration
-    configurer.configure(config, webServer, defaultConfig);
+@Settings
+record YourContextApiConfiguration(
+        @Setting(key = "web.http.yourcontext.port", description = "Port for yourcontext api context", defaultValue = 10080)
+        int port,
+        @Setting(key = "web.http.yourcontext.path", description = "Path for yourcontext api context", defaultValue = "/api/someh")
+        String path
+) {
+
 }
 ```
 
