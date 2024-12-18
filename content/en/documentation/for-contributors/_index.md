@@ -204,7 +204,7 @@ Detailed documentation about EDCs PostgreSQL implementations can be found [here]
 
 Data Plane Signaling (DPS) is the communication protocol that is used between control planes and data planes. Detailed
 information about it and other topics such as data plane self-registration and public API authentication can be found
-[here](./data-plane/data-plane-signaling/data-plane-signaling.md).
+[here](/documentation/for-contributors/data-plane/data-plane-signaling/).
 
 ### 4.2 Writing a custom data plane extension (sink/source)
 
