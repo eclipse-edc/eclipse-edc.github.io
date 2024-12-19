@@ -23,7 +23,7 @@ jobs:
           REGEX='https?://[^\s)"'"'"'<`:,]+'
 
           find . \( -name "*.md" -o -name "*.html" -o -name "*.txt" \) -type f -print0 | \
-          xargs -0 grep -HoP "$REGEX" > urls.txt || true
+          xargs -0 grep -oP "$REGEX" > urls.txt || true
 
           sort -u urls.txt -o urls.txt
 
