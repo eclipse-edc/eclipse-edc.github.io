@@ -39,7 +39,7 @@ jobs:
 
           echo "Total URLs after exclusion: $(wc -l < filtered_urls.txt)"
 
-          sed 's/[",.`:]$//' filtered_urls.txt > cleaned_urls.txt
+          sed 's/[\",.`:;\)\]]$//' filtered_urls.txt > cleaned_urls.txt
 
           echo "Total URLs after cleaning: $(wc -l < cleaned_urls.txt)"
 
@@ -71,9 +71,9 @@ jobs:
             TOTAL=$((TOTAL +1))
             echo "[$TOTAL] Checking URL: $url"
 
-            HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" --connect-timeout 10 "$url")
+            HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" -L --connect-timeout 10 "$url" || echo "000")
 
-            if [[ "$HTTP_STATUS" -ge 400 ]]; then
+            if [[ "$HTTP_STATUS" -ge 400 || "$HTTP_STATUS" -eq "000" ]]; then
               echo "❌ Dead link found: $url (HTTP status: $HTTP_STATUS)"
               DEAD_LINKS+=("$url")
               FAILED=$((FAILED +1))
