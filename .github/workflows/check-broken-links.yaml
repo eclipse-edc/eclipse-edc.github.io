@@ -39,7 +39,7 @@ jobs:
 
           echo "Total URLs after exclusion: $(wc -l < filtered_urls.txt)"
 
-          sed 's/[\",.`:;\)\]]$//' filtered_urls.txt > cleaned_urls.txt
+          sed -E 's/[">,)]+$//' filtered_urls.txt > cleaned_urls.txt
 
           echo "Total URLs after cleaning: $(wc -l < cleaned_urls.txt)"
 
