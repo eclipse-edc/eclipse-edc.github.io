@@ -1,0 +1,104 @@
+name: Check Dead Links
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Verify curl installation
+        run: curl --version
+
+      - name: Extract and clean URLs from all documentation
+        id: extract_urls
+        run: |
+          FILE_EXTENSIONS="*.md *.html *.txt"
+
+          REGEX='https?://[^\s)"'"'"'<`:,]+'
+
+          find . \( -name "*.md" -o -name "*.html" -o -name "*.txt" \) -type f -print0 | \
+          xargs -0 grep -HoP "$REGEX" > urls.txt || true
+
+          sort -u urls.txt -o urls.txt
+
+          echo "Total URLs found: $(wc -l < urls.txt)"
+
+          if [ -f exclude_patterns.txt ]; then
+            EXCLUDE_REGEX=$(paste -sd'|' exclude_patterns.txt)
+            grep -vE "$EXCLUDE_REGEX" urls.txt > filtered_urls.txt
+          else
+            echo "exclude_patterns.txt not found. No URLs will be excluded."
+            cp urls.txt filtered_urls.txt
+          fi
+
+          echo "Total URLs after exclusion: $(wc -l < filtered_urls.txt)"
+
+          sed 's/[",.`:]$//' filtered_urls.txt > cleaned_urls.txt
+
+          echo "Total URLs after cleaning: $(wc -l < cleaned_urls.txt)"
+
+          mv cleaned_urls.txt filtered_urls.txt
+
+      - name: Print URLs to be checked
+        run: |
+          echo "===== URLs to be checked ====="
+          cat filtered_urls.txt
+          echo "=============================="
+
+      - name: Check if URLs were found
+        run: |
+          if [ ! -s filtered_urls.txt ]; then
+            echo "No URLs found to check after applying exclusions."
+            exit 0
+          fi
+
+      - name: Check URLs using curl
+        shell: bash
+        run: |
+          set +e
+
+          TOTAL=0
+          FAILED=0
+          DEAD_LINKS=()
+
+          while IFS= read -r url; do
+            TOTAL=$((TOTAL +1))
+            echo "[$TOTAL] Checking URL: $url"
+
+            HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" --connect-timeout 10 "$url")
+
+            if [[ "$HTTP_STATUS" -ge 400 ]]; then
+              echo "❌ Dead link found: $url (HTTP status: $HTTP_STATUS)"
+              DEAD_LINKS+=("$url")
+              FAILED=$((FAILED +1))
+            else
+              echo "✅ Link is valid: $url (HTTP status: $HTTP_STATUS)"
+            fi
+          done < filtered_urls.txt
+
+          echo "Total links checked: $TOTAL"
+          echo "Dead links found: $FAILED"
+
+          if [ "$FAILED" -ne 0 ]; then
+            echo "::error::Found $FAILED dead links."
+            for dead in "${DEAD_LINKS[@]}"; do
+              echo "::error::Dead link: $dead"
+            done
+
+            printf "**Found %d dead links:**\n" "$FAILED" > dead_links.md
+            for dead in "${DEAD_LINKS[@]}"; do
+              printf "- %s\n" "$dead" >> dead_links.md
+            done
+
+            cat dead_links.md
+
+            exit 1
+          else
+            echo "All $TOTAL links are valid."
+          fi

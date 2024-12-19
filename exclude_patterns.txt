@@ -1,0 +1,12 @@
+<HOST>
+http://callback/url
+http://control-plane
+http://custom-dataplane-host:3000/dataflows
+http://example.com/asset:12345
+localhost
+provider-address
+http://provider/api/dsp
+controlplane-host
+dataplane-host
+example.com
+death.star
