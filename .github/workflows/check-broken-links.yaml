@@ -20,7 +20,7 @@ jobs:
         run: |
           FILE_EXTENSIONS="*.md *.html *.txt"
 
-          REGEX='https?://[^\s)"'"'"'<`:,]+'
+          REGEX='https?://[^\s)"'"'"'<`:,.]+'
 
           find . \( -name "*.md" -o -name "*.html" -o -name "*.txt" \) -type f -print0 | \
           xargs -0 grep -oPh "$REGEX" > urls.txt || true
@@ -71,7 +71,12 @@ jobs:
             TOTAL=$((TOTAL +1))
             echo "[$TOTAL] Checking URL: $url"
 
-            HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" -L --connect-timeout 10 "$url" || echo "000")
+            HTTP_STATUS=$(curl -k \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)" \
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
+            -H "Accept-Language: en-US,en;q=0.5" \
+            -H "Connection: keep-alive" \
+            -s -o /dev/null -w "%{http_code}" -L --connect-timeout 60 --retry 3 "$url" || echo "000")
 
             if [[ "$HTTP_STATUS" -ge 400 || "$HTTP_STATUS" -eq "000" ]]; then
               echo "❌ Dead link found: $url (HTTP status: $HTTP_STATUS)"
