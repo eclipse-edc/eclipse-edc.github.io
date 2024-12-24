@@ -20,7 +20,7 @@ jobs:
         run: |
           FILE_EXTENSIONS="*.md *.html *.txt"
 
-          REGEX='https?://[^\s)"'"'"'<`:,.]+'
+          REGEX='https?://[^\s)"'"'"'<`:,]+'
 
           find . \( -name "*.md" -o -name "*.html" -o -name "*.txt" \) -type f -print0 | \
           xargs -0 grep -oPh "$REGEX" > urls.txt || true
@@ -39,7 +39,7 @@ jobs:
 
           echo "Total URLs after exclusion: $(wc -l < filtered_urls.txt)"
 
-          sed -E 's/[">,)]+$//' filtered_urls.txt > cleaned_urls.txt
+          sed -E 's/[".>,)]+$//' filtered_urls.txt > cleaned_urls.txt
 
           echo "Total URLs after cleaning: $(wc -l < cleaned_urls.txt)"
 
@@ -72,11 +72,21 @@ jobs:
             echo "[$TOTAL] Checking URL: $url"
 
             HTTP_STATUS=$(curl -k \
-            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)" \
-            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
-            -H "Accept-Language: en-US,en;q=0.5" \
-            -H "Connection: keep-alive" \
-            -s -o /dev/null -w "%{http_code}" -L --connect-timeout 60 --retry 3 "$url" || echo "000")
+              -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)" \
+              -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
+              -H "Accept-Language: en-US,en;q=0.5" \
+              -H "Connection: keep-alive" \
+              -s -o /dev/null -w "%{http_code}" -L --connect-timeout 60 --retry 3 "$url" || echo "000")
+
+            FINAL_URL=$(curl -k \
+              -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)" \
+              -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
+              -H "Accept-Language: en-US,en;q=0.5" \
+              -H "Connection: keep-alive" \
+              -s -o /dev/null -w "%{url_effective}" -L --connect-timeout 60 --retry 3 "$url")
+
+            echo "HTTP status for $url: $HTTP_STATUS"
+            echo "Final URL after redirects: $FINAL_URL"
 
             if [[ "$HTTP_STATUS" -ge 400 || "$HTTP_STATUS" -eq "000" ]]; then
               echo "❌ Dead link found: $url (HTTP status: $HTTP_STATUS)"
