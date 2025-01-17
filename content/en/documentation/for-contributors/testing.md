@@ -7,14 +7,16 @@ weight: 40
   * [1. Adding EDC test fixtures](#1-adding-edc-test-fixtures)
   * [2. Controlling test verbosity](#2-controlling-test-verbosity)
   * [3. Definition and distinction](#3-definition-and-distinction)
+    * [3.1 Coding Guidelines](#31-coding-guidelines)
   * [4. Integration Tests](#4-integration-tests)
     * [4.1 TL;DR](#41-tldr)
     * [4.2 When to use them](#42-when-to-use-them)
-    * [4.3 Coding Guidelines](#43-coding-guidelines)
     * [4.4 Running integration tests locally](#44-running-integration-tests-locally)
     * [4.5 Running them in the CI pipeline](#45-running-them-in-the-ci-pipeline)
     * [4.6 Do's and Don'ts](#46-dos-and-donts)
-  * [5. Running an EDC instance from a JUnit test (End2End tests)](#5-running-an-edc-instance-from-a-junit-test-end2end-tests)
+  * [5. System tests](#5-system-tests)
+    * [5.1 Running an EDC instance from a JUnit test](#51-running-an-edc-instance-from-a-junit-test)
+    * [5.2 Solve potential port conflict issues with Testcontainers](#52-solve-potential-port-conflict-issues-with-testcontainers)
 <!-- TOC -->
 
 ## 1. Adding EDC test fixtures
@@ -37,30 +39,11 @@ property:
 ## 3. Definition and distinction
 
 * _unit tests_ test one single class by stubbing or mocking dependencies.
-* [_integration test_](#integration-tests) tests one particular aspect of a software, which may involve external
+* [_integration test_](#4-integration-tests) tests one particular aspect of a software, which may involve external
   systems.
-* [_system tests_](#system-tests) are end-to-end tests that rely on the _entire_ system to be present.
+* [_system tests_](#5-system-tests) are end-to-end tests that rely on the _entire_ system to be present.
 
-## 4. Integration Tests
-
-### 4.1 TL;DR
-
-Use integration tests only when necessary, keep them concise, implement them in a defensive manner using timeouts and
-randomized names, use test containers for external systems wherever possible. This increases portability.
-
-### 4.2 When to use them
-
-Generally speaking developers should favor writing unit tests over integration tests, because they are simpler, more
-stable and typically run faster. Sometimes that is not (easily) possible, especially when an implementation relies on an
-external system that is not easily mocked or stubbed such as databases.
-
-Therefore, in many cases writing unit tests is more involved that writing an integration test, for example say you want
-to test your implementation of a Postgres-backed database. You would have to mock the behaviour of the PostgreSQL
-database, which - while certainly possible - can get complicated pretty quickly. You might still choose to do that for
-simpler scenarios, but eventually you will probably want to write an integration test that uses an _actual_ PostgreSQL
-instance.
-
-### 4.3 Coding Guidelines
+### 3.1 Coding Guidelines
 
 The EDC codebase has few annotations and these annotation focuses on two important aspects:
 
@@ -84,7 +67,7 @@ the test to run. All of these annotations are composite annotations and contains
 - `@ComponentTest`: Marks an integration test with `ComponentTest` Junit Tag. This should be used when the test does not
   use any external systems, but uses actual collaborator objects instead of mocks.
 - there are other more specific tags for cloud-vendor specific environments, like `@AzureStorageIntegrationTest` or
-  `@AwsS3IntegrationTest`. Some of those enviroments can be emulated (with test containers), others can't.
+  `@AwsS3IntegrationTest`. Some of those environments can be emulated (with test containers), others can't.
 
 We encourage you to use these available annotation but if your integration test does not fit in one of these available
 annotations, and you want to categorize them based on their technologies then feel free to create a new annotations but
@@ -114,6 +97,25 @@ If possible all external system should be deployed using [Testcontainers](https:
 in special situations there might be a dedicated test instance running continuously, e.g. a cloud-based database test
 instance. In the latter case please be careful to avoid conflicts (e.g. database names) when multiple test runners
 access that system simultaneously and to properly clean up any residue before and after the test.
+
+## 4. Integration Tests
+
+### 4.1 TL;DR
+
+Use integration tests only when necessary, keep them concise, implement them in a defensive manner using timeouts and
+randomized names, use test containers for external systems wherever possible. This increases portability.
+
+### 4.2 When to use them
+
+Generally speaking developers should favor writing unit tests over integration tests, because they are simpler, more
+stable and typically run faster. Sometimes that is not (easily) possible, especially when an implementation relies on an
+external system that is not easily mocked or stubbed such as databases.
+
+Therefore, in many cases writing unit tests is more involved that writing an integration test, for example say you want
+to test your implementation of a Postgres-backed database. You would have to mock the behaviour of the PostgreSQL
+database, which - while certainly possible - can get complicated pretty quickly. You might still choose to do that for
+simpler scenarios, but eventually you will probably want to write an integration test that uses an _actual_ PostgreSQL
+instance.
 
 ### 4.4 Running integration tests locally
 
@@ -199,7 +201,18 @@ DO NOT:
 - perform complex external system setup in `@BeforeEach` or `@BeforeAll`
 - add production code that is only ever used from tests. A typical smell are `protected` or `package-private` methods.
 
-## 5. Running an EDC instance from a JUnit test (End2End tests)
+## 5. System tests
+
+System tests are test in which an EDC runtime runs in the JUnit process.
+To benefit from some fixtures that targets the management api, a 
+[test fixtures module is available](https://central.sonatype.com/artifact/org.eclipse.edc/management-api-test-fixtures)
+it can be added as a dependency:
+
+```kotlin
+testImplementation(testFixtures("org.eclipse.edc:management-api-test-fixtures:<version>"))
+```
+
+### 5.1 Running an EDC instance from a JUnit test
 
 In some circumstances it is necessary to launch an EDC runtime and execute tests against it. This could be a
 fully-fledged connector runtime, replete with persistence and all bells and whistles, or this could be a partial runtime
@@ -222,24 +235,24 @@ The runner can load an EDC runtime by using the `@RegisterExtension` annotation:
 @EndToEndTest
 class YourEndToEndTest {
 
-  @RegisterExtension
-  private final RuntimeExtension controlPlane = new RuntimePerClassExtension(new EmbeddedRuntime(
-          "control-plane", // the runtime's name, used for log output
-          Map.of( // the runtime's configuration
-                  "web.http.control.port", String.valueOf(getFreePort()),
-                  "web.http.control.path", "/control"
-                  //...
-          ),
-          // all modules to be put on the runtime classpath
-          ":core:common:connector-core",
-          ":core:control-plane:control-plane-core",
-          ":core:data-plane-selector:data-plane-selector-core",
-          ":extensions:control-plane:transfer:transfer-data-plane-signaling",
-          ":extensions:common:iam:iam-mock",
-          ":extensions:common:http",
-          ":extensions:common:api:control-api-configuration"
-          //...
-  ));
+    @RegisterExtension
+    private final RuntimeExtension controlPlane = new RuntimePerClassExtension(new EmbeddedRuntime(
+            "control-plane", // the runtime's name, used for log output
+            // all modules to be put on the runtime classpath
+            ":core:common:connector-core",
+            ":core:control-plane:control-plane-core",
+            ":core:data-plane-selector:data-plane-selector-core",
+            ":extensions:control-plane:transfer:transfer-data-plane-signaling",
+            ":extensions:common:iam:iam-mock",
+            ":extensions:common:http",
+            ":extensions:common:api:control-api-configuration")
+            // the runtime configuration is passed through a lazy provider
+            .configurationProvider(() -> ConfigFactory.fromMap(Map.of(
+                    "web.http.control.port", String.valueOf(getFreePort()),
+                    "web.http.control.path", "/control"))
+            )
+    );
+    
 }
 ```
 
@@ -263,3 +276,44 @@ like a control plane and a data plane).
 
 Technically, the number of runtimes launched that way is not limited (other than by host system resource), so
 theoretically, an entire dataspace with N participants could be launched that way...
+
+### 5.2 Solve potential port conflict issues with Testcontainers
+
+Using Testcontainers in the system tests could lead to port conflicts, especially if the ports generated randomly to be
+used in the EDC runtimes are created statically before the Testcontainers instances are spin up.
+
+To solve this problem it's good to follow the "lazy configuration" practice:
+- generate the random ports in the `configurationProvider` that's passed to the `EmbeddedRuntime`, it will ensure that
+  the port number is assigned lazily right before the runtime startup
+- if a port is also needed to be configured in another runtime (e.g. to permit communication on that port by the other
+  runtime, it can be instantiated lazily using the `LazySupplier` as shown in the example:
+
+```java
+@EndToEndTest
+class YourEndToEndTest {
+
+    private final LazySupplier<Integer> port = new LazySupplier<>(Ports::getFreePort);
+
+    @RegisterExtension
+    private final RuntimeExtension connector = new RuntimePerClassExtension(new EmbeddedRuntime(
+            "connector",
+            ":runtime")
+            .configurationProvider(() -> ConfigFactory.fromMap(Map.of(
+                    // port will be lazily instantiated here...
+                    "web.http.port", String.valueOf(port.get())
+            ))
+        )
+    );
+
+    @RegisterExtension
+    private final RuntimeExtension anotherConnector = new RuntimePerClassExtension(new EmbeddedRuntime(
+            "connector",
+            ":runtime")
+            .configurationProvider(() -> ConfigFactory.fromMap(Map.of(
+                    // ... or it could be instantiated lazily here!
+                    "connector.port", String.valueOf(port.get())
+            ))
+        )
+    );
+}
+```
