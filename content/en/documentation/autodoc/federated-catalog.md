@@ -5,7 +5,7 @@
 
 Module `connector-runtime`
 --------------------------
-**Artifact:** org.eclipse.edc:connector-runtime:0.10.1
+**Artifact:** org.eclipse.edc:connector-runtime:0.11.0
 
 **Categories:** _None_
 
@@ -27,18 +27,18 @@ _None_
 Module `crawler-spi`
 --------------------
 **Name:** Crawler services
-**Artifact:** org.eclipse.edc:crawler-spi:0.10.1
+**Artifact:** org.eclipse.edc:crawler-spi:0.11.0
 
 **Categories:** _None_
 
 ### Extension points
-  - `org.eclipse.edc.crawler.spi.TargetNodeDirectory`
   - `org.eclipse.edc.crawler.spi.TargetNodeFilter`
+  - `org.eclipse.edc.crawler.spi.TargetNodeDirectory`
 
 ### Extensions
 Module `federated-catalog-api`
 ------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-api:0.10.1
+**Artifact:** org.eclipse.edc:federated-catalog-api:0.11.0
 
 **Categories:** _None_
 
@@ -52,7 +52,12 @@ _None_
 **Overview:** No overview provided.
 
 
-### Configuration_None_
+### Configuration
+
+| Key                     | Required | Type     | Default        | Pattern | Min | Max | Description |
+| ----------------------- | -------- | -------- | -------------- | ------- | --- | --- | ----------- |
+| `web.http.catalog.port` | `*`      | `string` | `17171`        |         |     |     |             |
+| `web.http.catalog.path` | `*`      | `string` | `/api/catalog` |         |     |     |             |
 
 #### Provided services
 _None_
@@ -65,10 +70,11 @@ _None_
 - `org.eclipse.edc.spi.types.TypeManager` (required)
 - `org.eclipse.edc.transform.spi.TypeTransformerRegistry` (required)
 - `org.eclipse.edc.spi.system.apiversion.ApiVersionService` (required)
+- `org.eclipse.edc.web.spi.configuration.PortMappingRegistry` (required)
 
 Module `federated-catalog-cache-sql`
 ------------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-cache-sql:0.10.1
+**Artifact:** org.eclipse.edc:federated-catalog-cache-sql:0.11.0
 
 **Categories:** _None_
 
@@ -84,10 +90,9 @@ _None_
 
 ### Configuration
 
-| Key                                         | Required | Type     | Default   | Pattern | Min | Max | Description               |
-| ------------------------------------------- | -------- | -------- | --------- | ------- | --- | --- | ------------------------- |
-| ~~edc.datasource.federatedcatalog.name~~    |          | `string` | ``        |         |     |     |                           |
-| `edc.sql.store.federatedcatalog.datasource` |          | `string` | `default` |         |     |     | The datasource to be used |
+| Key                                         | Required | Type     | Default   | Pattern | Min | Max | Description |
+| ------------------------------------------- | -------- | -------- | --------- | ------- | --- | --- | ----------- |
+| `edc.sql.store.federatedcatalog.datasource` | `*`      | `string` | `default` |         |     |     |             |
 
 #### Provided services
 - `org.eclipse.edc.catalog.spi.FederatedCatalogCache`
@@ -102,7 +107,7 @@ _None_
 
 Module `federated-catalog-core`
 -------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-core:0.10.1
+**Artifact:** org.eclipse.edc:federated-catalog-core:0.11.0
 
 **Categories:** _None_
 
@@ -118,11 +123,11 @@ _None_
 
 ### Configuration
 
-| Key                                          | Required | Type     | Default | Pattern | Min | Max | Description                                                                                                     |
-| -------------------------------------------- | -------- | -------- | ------- | ------- | --- | --- | --------------------------------------------------------------------------------------------------------------- |
-| `edc.catalog.cache.execution.period.seconds` |          | `string` | ``      |         |     |     | The time to elapse between two crawl runs                                                                       |
-| `edc.catalog.cache.partition.num.crawlers`   |          | `string` | ``      |         |     |     | The number of crawlers (execution threads) that should be used. The engine will re-use crawlers when necessary. |
-| `edc.catalog.cache.execution.delay.seconds`  |          | `string` | ``      |         |     |     | The initial delay for the cache crawler engine                                                                  |
+| Key                                          | Required | Type     | Default | Pattern | Min | Max | Description |
+| -------------------------------------------- | -------- | -------- | ------- | ------- | --- | --- | ----------- |
+| `edc.catalog.cache.execution.period.seconds` | `*`      | `string` | `60`    |         |     |     |             |
+| `edc.catalog.cache.partition.num.crawlers`   | `*`      | `string` | `2`     |         |     |     |             |
+| `edc.catalog.cache.execution.delay.seconds`  |          | `string` | ``      |         |     |     |             |
 
 #### Provided services
 - `org.eclipse.edc.catalog.spi.FederatedCatalogCache`
@@ -141,9 +146,10 @@ _None_
 
 ### Configuration
 
-| Key                                   | Required | Type     | Default | Pattern | Min | Max | Description |
-| ------------------------------------- | -------- | -------- | ------- | ------- | --- | --- | ----------- |
-| `edc.catalog.cache.execution.enabled` |          | `string` | ``      |         |     |     |             |
+| Key                                        | Required | Type     | Default | Pattern | Min | Max | Description |
+| ------------------------------------------ | -------- | -------- | ------- | ------- | --- | --- | ----------- |
+| `edc.catalog.cache.execution.enabled`      | `*`      | `string` | `true`  |         |     |     |             |
+| `edc.catalog.cache.partition.num.crawlers` | `*`      | `string` | `2`     |         |     |     |             |
 
 #### Provided services
 - `org.eclipse.edc.crawler.spi.CrawlerActionRegistry`
@@ -164,7 +170,7 @@ _None_
 Module `federated-catalog-spi`
 ------------------------------
 **Name:** Catalog services
-**Artifact:** org.eclipse.edc:federated-catalog-spi:0.10.1
+**Artifact:** org.eclipse.edc:federated-catalog-spi:0.11.0
 
 **Categories:** _None_
 
@@ -174,7 +180,7 @@ Module `federated-catalog-spi`
 ### Extensions
 Module `target-node-directory-sql`
 ----------------------------------
-**Artifact:** org.eclipse.edc:target-node-directory-sql:0.10.1
+**Artifact:** org.eclipse.edc:target-node-directory-sql:0.11.0
 
 **Categories:** _None_
 
@@ -190,9 +196,9 @@ _None_
 
 ### Configuration
 
-| Key                                            | Required | Type     | Default   | Pattern | Min | Max | Description               |
-| ---------------------------------------------- | -------- | -------- | --------- | ------- | --- | --- | ------------------------- |
-| `edc.sql.store.targetnodedirectory.datasource` |          | `string` | `default` |         |     |     | The datasource to be used |
+| Key                                            | Required | Type     | Default   | Pattern | Min | Max | Description |
+| ---------------------------------------------- | -------- | -------- | --------- | ------- | --- | --- | ----------- |
+| `edc.sql.store.targetnodedirectory.datasource` | `*`      | `string` | `default` |         |     |     |             |
 
 #### Provided services
 - `org.eclipse.edc.crawler.spi.TargetNodeDirectory`
