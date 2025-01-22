@@ -11,7 +11,8 @@ important things to note for a successful contribution. Choosing an area to work
 successful pull request.
 
 As with any other open-source project, it is generally good practice to start out with some relatively low-impact
-contributions like documentation, fixing some minor bugs or generally issues with `good first issue` label on them.
+contributions like documentation, fixing some minor bugs or generally issues with `good first issue` label on them, 
+check [this page](https://github.com/search?q=org%3Aeclipse-edc+label%3A%22good+first+issue%22+state%3Aopen&type=issues&ref=advsearch).
 That way we (the committers) get to know you, we can build trust, and you'll get to know the code base better.
 
 It is **not recommended** to start your journey with high-impact contributions such as changes to core modules, changes
