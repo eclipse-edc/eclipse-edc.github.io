@@ -9,6 +9,8 @@ weight: 10
     * [1.2 Registering controllers](#12-registering-controllers)
     * [1.3 Registering other resources](#13-registering-other-resources)
     * [1.4 API Authentication](#14-api-authentication)
+      * [1.4.1 Authentication Configuration](#141-authentication-configuration) 
+      * [1.4.2 Manual Authentication wiring](#142-manual-authentication-wiring) 
   * [2. Validators](#2-validators)
   * [3. Transformers](#3-transformers)
   * [4. Aggregate services](#4-aggregate-services)
@@ -114,6 +116,45 @@ Examples of this in EDC are JSON-LD interceptors, that expand/compact JSON-LD on
 
 ### 1.4 API Authentication
 
+#### 1.4.1 Authentication configuration
+
+The `auth-configuration` extension provides a way to configure available `AuthenticationService`s and bind them to a web context. To be compliant with the auth configuration, each `AuthenticationService` implementors should register an `ApiAuthenticationProvider` in the `ApiAuthenticationProviderRegistry`. Each `ApiAuthenticationProvider` it's associated to an authentication type in the provider registry, and should create an instance of `AuthenticationService` based on the input `Config`.
+
+
+```java
+@Inject
+private ApiAuthenticationProviderRegistry providerRegistry;
+
+@Override
+public void initialize(ServiceExtensionContext context) {
+    // check the input config and build the `SuperCustomAuthService`
+    providerRegistry.register("customauthtype", (config) -> Result.success(new SuperCustomAuthService()));
+}
+```
+
+where the config is an object `Config` containing all the properties in the `auth` object `web.http.*.auth.*`
+
+For example applying the new `customauthtype` to the `management` api context a configuration would look like this:
+
+```
+web.http.management.auth.type=customauthtype
+web.http.management.auth.custom-property=custom
+```
+
+Currently available types are:
+
+- tokenbased (`auth-tokenbased`)
+- delegated (`auth-delegated`)
+
+Example of configuring a `tokenbased` authentication for `management` web context:
+
+```
+web.http.management.auth.type=tokenbased
+web.http.management.auth.key.alias=vaultAlias
+```
+
+#### 1.4.2 Manual authentication wiring
+
 In Jersey, one way to do request authentication is by implementing the `ContainerRequestFilter` interface. Usually,
 authentication and authorization information is communicated in the request header, so EDC defines the
 `AuthenticationRequestFilter`, which extracts the headers from the request, and forwards them to an
@@ -141,6 +182,7 @@ public void initialize(ServiceExtensionContext context) {
 This registers the request filter for the web context, and registers the authentication service within the request
 filter. That way, whenever a HTTP request hits the `"yourcontext"` servlet container, the request filter gets invoked,
 delegating to the `SuperCustomAuthService` instance.
+
 
 ## 2. Validators
 
