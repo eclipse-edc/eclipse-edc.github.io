@@ -104,7 +104,7 @@ process and advance its state.
 ## 2. Transformers
 
 EDC uses JSON-LD serialization on API ingress and egress. For information about this can be found [in this
-chapter](./json-ld.md), but the TL;DR is that it is necessary because of extensible properties and
+chapter](json-ld.md), but the TL;DR is that it is necessary because of extensible properties and
 namespaces on wire-level DTOs.
 
 ### 2.1 Basic Serialization and Deserialization
@@ -195,11 +195,11 @@ _Note that this example serves for illustration purposes only!_
 Usually, transformation happens in API controllers to deserialize input, process and serialize output, but controllers
 don't use transformers directly because more than one transformer may be required to correctly deserialize an object.
 Rather, they have a reference to a `TypeTransformerRegistry` for this. For more information please refer to the [chapter
-about service layers](./service-layers.md).
+about service layers](service-layers.md).
 
 ### 2.3 Reporting transformation errors
 
-Generally speaking, input validation should be performed by [validators](./service-layers.md#2-validators). However, it
+Generally speaking, input validation should be performed by [validators](service-layers.md#2-validators). However, it
 is still possible that an object cannot be serialized/deserialized correctly, for example when a property has has the
 wrong type, wrong multiplicity, cannot be parsed, unknown property, etc. Those types of errors should be reported to the
 `TransformerContext`:
@@ -221,12 +221,12 @@ private void transformProperties(String key, JsonValue jsonValue, DataPlaneInsta
 ```
 
 Transformers should report errors to the context instead of throwing exceptions. Please note that basic JSON validation
-should be performed by [validators](./service-layers.md#2-validators).
+should be performed by [validators](service-layers.md#2-validators).
 
 ## 3. Token generation and decorators
 
 A token is a datastructure that consists of a header and claims and that is signed with a private key. While EDC
-is able to create any type of tokens through [extensions](./extension-model.md), in most use cases JSON Web Tokens (JWT)
+is able to create any type of tokens through [extensions](../control-plane/extension-model.md), in most use cases JSON Web Tokens (JWT)
 are a good option.
 
 The `TokenGenerationService` offers a way to generate such a token by passing in a reference to a private key and a set
@@ -246,7 +246,7 @@ be opinionated with regards to the token technology.
 
 When receiving a token, EDC makes use of the `TokenValidationService` facility to verify and validate the incoming
 token. Out-of-the-box JWTs are supported, but other token types could be supported through
-[extensions](./extension-model.md). This section will be limited to validating JWT tokens.
+[extensions](../control-plane/extension-model.md). This section will be limited to validating JWT tokens.
 
 Every JWT that is validated by EDC _must_ have a `kid` header indicating the ID of the public key with which the token
 can be verified. In addition, a `PublicKeyResolver` implementation is required to download the public key.

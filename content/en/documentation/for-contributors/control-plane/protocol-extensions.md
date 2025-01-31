@@ -52,11 +52,11 @@ and it is registered in the `RemoteMessageDispatcherRegistry`, where it gets ass
 Internally EDC uses the `RemoteMessageDispatcherRegistry` whenever it needs to deliver a `RemoteMessage` to the counter-party. The `RemoteMessage` then gets routed to the right `RemoteMessageDispatcher` based on the `RemoteMessage#getProtocol` property.
 
 
-> EDC also uses `RemoteMessageDispatcherRegistry` for non-protocol messages  when dispatching [event callbacks](./service-layers.md#63-registering-for-callbacks-webhooks)
+> EDC also uses `RemoteMessageDispatcherRegistry` for non-protocol messages  when dispatching [event callbacks](../runtime/service-layers.md#63-registering-for-callbacks-webhooks)
 
 ### 1.2 Handling incoming messages with protocol services
 
-On the ingress side, protocol implementations should be able to receive messages through the network (e.g. [API Controllers](./service-layers.md#1-api-controllers)), deserialize them into the corresponding `RemoteMessage`s and then dispatching them to the right protocol service.
+On the ingress side, protocol implementations should be able to receive messages through the network (e.g. [API Controllers](../runtime/service-layers.md#1-api-controllers)), deserialize them into the corresponding `RemoteMessage`s and then dispatching them to the right protocol service.
 
 Protocol services are three:
 
@@ -93,7 +93,7 @@ Handlers map a `RemoteMessage` to an HTTP Request and instruct the `DspHttpRemot
 
 ### 2.2 HTTP endpoints
 
-Each `dsp-*-http-api` module exposes its own [API Controllers](./service-layers.md#1-api-controllers) for serving the specification requests. Each request handler transforms the JSON-LD in input, if present, into a `RemoteMessage` and then calls the [protocol service](#12-handling-incoming-messages-with-protocol-services) layer.
+Each `dsp-*-http-api` module exposes its own [API Controllers](../runtime/service-layers.md#1-api-controllers) for serving the specification requests. Each request handler transforms the JSON-LD in input, if present, into a `RemoteMessage` and then calls the [protocol service](#12-handling-incoming-messages-with-protocol-services) layer.
 
 ### 2.2 `RemoteMessage` transformers
 

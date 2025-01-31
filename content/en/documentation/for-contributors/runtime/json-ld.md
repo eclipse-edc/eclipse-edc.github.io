@@ -113,7 +113,7 @@ For playing around JSON-LD and processing algorithm the [playground](https://jso
 
 EDC uses JSON-LD as primary serialization format at API layer and at runtime EDC manages the objects in their expanded
 form, for example when transforming `JsonObject` into EDC entities and and backwards
-in [transformers](./programming-primitives.md#2-transformers) or when [validating](#11-json-ld-validation) input
+in [transformers](programming-primitives.md#2-transformers) or when [validating](#11-json-ld-validation) input
 `JsonObject` at API level.
 
 > Extensible properties in entities are always stored expanded form.
@@ -387,7 +387,7 @@ public class FooValidator {
 }
 ```
 
-and can be registered with the [@Injectable](./dependency-injection.md#2-injecting-a-service)
+and can be registered with the [@Injectable](../control-plane/dependency-injection.md#2-injecting-a-service)
 `JsonObjectValidatorRegistry`:
 
 ```java

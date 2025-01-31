@@ -640,7 +640,7 @@ any API.
 
 Contract negotiations are asynchronous in nature. That means after initiating them, they become (potentially
 long-running) stateful processes that are advanced by an
-internal [state machine](../programming-primitives.md#1-state-machines).
+internal [state machine](../../runtime/programming-primitives.md#1-state-machines).
 The current state of the negotiation can be queried and altered through the management API.
 
 Here's a diagram of the state machine applied to contract negotiations:
@@ -839,7 +839,7 @@ and construct the list of
 
 A `TransferProcess` is a record of the data sharing procedure between a _consumer_ and a _provider_. As they traverse
 through the system, they transition through several
-states ([`TransferProcessStates`](../programming-primitives.md#1-state-machines)).
+states ([`TransferProcessStates`](../../runtime/programming-primitives.md#1-state-machines)).
 
 Once a contract is [negotiated](#4-contract-negotiations) and an [agreement](#5-contract-agreements) is reached, the
 consumer connector may send a transfer initiate request to start the transfer. In the course of doing that, both parties

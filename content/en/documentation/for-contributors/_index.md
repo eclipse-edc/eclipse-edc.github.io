@@ -11,23 +11,24 @@ weight: 30
     * [1.3 Architectural and coding principles](#13-architectural-and-coding-principles)
   * [2. The control plane](#2-the-control-plane)
     * [2.1 Entities](#21-entities)
-    * [2.2 Programming Primitives](#22-programming-primitives)
-    * [2.3 Serialization via JSON-LD](#23-serialization-via-json-ld)
-    * [2.4 Extension model](#24-extension-model)
-    * [2.5 Dependency injection deep dive](#25-dependency-injection-deep-dive)
-    * [2.6 Service layers](#26-service-layers)
-    * [2.7 Policy Monitor](#27-policy-monitor)
-    * [2.8 Protocol extensions (DSP)](#28-protocol-extensions-dsp)
+    * [2.2 Policy Monitor](#22-policy-monitor)
+    * [2.3 Protocol extensions (DSP)](#23-protocol-extensions-dsp)
     * [3. (Postgre-)SQL persistence](#3-postgre-sql-persistence)
   * [4. The data plane](#4-the-data-plane)
     * [4.1 Data plane signaling](#41-data-plane-signaling)
     * [4.2 Writing a custom data plane extension (sink/source)](#42-writing-a-custom-data-plane-extension-sinksource)
     * [4.3 Writing a custom data plane (using only DPS)](#43-writing-a-custom-data-plane-using-only-dps)
-  * [5. Development best practices](#5-development-best-practices)
-    * [5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#51-writing-unit--component--integration--api--endtoend-tests)
-    * [5.1 Coding best practices](#51-coding-best-practices)
-    * [5.2 Testing best practices](#52-testing-best-practices)
-    * [5.3 Other best practices](#53-other-best-practices)
+  * [5. Runtime](#5-runtime)
+    * [5.1 Serialization via JSON-LD](#51-serialization-via-json-ld)
+    * [5.2 Programming Primitives](#52-programming-primitives)
+    * [5.3 Extension model](#53-extension-model)
+    * [5.4 Dependency injection deep dive](#54-dependency-injection-deep-dive)
+    * [5.5 Service layers](#55-service-layers)
+  * [6. Development best practices](#6-development-best-practices)
+    * [6.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests](#61-writing-unit--component--integration--api--endtoend-tests)
+    * [6.1 Coding best practices](#61-coding-best-practices)
+    * [6.2 Testing best practices](#62-testing-best-practices)
+    * [6.3 Other best practices](#63-other-best-practices)
   * [6. Further concepts](#6-further-concepts)
     * [6.1 Autodoc](#61-autodoc)
     * [6.2 Adapting the Gradle build](#62-adapting-the-gradle-build)
@@ -127,53 +128,14 @@ are located at `extensions/control-plane/api/management-api`.
 
 Detailed documentation about entities can be found [here](./control-plane/entities.md)
 
-### 2.2 Programming Primitives
-
-This chapter describes the fundamental architectural and programming paradigms that are used in EDC. Typically, they
-are not related to one single extension or feature area, they are of overarching character.
-
-Detailed documentation about programming primitives can be found [here](./control-plane/programming-primitives.md)
-
-### 2.3 Serialization via JSON-LD
-
-JSON-LD is a JSON-based format for serializing [Linked Data](https://www.w3.org/wiki/LinkedData), and allows adding
-specific "context" to the data expressed as JSON format.
-It is a [W3C](https://www.w3.org/TR/json-ld/) standard since 2010.
-
-Detailed information about how JSON-LD is used in EDC can be found [here](./control-plane/json-ld.md)
-
-### 2.4 Extension model
-
-One of the principles EDC is built around is _extensibility_. This means that by simply putting a Java module on the
-classpath, the code in it will be used to enrich and influence the runtime behaviour of EDC. For instance, contributing
-additional data persistence implementations can be achieved this way. This is sometimes also referred to as "plugin".
-
-Detailed documentation about the EDC extension model can be found [here](./control-plane/extension-model.md)
-
-### 2.5 Dependency injection deep dive
-
-In EDC, dependency injection is available to inject services into extension classes (implementors of the
-`ServiceExtension` interface). The `ServiceExtensionContext` acts as service registry, and since it's not _quite_ an IoC
-container, we'll refer to it simple as the "context" in this chapter.
-
-Detailed documentation about the EDC dependency injection mechanism can be
-found [here](./control-plane/dependency-injection.md)
-
-### 2.6 Service layers
-
-Like many other applications and application frameworks, EDC is built upon a vertically oriented set of different layers
-that we call "service layers".
-
-Detailed documentation about the EDC service layers can be found [here](./control-plane/service-layers.md)
-
-### 2.7 Policy Monitor
+### 2.2 Policy Monitor
 
 The policy monitor is a component that watches over on-going transfers and ensures that the policies associated with the
 transfer are still valid.
 
 Detailed documentation about the policy monitor can be found [here](./control-plane/policy-monitor.md)
 
-### 2.8 Protocol extensions (DSP)
+### 2.3 Protocol extensions (DSP)
 
 This chapter describes how EDC abstracts the interaction between connectors in a Dataspace through protocol extensions
 and introduces the current default implementation which follows the [Dataspace
@@ -186,13 +148,13 @@ Detailed documentation about protocol extensions can be found [here](./control-p
 PostgreSQL is a very popular open-source database and it has a large community and vendor adoption. It is also EDCs data
 persistence technology of choice.
 
-Every [store](./control-plane/service-layers.md#5-data-persistence) in the EDC, intended to persist state, comes out of
+Every [store](runtime/service-layers.md#5-data-persistence) in the EDC, intended to persist state, comes out of
 the box with two implementations:
 
 - in-memory
 - sql (PostgreSQL dialect)
 
-By default, the [in-memory stores](./control-plane/service-layers.md#51-in-memory-stores) are provided by the dependency
+By default, the [in-memory stores](runtime/service-layers.md#51-in-memory-stores) are provided by the dependency
 injection, the SQL variants can be used by simply adding the relevant extensions (e.g. `asset-index-sql`,
 `contract-negotiation-store-sql`, ...) to the classpath.
 
@@ -222,17 +184,58 @@ to write a data plane from scratch (without using EDC and [DPF](./data-plane/dat
 
 Detailed documentation about writing a custom data plane be found [here](./data-plane/custom-data-plane.md).
 
+## 5. Runtime
 
-## 5. Development best practices
+### 5.1 Serialization via JSON-LD
 
-### 5.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests
+JSON-LD is a JSON-based format for serializing [Linked Data](https://www.w3.org/wiki/LinkedData), and allows adding
+specific "context" to the data expressed as JSON format.
+It is a [W3C](https://www.w3.org/TR/json-ld/) standard since 2010.
+
+Detailed information about how JSON-LD is used in EDC can be found [here](runtime/json-ld.md)
+
+### 5.2 Programming Primitives
+
+This chapter describes the fundamental architectural and programming paradigms that are used in EDC. Typically, they
+are not related to one single extension or feature area, they are of overarching character.
+
+Detailed documentation about programming primitives can be found [here](runtime/programming-primitives.md)
+
+
+### 5.3 Extension model
+
+One of the principles EDC is built around is _extensibility_. This means that by simply putting a Java module on the
+classpath, the code in it will be used to enrich and influence the runtime behaviour of EDC. For instance, contributing
+additional data persistence implementations can be achieved this way. This is sometimes also referred to as "plugin".
+
+Detailed documentation about the EDC extension model can be found [here](runtime/extension-model.md)
+
+### 5.4 Dependency injection deep dive
+
+In EDC, dependency injection is available to inject services into extension classes (implementors of the
+`ServiceExtension` interface). The `ServiceExtensionContext` acts as service registry, and since it's not _quite_ an IoC
+container, we'll refer to it simple as the "context" in this chapter.
+
+Detailed documentation about the EDC dependency injection mechanism can be
+found [here](runtime/dependency-injection.md)
+
+### 5.5 Service layers
+
+Like many other applications and application frameworks, EDC is built upon a vertically oriented set of different layers
+that we call "service layers".
+
+Detailed documentation about the EDC service layers can be found [here](runtime/service-layers.md)
+
+## 6. Development best practices
+
+### 6.1 Writing Unit-, Component-, Integration-, Api-, EndToEnd-Tests
 
 test pyramid... Like any other project, EDC has established a set of recommendations and rules that contributors must
 adhere to in order to guarantee a smooth collaboration with the project. Note that familiarity with our [formal
 contribution guidelines](./guidelines) is assumed. There additional recommendations we have compiled that
 are relevant when deploying and administering EDC instances.
 
-### 5.1 Coding best practices
+### 6.1 Coding best practices
 
 Code should be written to conform with the EDC [style guide](./guidelines/styleguide).
 
@@ -241,13 +244,13 @@ method X" or "Performing action Z" should be avoided because they pollute the lo
 
 Please find detailed information about logging [here](logging.md).
 
-### 5.2 Testing best practices
+### 6.2 Testing best practices
 
 Every class in the EDC code base should have a test class that verifies the correct functionality of the code.
 
 Detailed information about testing can be found [here](./testing.md).
 
-### 5.3 Other best practices
+### 6.3 Other best practices
 
 Please find general best practices and recommendations [here](./best-practices.md).
 
