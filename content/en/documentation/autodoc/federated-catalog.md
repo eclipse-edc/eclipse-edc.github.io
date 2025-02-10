@@ -5,7 +5,7 @@
 
 Module `connector-runtime`
 --------------------------
-**Artifact:** org.eclipse.edc:connector-runtime:0.11.0
+**Artifact:** org.eclipse.edc:connector-runtime:0.11.1
 
 **Categories:** _None_
 
@@ -27,18 +27,18 @@ _None_
 Module `crawler-spi`
 --------------------
 **Name:** Crawler services
-**Artifact:** org.eclipse.edc:crawler-spi:0.11.0
+**Artifact:** org.eclipse.edc:crawler-spi:0.11.1
 
 **Categories:** _None_
 
 ### Extension points
-  - `org.eclipse.edc.crawler.spi.TargetNodeFilter`
   - `org.eclipse.edc.crawler.spi.TargetNodeDirectory`
+  - `org.eclipse.edc.crawler.spi.TargetNodeFilter`
 
 ### Extensions
 Module `federated-catalog-api`
 ------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-api:0.11.0
+**Artifact:** org.eclipse.edc:federated-catalog-api:0.11.1
 
 **Categories:** _None_
 
@@ -74,7 +74,7 @@ _None_
 
 Module `federated-catalog-cache-sql`
 ------------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-cache-sql:0.11.0
+**Artifact:** org.eclipse.edc:federated-catalog-cache-sql:0.11.1
 
 **Categories:** _None_
 
@@ -107,7 +107,7 @@ _None_
 
 Module `federated-catalog-core`
 -------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-core:0.11.0
+**Artifact:** org.eclipse.edc:federated-catalog-core:0.11.1
 
 **Categories:** _None_
 
@@ -170,7 +170,7 @@ _None_
 Module `federated-catalog-spi`
 ------------------------------
 **Name:** Catalog services
-**Artifact:** org.eclipse.edc:federated-catalog-spi:0.11.0
+**Artifact:** org.eclipse.edc:federated-catalog-spi:0.11.1
 
 **Categories:** _None_
 
@@ -180,7 +180,7 @@ Module `federated-catalog-spi`
 ### Extensions
 Module `target-node-directory-sql`
 ----------------------------------
-**Artifact:** org.eclipse.edc:target-node-directory-sql:0.11.0
+**Artifact:** org.eclipse.edc:target-node-directory-sql:0.11.1
 
 **Categories:** _None_
 
