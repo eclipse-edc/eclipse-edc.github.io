@@ -174,13 +174,13 @@ The EDC Data Plane is build on top of the *Data Plane Framework (DPF)*, which ca
  The framework has extensibility points for supporting different data sources and sinks (e.g., S3, HTTP, Kafka) and can 
 perform direct streaming between different source and sink types.
 
-Detailed documentation about writing a custom data plane extension can be found [here](./data-plane/data-plane-extensions.md).
+Detailed documentation about writing a custom data plane extension can be found [here](./data-plane/_index.md#2-the-data-plane-framework).
 
 
 ### 4.3 Writing a custom data plane (using only DPS)
 
 Since the communication between control plane and data plane is well-defined in the [DPS](#41-data-plane-signaling) protocol, it's possible 
-to write a data plane from scratch (without using EDC and [DPF](./data-plane/data-plane-extensions.md#2-the-data-plane-framework)) and make it work with the EDC control plane.
+to write a data plane from scratch (without using EDC and [DPF](./data-plane/_index.md#2-the-data-plane-framework)) and make it work with the EDC control plane.
 
 Detailed documentation about writing a custom data plane be found [here](./data-plane/custom-data-plane.md).
 

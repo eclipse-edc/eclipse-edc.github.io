@@ -38,7 +38,7 @@ Its purpose is to inform the consumer where they can obtain the data, and which 
 
 The `EndpointDataReference` is a data structure that is used on the consumer side to contain all the relevant
 information of the `DataAddress` and some additional information associated with the transfer, such as asset ID and
-contract ID. Note that is is only the case if the consumer is implemented using EDC.
+contract ID. Note that it's only the case if the consumer is implemented using EDC.
 
 A transfer process may be `STARTED` multiple times (e.g., after it is temporarily `SUSPENDED`), the consumer may receive
 a different `DataAddress` objects as part of each start message. The consumer must **always** create a new `EDR` from
@@ -100,7 +100,7 @@ Content-Type: application/json
 
 The data plane responds with a `DataFlowResponseMessage`, that contains the public endpoint, the authorization token and
 possibly other information in the form of a `DataAddress`. For more information about how access tokens are generated,
-please refer to [this chapter](#52-public-api-access-control).
+please refer to [this chapter](#32-public-api-access-control).
 
 ### 2.2 `SUSPEND`
 
@@ -140,12 +140,17 @@ Content-Type: application/json
 ## 3. Data plane public API
 
 One popular use case for data transmission is where the provider organization exposes a REST API where consumers can
-download data. We call this a "Http-PULL" transfer. This is especially useful for structured data, such as JSON and it
-can even be used to model _streaming_ data.
+download data. We call this a "HttpData-PULL" transfer. This is especially useful for structured data, such as JSON, and
+it can even be used to model _streaming_ data.
 
 To achieve that, the provider data plane can expose a "public API" that takes REST requests and satisfies them by
 pulling data out of a `DataSource` which it obtains by verifying and parsing the `Authorization` token (see [this
 chapter](#32-public-api-access-control) for details).
+
+> Note that the EDC does not provide an implementation of a Public API, this would need to be implemented by the adopters
+> or by a third party, it could be made using EDC by also by extending a full-fledged proxy application.
+> More details on how to write a custom implementation in the
+> [Samples repository](https://github.com/eclipse-edc/Samples/tree/main/transfer/transfer-03-consumer-pull)
 
 ### 3.1 Endpoints and endpoint resolution
 
