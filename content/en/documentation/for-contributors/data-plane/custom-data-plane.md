@@ -255,7 +255,7 @@ a `generateDataAddress` should generate a `DataAddress` in DSP format that conta
 for fetching the data: `endpoint`, `endpointType` and custom extensible properties `endpointProperties`.
 
 For example the default [EDC](./data-plane-signaling/_index.md#323-access-token-generation) generates a `DataAddress`
-that contains also authorization information like the auth token to be used when request data using the Data Plane
+that contains also authorization information like the auth token to be used when request data using a Data Plane
 [public API](./data-plane-signaling/_index.md#3-data-plane-public-api) and the token type (e.g. bearer).
 
 Implementors may also want to track `PULL` requests in a persistent storage, which can be useful in scenario like token
