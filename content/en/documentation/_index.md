@@ -1,6 +1,6 @@
 ---
 title: Documentation
-menu: {main: {weight: 20}}
+menu: { main: { weight: 20 } }
 weight: 20
 
 cascade:
@@ -8,9 +8,9 @@ cascade:
 ---
 
 {{% pageinfo %}}
-Welcome to the EDC, a framework for building globally-scalable data sharing services. 
+Welcome to the Eclipse Dataspace Components (EDC), a framework for building globally-scalable data sharing services.
 {{% /pageinfo %}}
-   
+
 Many organizations face the challenge of securely sharing data with their partners or other trusted third parties. In
 the past, this has been the realm of proprietary EDI solutions. EDC is an alternative to these systems built on the
 concept of [dataspaces](https://dataspace.eclipse.org/). EDC is a set of components that enable developers to create
