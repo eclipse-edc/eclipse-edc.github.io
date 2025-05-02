@@ -1,0 +1,21 @@
+# 以下是排除检查的URL模式，每行一个正则表达式
+# 这些链接将被lychee忽略不进行检查
+
+# 示例域名
+^https?://example\.com
+^https?://example\.org
+
+# 常见的临时URL或本地开发URL
+^https?://localhost
+^https?://127\.0\.0\.1
+^https?://0\.0\.0\.0
+
+# 社交媒体链接（通常有反爬虫措施可能导致检查失败）
+^https?://(www\.)?linkedin\.com
+^https?://(www\.)?twitter\.com
+^https?://(www\.)?facebook\.com
+
+# 可能有限制访问的文件
+\.pdf$
+
+# 添加项目特定需要排除的URL模式 

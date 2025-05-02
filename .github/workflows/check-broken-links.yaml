@@ -1,119 +1,47 @@
-name: Check Dead Links
+name: Check Broken Links
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  # 可选：添加定期检查
+  # schedule:
+  #   - cron: "0 0 * * 0"  # 每周日执行一次
 
 jobs:
   check-links:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Verify curl installation
-        run: curl --version
-
-      - name: Extract and clean URLs from all documentation
-        id: extract_urls
+      - name: Setup link exclusion patterns (optional)
+        id: setup-exclude
         run: |
-          FILE_EXTENSIONS="*.md *.html *.txt"
-
-          REGEX='https?://[^\s)"'"'"'<`:,]+'
-
-          find . \( -name "*.md" -o -name "*.html" -o -name "*.txt" \) -type f -print0 | \
-          xargs -0 grep -oPh "$REGEX" > urls.txt || true
-
-          sort -u urls.txt -o urls.txt
-
-          echo "Total URLs found: $(wc -l < urls.txt)"
-
-          if [ -f exclude_patterns.txt ]; then
-            EXCLUDE_REGEX=$(paste -sd'|' exclude_patterns.txt)
-            grep -vE "$EXCLUDE_REGEX" urls.txt > filtered_urls.txt
+          if [ -f .lycheeignore ]; then
+            echo "Exclusion patterns found in .lycheeignore"
           else
-            echo "exclude_patterns.txt not found. No URLs will be excluded."
-            cp urls.txt filtered_urls.txt
+            echo "# 添加要排除的链接正则表达式，每行一个" > .lycheeignore
+            echo "# 例如：^https://example.com" >> .lycheeignore
           fi
+          
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          args: --verbose --no-progress './**/*.md' './**/*.html' './**/*.txt'
+          fail: true
+          format: markdown
+          output: ./lychee-report.md
 
-          echo "Total URLs after exclusion: $(wc -l < filtered_urls.txt)"
-
-          sed -E 's/[".>,)]+$//' filtered_urls.txt > cleaned_urls.txt
-
-          echo "Total URLs after cleaning: $(wc -l < cleaned_urls.txt)"
-
-          mv cleaned_urls.txt filtered_urls.txt
-
-      - name: Print URLs to be checked
-        run: |
-          echo "===== URLs to be checked ====="
-          cat filtered_urls.txt
-          echo "=============================="
-
-      - name: Check if URLs were found
-        run: |
-          if [ ! -s filtered_urls.txt ]; then
-            echo "No URLs found to check after applying exclusions."
-            exit 0
-          fi
-
-      - name: Check URLs using curl
-        shell: bash
-        run: |
-          set +e
-
-          TOTAL=0
-          FAILED=0
-          DEAD_LINKS=()
-
-          while IFS= read -r url; do
-            TOTAL=$((TOTAL +1))
-            echo "[$TOTAL] Checking URL: $url"
-
-            HTTP_STATUS=$(curl -k \
-              -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)" \
-              -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
-              -H "Accept-Language: en-US,en;q=0.5" \
-              -H "Connection: keep-alive" \
-              -s -o /dev/null -w "%{http_code}" -L --connect-timeout 60 --retry 3 "$url" || echo "000")
-
-            FINAL_URL=$(curl -k \
-              -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)" \
-              -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" \
-              -H "Accept-Language: en-US,en;q=0.5" \
-              -H "Connection: keep-alive" \
-              -s -o /dev/null -w "%{url_effective}" -L --connect-timeout 60 --retry 3 "$url")
-
-            echo "HTTP status for $url: $HTTP_STATUS"
-            echo "Final URL after redirects: $FINAL_URL"
-
-            if [[ "$HTTP_STATUS" -ge 400 || "$HTTP_STATUS" -eq "000" ]]; then
-              echo "❌ Dead link found: $url (HTTP status: $HTTP_STATUS)"
-              DEAD_LINKS+=("$url")
-              FAILED=$((FAILED +1))
-            else
-              echo "✅ Link is valid: $url (HTTP status: $HTTP_STATUS)"
-            fi
-          done < filtered_urls.txt
-
-          echo "Total links checked: $TOTAL"
-          echo "Dead links found: $FAILED"
-
-          if [ "$FAILED" -ne 0 ]; then
-            echo "::error::Found $FAILED dead links."
-            for dead in "${DEAD_LINKS[@]}"; do
-              echo "::error::Dead link: $dead"
-            done
-
-            printf "**Found %d dead links:**\n" "$FAILED" > dead_links.md
-            for dead in "${DEAD_LINKS[@]}"; do
-              printf "- %s\n" "$dead" >> dead_links.md
-            done
-
-            cat dead_links.md
-
-            exit 1
-          else
-            echo "All $TOTAL links are valid."
-          fi
+      # 如果需要将检查结果作为PR评论发布，可以取消注释下面这一步
+      # - name: Create Comment
+      #   uses: peter-evans/create-or-update-comment@v3
+      #   if: github.event_name == 'pull_request' && steps.lychee.outputs.exit_code != 0
+      #   with:
+      #     issue-number: ${{ github.event.pull_request.number }}
+      #     body-file: ./lychee-report.md

@@ -1,0 +1,53 @@
+name: Scheduled Broken Links Check
+
+on:
+  # 定期执行
+  schedule:
+    - cron: "0 0 * * 0"  # 每周日UTC时间00:00执行
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write  # 需要创建issue的权限
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 可选：缓存功能，减少API限制和重复请求
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          args: >-
+            --cache
+            --verbose
+            --no-progress
+            --exclude-path node_modules/
+            --exclude-path .git/
+            './**/*.md'
+            './**/*.html'
+            './**/*.txt'
+          fail: false
+          format: markdown
+
+      - name: Create Issue From File
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 🔍 Broken Links Report
+          content-filepath: ./lychee/out.md
+          labels: bug, documentation 
