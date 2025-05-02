@@ -17,6 +17,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Set up caching to reduce API requests
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
       - name: Setup link exclusion patterns (optional)
         id: setup-exclude
         run: |
@@ -34,10 +42,16 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           args: >-
+            --cache
+            --max-cache-age 48h
             --verbose
             --no-progress
             --exclude-path ".git"
             --exclude-path "node_modules"
+            --max-retries 5
+            --timeout 30
+            --max-concurrency 8
+            --retry-wait-time 3
             './**/*.md' 
             './**/*.html' 
             './**/*.txt'

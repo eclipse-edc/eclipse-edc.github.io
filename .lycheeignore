@@ -25,4 +25,10 @@ file://.*\.svg$
 # Exclude content directory files which may be generated during build
 file://.*?/content/.*
 
+# GitHub specific patterns to reduce API rate limiting
+# These patterns are specifically for repositories that frequently cause 429 errors
+^https?://github\.com/git/git/blob/
+^https?://raw\.githubusercontent\.com/git/
+^https?://api\.github\.com/
+
 # Add project-specific URL patterns to exclude here 

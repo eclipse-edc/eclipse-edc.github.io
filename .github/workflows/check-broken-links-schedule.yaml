@@ -34,10 +34,15 @@ jobs:
         with:
           args: >-
             --cache
+            --max-cache-age 48h
             --verbose
             --no-progress
             --exclude-path ".git"
             --exclude-path "node_modules"
+            --max-retries 5
+            --timeout 30
+            --max-concurrency 8
+            --retry-wait-time 3
             './**/*.md'
             './**/*.html'
             './**/*.txt'
