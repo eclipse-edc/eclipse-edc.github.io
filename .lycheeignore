@@ -1,21 +1,21 @@
-# 以下是排除检查的URL模式，每行一个正则表达式
-# 这些链接将被lychee忽略不进行检查
+# URL patterns to exclude from checking, one regex pattern per line
+# These links will be ignored by lychee
 
-# 示例域名
+# Example domains
 ^https?://example\.com
 ^https?://example\.org
 
-# 常见的临时URL或本地开发URL
+# Common temporary URLs or local development URLs
 ^https?://localhost
 ^https?://127\.0\.0\.1
 ^https?://0\.0\.0\.0
 
-# 社交媒体链接（通常有反爬虫措施可能导致检查失败）
+# Social media links (often have anti-scraping measures that may cause checks to fail)
 ^https?://(www\.)?linkedin\.com
 ^https?://(www\.)?twitter\.com
 ^https?://(www\.)?facebook\.com
 
-# 可能有限制访问的文件
+# Files that may have restricted access
 \.pdf$
 
-# 添加项目特定需要排除的URL模式 
+# Add project-specific URL patterns to exclude here 

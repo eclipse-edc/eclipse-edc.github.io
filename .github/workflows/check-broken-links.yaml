@@ -3,9 +3,9 @@ name: Check Broken Links
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  # 可选：添加定期检查
+  # Optional: Add scheduled checks
   # schedule:
-  #   - cron: "0 0 * * 0"  # 每周日执行一次
+  #   - cron: "0 0 * * 0"  # Runs once every Sunday
 
 jobs:
   check-links:
@@ -23,8 +23,8 @@ jobs:
           if [ -f .lycheeignore ]; then
             echo "Exclusion patterns found in .lycheeignore"
           else
-            echo "# 添加要排除的链接正则表达式，每行一个" > .lycheeignore
-            echo "# 例如：^https://example.com" >> .lycheeignore
+            echo "# Add URL regex patterns to exclude, one per line" > .lycheeignore
+            echo "# Example: ^https://example.com" >> .lycheeignore
           fi
           
       - name: Link Checker
@@ -38,7 +38,7 @@ jobs:
           format: markdown
           output: ./lychee-report.md
 
-      # 如果需要将检查结果作为PR评论发布，可以取消注释下面这一步
+      # If you want to post check results as PR comments, uncomment the following step
       # - name: Create Comment
       #   uses: peter-evans/create-or-update-comment@v3
       #   if: github.event_name == 'pull_request' && steps.lychee.outputs.exit_code != 0

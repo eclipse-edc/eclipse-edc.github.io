@@ -39,32 +39,3 @@ To remove the produced images run:
 docker compose rm
 ```
 For more information see the [Docker Compose documentation][].
-
-## 断链检测
-
-本项目使用GitHub Actions自动检测文档中的断链。
-
-### 自动检测
-
-有两种自动检测机制：
-
-1. **PR检测**：当创建或更新Pull Request时，会自动运行断链检测。
-   - 配置文件：`.github/workflows/check-broken-links.yaml`
-   - 如果检测到断链，PR检查将失败
-
-2. **定期检测**：每周自动运行一次断链检测，并在发现问题时创建Issue。
-   - 配置文件：`.github/workflows/check-broken-links-schedule.yaml`
-   - 检测结果会自动创建带有详细报告的Issue
-
-### 排除特定链接
-
-如果某些链接需要排除检测（例如内部开发环境、需要认证的链接），可以在`.lycheeignore`文件中添加正则表达式模式。
-
-### 手动运行检测
-
-您可以通过GitHub Actions页面手动触发定期检测工作流。
-
-1. 打开本项目的Actions页面
-2. 选择"Scheduled Broken Links Check"工作流
-3. 点击"Run workflow"
-4. 检测完成后，如果发现断链，会自动创建Issue
