@@ -18,4 +18,11 @@
 # Files that may have restricted access
 \.pdf$
 
+# Local file paths that exist in production but not in CI environment
+file:///home/runner/work/eclipse-edc.github.io/eclipse-edc.github.io/content/en/images/edc.schematic.svg
+# Exclude all local SVG files as they may be processed during build
+file://.*\.svg$
+# Exclude content directory files which may be generated during build
+file://.*?/content/.*
+
 # Add project-specific URL patterns to exclude here 

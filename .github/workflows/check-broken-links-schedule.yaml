@@ -36,8 +36,8 @@ jobs:
             --cache
             --verbose
             --no-progress
-            --exclude-path node_modules/
-            --exclude-path .git/
+            --exclude-path ".git"
+            --exclude-path "node_modules"
             './**/*.md'
             './**/*.html'
             './**/*.txt'

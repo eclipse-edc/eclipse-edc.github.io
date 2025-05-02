@@ -33,7 +33,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          args: --verbose --no-progress './**/*.md' './**/*.html' './**/*.txt'
+          args: >-
+            --verbose
+            --no-progress
+            --exclude-path ".git"
+            --exclude-path "node_modules"
+            './**/*.md' 
+            './**/*.html' 
+            './**/*.txt'
           fail: true
           format: markdown
           output: ./lychee-report.md
