@@ -1,0 +1,68 @@
+name: Check Broken Links
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  # Optional: Add scheduled checks
+  # schedule:
+  #   - cron: "0 0 * * 0"  # Runs once every Sunday
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up caching to reduce API requests
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Setup link exclusion patterns (optional)
+        id: setup-exclude
+        run: |
+          if [ -f .lycheeignore ]; then
+            echo "Exclusion patterns found in .lycheeignore"
+          else
+            echo "# Add URL regex patterns to exclude, one per line" > .lycheeignore
+            echo "# Example: ^https://example.com" >> .lycheeignore
+          fi
+          
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          args: >-
+            --cache
+            --max-cache-age 48h
+            --verbose
+            --no-progress
+            --exclude-path ".git"
+            --exclude-path "node_modules"
+            --max-retries 5
+            --timeout 30
+            --max-concurrency 8
+            --retry-wait-time 3
+            './**/*.md' 
+            './**/*.html' 
+            './**/*.txt'
+          fail: true
+          format: markdown
+          output: ./lychee-report.md
+
+      # If you want to post check results as PR comments, uncomment the following step
+      # - name: Create Comment
+      #   uses: peter-evans/create-or-update-comment@v3
+      #   if: github.event_name == 'pull_request' && steps.lychee.outputs.exit_code != 0
+      #   with:
+      #     issue-number: ${{ github.event.pull_request.number }}
+      #     body-file: ./lychee-report.md

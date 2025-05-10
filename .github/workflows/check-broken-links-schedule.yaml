@@ -1,0 +1,58 @@
+name: Scheduled Broken Links Check
+
+on:
+  # Run on schedule
+  schedule:
+    - cron: "0 0 * * 0"  # Runs at 00:00 UTC every Sunday
+  # Manual trigger
+  workflow_dispatch:
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write  # Permission needed to create issues
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Optional: Cache to reduce API rate limits and duplicate requests
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          args: >-
+            --cache
+            --max-cache-age 48h
+            --verbose
+            --no-progress
+            --exclude-path ".git"
+            --exclude-path "node_modules"
+            --max-retries 5
+            --timeout 30
+            --max-concurrency 8
+            --retry-wait-time 3
+            './**/*.md'
+            './**/*.html'
+            './**/*.txt'
+          fail: false
+          format: markdown
+
+      - name: Create Issue From File
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 🔍 Broken Links Report
+          content-filepath: ./lychee/out.md
+          labels: bug, documentation 

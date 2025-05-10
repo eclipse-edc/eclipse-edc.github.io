@@ -1,0 +1,34 @@
+# URL patterns to exclude from checking, one regex pattern per line
+# These links will be ignored by lychee
+
+# Example domains
+^https?://example\.com
+^https?://example\.org
+
+# Common temporary URLs or local development URLs
+^https?://localhost
+^https?://127\.0\.0\.1
+^https?://0\.0\.0\.0
+
+# Social media links (often have anti-scraping measures that may cause checks to fail)
+^https?://(www\.)?linkedin\.com
+^https?://(www\.)?twitter\.com
+^https?://(www\.)?facebook\.com
+
+# Files that may have restricted access
+\.pdf$
+
+# Local file paths that exist in production but not in CI environment
+file:///home/runner/work/eclipse-edc.github.io/eclipse-edc.github.io/content/en/images/edc.schematic.svg
+# Exclude all local SVG files as they may be processed during build
+file://.*\.svg$
+# Exclude content directory files which may be generated during build
+file://.*?/content/.*
+
+# GitHub specific patterns to reduce API rate limiting
+# These patterns are specifically for repositories that frequently cause 429 errors
+^https?://github\.com/git/git/blob/
+^https?://raw\.githubusercontent\.com/git/
+^https?://api\.github\.com/
+
+# Add project-specific URL patterns to exclude here 
