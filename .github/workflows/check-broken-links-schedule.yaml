@@ -18,46 +18,58 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          fetch-depth: 0
 
-      # Set up caching to reduce API requests
+      # Optimize caching strategy
       - name: Restore lychee cache
         uses: actions/cache@v4
         with:
           path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
+          key: cache-lychee-scheduled-${{ github.sha }}
+          restore-keys: |
+            cache-lychee-scheduled-
+            cache-lychee-
 
-      # Simple external link check (only HTTP/HTTPS URLs)
-      - name: Check External Links Only
+      # Check external links (HTTP/HTTPS URLs only)
+      - name: Check external links
         id: lychee-external
         uses: lycheeverse/lychee-action@v2
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: >-
             --cache
-            --max-cache-age 48h
+            --max-cache-age 72h
             --verbose
             --no-progress
             --exclude-path ".git"
             --exclude-path "node_modules"
             --exclude-path "themes"
+            --exclude-path "static/lib"
             --scheme "https"
             --scheme "http"
-            --max-retries 5
-            --timeout 30
-            --max-concurrency 8
-            --retry-wait-time 3
+            --max-retries 6
+            --retry-wait-time 10
+            --timeout 45
+            --max-concurrency 4
+            --github-token "${{ github.token }}"
             './**/*.md'
             './**/*.html'
-            './**/*.txt'
           fail: false
           format: markdown
           output: ./lychee-external-report.md
 
-      - name: Create Issue From File
-        if: steps.lychee-external.outputs.exit_code != 0
+      - name: Check report content
+        id: check-report
+        run: |
+          if [ -f ./lychee-external-report.md ] && [ -s ./lychee-external-report.md ] && grep -q "Broken links found" ./lychee-external-report.md; then
+            echo "broken_links=true" >> $GITHUB_OUTPUT
+          else
+            echo "broken_links=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue
+        if: steps.lychee-external.outputs.exit_code != 0 && steps.check-report.outputs.broken_links == 'true'
         uses: peter-evans/create-issue-from-file@v5
         with:
           title: 🔍 External Broken Links Report

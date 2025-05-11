@@ -39,3 +39,18 @@ To remove the produced images run:
 docker compose rm
 ```
 For more information see the [Docker Compose documentation][].
+
+## Broken Link Checking
+
+This repository includes GitHub Actions workflows to check for broken links:
+
+- PR checks: `.github/workflows/check-broken-links.yaml` (runs on every PR)
+- Scheduled checks: `.github/workflows/check-broken-links-schedule.yaml` (runs weekly)
+
+Both workflows use [lychee](https://github.com/lycheeverse/lychee) to detect broken links.
+
+### Configuration
+
+- URL patterns to ignore are specified in `.lycheeignore`
+- See `.lycheeignore.md` for documentation on the ignore patterns
+- See `.github/workflows/README.md` for workflow documentation

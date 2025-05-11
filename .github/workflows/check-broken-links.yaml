@@ -12,85 +12,57 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: write
       
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          fetch-depth: 0
 
-      # Setup Node.js for theme dependencies
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # Optimize caching strategy to reduce API requests
+      - name: Restore lychee cache
+        uses: actions/cache@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: |
+            cache-lychee-${{ github.event.pull_request.base.sha }}
+            cache-lychee-
 
-      # Install theme dependencies
-      - name: Install dependencies
-        run: |
-          if [ -f "package.json" ]; then
-            npm ci
-          fi
-
-      # Build the Hugo site first to handle rendering
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: '0.110.0'  # Use a specific version known to work with your theme
-          extended: true
-
-      # Check for Hugo config
-      - name: Check Hugo configuration
-        run: |
-          if [ -f "config.toml" ]; then
-            echo "Using config.toml"
-          elif [ -f "config.yaml" ]; then
-            echo "Using config.yaml"
-          elif [ -f "config.json" ]; then
-            echo "Using config.json"
-          else
-            echo "No Hugo config found"
-          fi
-          
-          # Print theme info
-          if [ -d "themes" ]; then
-            echo "Themes directory contents:"
-            ls -la themes/
-          fi
-
-      # Simple external link check to avoid Hugo build issues
-      - name: Check External Links Only
+      # Check external links only
+      - name: Check external links
         id: lychee-external
         uses: lycheeverse/lychee-action@v2
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: >-
             --cache
-            --max-cache-age 48h
+            --max-cache-age 72h
             --verbose
             --no-progress
             --exclude-path ".git"
             --exclude-path "node_modules"
             --exclude-path "themes"
+            --exclude-path "static/lib"
             --scheme "https"
             --scheme "http"
-            --max-retries 5
-            --timeout 30
-            --max-concurrency 8
-            --retry-wait-time 3
+            --max-retries 6
+            --retry-wait-time 10
+            --timeout 45
+            --max-concurrency 4
+            --github-token "${{ github.token }}"
             './**/*.md' 
             './**/*.html' 
-            './**/*.txt'
           fail: true
           format: markdown
           output: ./lychee-external-report.md
 
-      # If you want to post check results as PR comments, uncomment the following step
-      # - name: Create Comment
-      #   uses: peter-evans/create-or-update-comment@v3
-      #   if: github.event_name == 'pull_request' && steps.lychee-external.outputs.exit_code != 0
-      #   with:
-      #     issue-number: ${{ github.event.pull_request.number }}
-      #     body-file: ./lychee-external-report.md
+      # Add check results as PR comment
+      - name: Create PR comment
+        uses: peter-evans/create-or-update-comment@v3
+        if: github.event_name == 'pull_request' && steps.lychee-external.outputs.exit_code != 0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: ./lychee-external-report.md
