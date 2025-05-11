@@ -16,7 +16,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
+      # Build the Hugo site first to handle rendering
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          extended: true
+
+      - name: Build Hugo Site
+        run: |
+          hugo --minify
+          echo "Hugo site built successfully to ./public directory"
+      
       # Set up caching to reduce API requests
       - name: Restore lychee cache
         uses: actions/cache@v4
@@ -35,8 +49,9 @@ jobs:
             echo "# Example: ^https://example.com" >> .lycheeignore
           fi
           
-      - name: Link Checker
-        id: lychee
+      # Run two separate link checks: one for external URLs and one for local files
+      - name: Check External Links
+        id: lychee-external
         uses: lycheeverse/lychee-action@v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -48,6 +63,9 @@ jobs:
             --no-progress
             --exclude-path ".git"
             --exclude-path "node_modules"
+            --exclude-path "public"
+            --scheme "https"
+            --scheme "http"
             --max-retries 5
             --timeout 30
             --max-concurrency 8
@@ -55,9 +73,52 @@ jobs:
             './**/*.md' 
             './**/*.html' 
             './**/*.txt'
+          fail: false
+          format: markdown
+          output: ./lychee-external-report.md
+
+      # Check links in the generated Hugo site (public directory)
+      - name: Check Links in Generated Site
+        id: lychee-hugo
+        uses: lycheeverse/lychee-action@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          args: >-
+            --cache
+            --max-cache-age 48h
+            --verbose
+            --no-progress
+            --exclude-path ".git"
+            --exclude-path "node_modules"
+            --base "file://$(pwd)/public"
+            --max-retries 3
+            --timeout 30
+            --max-concurrency 8
+            --retry-wait-time 3
+            './public/**/*.html'
           fail: true
           format: markdown
-          output: ./lychee-report.md
+          output: ./lychee-hugo-report.md
+
+      # Combine reports
+      - name: Combine Reports
+        if: steps.lychee-external.outputs.exit_code != 0 || steps.lychee-hugo.outputs.exit_code != 0
+        run: |
+          echo "# Link Checker Report" > ./lychee-combined-report.md
+          echo "" >> ./lychee-combined-report.md
+          echo "## External Link Check Results" >> ./lychee-combined-report.md
+          cat ./lychee-external-report.md >> ./lychee-combined-report.md
+          echo "" >> ./lychee-combined-report.md
+          echo "## Generated Site Link Check Results" >> ./lychee-combined-report.md
+          cat ./lychee-hugo-report.md >> ./lychee-combined-report.md
+
+      # Fail the workflow if the Hugo site check fails
+      - name: Check for errors
+        if: steps.lychee-hugo.outputs.exit_code != 0
+        run: |
+          echo "Errors found in the generated Hugo site. See the report for details."
+          exit 1
 
       # If you want to post check results as PR comments, uncomment the following step
       # - name: Create Comment
