@@ -12,7 +12,7 @@
         "and": [
           {
             "leftOperand": "edc:inForceDate",
-            "operator": "gte",
+            "operator": "gt",
             "rightOperand": {
               "@value": "contractAgreement",
               "@type": "edc:dateExpression"
@@ -20,7 +20,7 @@
           },
           {
             "leftOperand": "edc:inForceDate",
-            "operator": "lte",
+            "operator": "lt",
             "rightOperand": {
               "@value": "contractAgreement + 100d",
               "@type": "edc:dateExpression"

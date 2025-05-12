@@ -12,7 +12,7 @@
         "and": [
           {
             "leftOperand": "edc:inForceDate",
-            "operator": "gte",
+            "operator": "gt",
             "rightOperand": {
               "@value": "2023-01-01T00:00:01Z",
               "@type": "xsd:datetime"
@@ -20,7 +20,7 @@
           },
           {
             "leftOperand": "edc:inForceDate",
-            "operator": "lte",
+            "operator": "lt",
             "rightOperand": {
               "@value": "2024-01-01T00:00:01Z",
               "@type": "xsd:datetime"

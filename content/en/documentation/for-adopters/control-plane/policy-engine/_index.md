@@ -183,7 +183,7 @@ operands `https://w3id.org/edc/v0.0.1/ns/inForceDate`:
         "and": [
           {
             "leftOperand": "https://w3id.org/edc/v0.0.1/ns/inForceDate",
-            "operator": "gte",
+            "operator": "gt",
             "rightOperand": {
               "@value": "contractAgreement",
               "@type": "https://w3id.org/edc/v0.0.1/ns/inForceDate:dateExpression"
@@ -191,7 +191,7 @@ operands `https://w3id.org/edc/v0.0.1/ns/inForceDate`:
           },
           {
             "leftOperand": "https://w3id.org/edc/v0.0.1/ns/inForceDate:inForceDate",
-            "operator": "lte",
+            "operator": "lt",
             "rightOperand": {
               "@value": "contractAgreement + 100d",
               "@type": "https://w3id.org/edc/v0.0.1/ns/inForceDate:dateExpression"
@@ -223,7 +223,7 @@ Fixed dates may also be specified as follows using `https://w3id.org/edc/v0.0.1/
         "and": [
           {
             "leftOperand": "https://w3id.org/edc/v0.0.1/ns/inForceDate",
-            "operator": "gte",
+            "operator": "gt",
             "rightOperand": {
               "@value": "2023-01-01T00:00:01Z",
               "@type": "xsd:datetime"
@@ -231,7 +231,7 @@ Fixed dates may also be specified as follows using `https://w3id.org/edc/v0.0.1/
           },
           {
             "leftOperand": "https://w3id.org/edc/v0.0.1/ns/inForceDate",
-            "operator": "lte",
+            "operator": "lt",
             "rightOperand": {
               "@value": "2024-01-01T00:00:01Z",
               "@type": "xsd:datetime"
@@ -272,7 +272,7 @@ defines a contact is not in force before `January 1, 2023`:
       "action": "use",
       "constraint": {
         "leftOperand": "edc:inForceDate",
-        "operator": "gte",
+        "operator": "gt",
         "rightOperand": {
           "@value": "2023-01-01T00:00:01Z",
           "@type": "xsd:datetime"
