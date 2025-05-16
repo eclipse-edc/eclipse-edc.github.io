@@ -1,0 +1,68 @@
+name: Check Broken Links
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  # Optional: Add scheduled checks
+  # schedule:
+  #   - cron: "0 0 * * 0"  # Runs once every Sunday
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Optimize caching strategy to reduce API requests
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: |
+            cache-lychee-${{ github.event.pull_request.base.sha }}
+            cache-lychee-
+
+      # Check external links only
+      - name: Check external links
+        id: lychee-external
+        uses: lycheeverse/lychee-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: >-
+            --cache
+            --max-cache-age 72h
+            --verbose
+            --no-progress
+            --exclude-path ".git"
+            --exclude-path "node_modules"
+            --exclude-path "themes"
+            --exclude-path "static/lib"
+            --scheme "https"
+            --scheme "http"
+            --max-retries 6
+            --retry-wait-time 10
+            --timeout 45
+            --max-concurrency 4
+            --github-token "${{ github.token }}"
+            './**/*.md' 
+            './**/*.html' 
+          fail: true
+          format: markdown
+          output: ./lychee-external-report.md
+
+      # Add check results as PR comment
+      - name: Create PR comment
+        uses: peter-evans/create-or-update-comment@v3
+        if: github.event_name == 'pull_request' && steps.lychee-external.outputs.exit_code != 0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: ./lychee-external-report.md
