@@ -5,7 +5,7 @@
 
 Module `connector-runtime`
 --------------------------
-**Artifact:** org.eclipse.edc:connector-runtime:0.12.0
+**Artifact:** org.eclipse.edc:connector-runtime:0.13.0
 
 **Categories:** _None_
 
@@ -27,7 +27,7 @@ _None_
 Module `crawler-spi`
 --------------------
 **Name:** Crawler services
-**Artifact:** org.eclipse.edc:crawler-spi:0.12.0
+**Artifact:** org.eclipse.edc:crawler-spi:0.13.0
 
 **Categories:** _None_
 
@@ -38,7 +38,7 @@ Module `crawler-spi`
 ### Extensions
 Module `federated-catalog-api`
 ------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-api:0.12.0
+**Artifact:** org.eclipse.edc:federated-catalog-api:0.13.0
 
 **Categories:** _None_
 
@@ -74,7 +74,7 @@ _None_
 
 Module `federated-catalog-cache-sql`
 ------------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-cache-sql:0.12.0
+**Artifact:** org.eclipse.edc:federated-catalog-cache-sql:0.13.0
 
 **Categories:** _None_
 
@@ -82,7 +82,7 @@ Module `federated-catalog-cache-sql`
 _None_
 
 ### Extensions
-#### Class: `org.eclipse.edc.catalog.store.sql.SqlFederatedCatalogCacheExtension`
+#### Class: `org.eclipse.edc.catalog.cache.sql.SqlFederatedCatalogCacheExtension`
 **Name:** "SQL federated catalog cache"
 
 **Overview:** No overview provided.
@@ -100,14 +100,14 @@ _None_
 #### Referenced (injected) services
 - `org.eclipse.edc.transaction.datasource.spi.DataSourceRegistry` (required)
 - `org.eclipse.edc.transaction.spi.TransactionContext` (required)
-- `org.eclipse.edc.catalog.store.sql.FederatedCatalogCacheStatements` (optional)
+- `org.eclipse.edc.catalog.cache.sql.FederatedCatalogCacheStatements` (optional)
 - `org.eclipse.edc.spi.types.TypeManager` (required)
 - `org.eclipse.edc.sql.QueryExecutor` (required)
 - `org.eclipse.edc.sql.bootstrapper.SqlSchemaBootstrapper` (required)
 
 Module `federated-catalog-core`
 -------------------------------
-**Artifact:** org.eclipse.edc:federated-catalog-core:0.12.0
+**Artifact:** org.eclipse.edc:federated-catalog-core:0.13.0
 
 **Categories:** _None_
 
@@ -115,29 +115,6 @@ Module `federated-catalog-core`
 _None_
 
 ### Extensions
-#### Class: `org.eclipse.edc.catalog.cache.FederatedCatalogDefaultServicesExtension`
-**Name:** "FederatedCatalogDefaultServicesExtension"
-
-**Overview:** No overview provided.
-
-
-### Configuration
-
-| Key                                          | Required | Type     | Default | Pattern | Min | Max | Description                                                                                                     |
-| -------------------------------------------- | -------- | -------- | ------- | ------- | --- | --- | --------------------------------------------------------------------------------------------------------------- |
-| `edc.catalog.cache.execution.period.seconds` | `*`      | `string` | `60`    |         |     |     | The time to elapse between two crawl runs                                                                       |
-| `edc.catalog.cache.partition.num.crawlers`   | `*`      | `string` | `2`     |         |     |     | The number of crawlers (execution threads) that should be used. The engine will re-use crawlers when necessary. |
-| `edc.catalog.cache.execution.delay.seconds`  |          | `string` | ``      |         |     |     | The initial delay for the cache crawler engine                                                                  |
-
-#### Provided services
-- `org.eclipse.edc.catalog.spi.FederatedCatalogCache`
-- `org.eclipse.edc.crawler.spi.TargetNodeDirectory`
-- `org.eclipse.edc.catalog.spi.QueryService`
-- `org.eclipse.edc.crawler.spi.model.ExecutionPlan`
-
-#### Referenced (injected) services
-- `org.eclipse.edc.catalog.spi.FederatedCatalogCache` (required)
-
 #### Class: `org.eclipse.edc.catalog.cache.FederatedCatalogCacheExtension`
 **Name:** "Federated Catalog Cache"
 
@@ -162,15 +139,39 @@ _None_
 - `org.eclipse.edc.crawler.spi.TargetNodeFilter` (optional)
 - `org.eclipse.edc.crawler.spi.model.ExecutionPlan` (optional)
 - `org.eclipse.edc.spi.types.TypeManager` (required)
+- `org.eclipse.edc.participant.spi.ParticipantIdMapper` (required)
 - `org.eclipse.edc.transform.spi.TypeTransformerRegistry` (required)
 - `org.eclipse.edc.jsonld.spi.JsonLd` (required)
 - `org.eclipse.edc.spi.monitor.Monitor` (required)
 - `org.eclipse.edc.transform.spi.TypeTransformerRegistry` (required)
 
+#### Class: `org.eclipse.edc.catalog.cache.FederatedCatalogDefaultServicesExtension`
+**Name:** "FederatedCatalogDefaultServicesExtension"
+
+**Overview:** No overview provided.
+
+
+### Configuration
+
+| Key                                          | Required | Type     | Default | Pattern | Min | Max | Description                                                                                                     |
+| -------------------------------------------- | -------- | -------- | ------- | ------- | --- | --- | --------------------------------------------------------------------------------------------------------------- |
+| `edc.catalog.cache.execution.period.seconds` | `*`      | `string` | `60`    |         |     |     | The time to elapse between two crawl runs                                                                       |
+| `edc.catalog.cache.partition.num.crawlers`   | `*`      | `string` | `2`     |         |     |     | The number of crawlers (execution threads) that should be used. The engine will re-use crawlers when necessary. |
+| `edc.catalog.cache.execution.delay.seconds`  |          | `string` | ``      |         |     |     | The initial delay for the cache crawler engine                                                                  |
+
+#### Provided services
+- `org.eclipse.edc.catalog.spi.FederatedCatalogCache`
+- `org.eclipse.edc.crawler.spi.TargetNodeDirectory`
+- `org.eclipse.edc.catalog.spi.QueryService`
+- `org.eclipse.edc.crawler.spi.model.ExecutionPlan`
+
+#### Referenced (injected) services
+- `org.eclipse.edc.catalog.spi.FederatedCatalogCache` (required)
+
 Module `federated-catalog-spi`
 ------------------------------
 **Name:** Catalog services
-**Artifact:** org.eclipse.edc:federated-catalog-spi:0.12.0
+**Artifact:** org.eclipse.edc:federated-catalog-spi:0.13.0
 
 **Categories:** _None_
 
@@ -180,7 +181,7 @@ Module `federated-catalog-spi`
 ### Extensions
 Module `target-node-directory-sql`
 ----------------------------------
-**Artifact:** org.eclipse.edc:target-node-directory-sql:0.12.0
+**Artifact:** org.eclipse.edc:target-node-directory-sql:0.13.0
 
 **Categories:** _None_
 
@@ -188,7 +189,7 @@ Module `target-node-directory-sql`
 _None_
 
 ### Extensions
-#### Class: `org.eclipse.edc.catalog.store.sql.SqlTargetNodeDirectoryExtension`
+#### Class: `org.eclipse.edc.catalog.directory.sql.SqlTargetNodeDirectoryExtension`
 **Name:** "SQL target node directory"
 
 **Overview:** No overview provided.
@@ -206,7 +207,7 @@ _None_
 #### Referenced (injected) services
 - `org.eclipse.edc.transaction.datasource.spi.DataSourceRegistry` (required)
 - `org.eclipse.edc.transaction.spi.TransactionContext` (required)
-- `org.eclipse.edc.catalog.store.sql.TargetNodeStatements` (optional)
+- `org.eclipse.edc.catalog.directory.sql.TargetNodeStatements` (optional)
 - `org.eclipse.edc.spi.types.TypeManager` (required)
 - `org.eclipse.edc.sql.QueryExecutor` (required)
 - `org.eclipse.edc.sql.bootstrapper.SqlSchemaBootstrapper` (required)
