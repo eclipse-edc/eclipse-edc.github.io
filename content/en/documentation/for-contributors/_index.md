@@ -292,7 +292,7 @@ The most important plugin is the "EDC build" plugin. It consists essentially of 
 - _a plugin class_: extends `Plugin<Project>` from the Gradle API to hook into the Gradle task infrastructure
 - _extensions_: they are POJOs that are model classes for configuration.
 - _conventions_: individual mutations that are applied to the project. For example, we use conventions to add some
-  standard repositories to all projects, or to implement publishing to OSSRH and MavenCentral in a generic way.
+  standard repositories to all projects, or to implement publishing to Snapshot Repository and MavenCentral in a generic way.
 - _tasks_: executable Gradle tasks that perform a certain action like merging OpenAPI Specification documents.
 
 It is important to note that a Gradle build is separated in _phases_, namely _Initialization_, _Configuration_ and
@@ -301,7 +301,7 @@ _conventions_ as well as other plugins have to be applied in the _Configuration_
 
 ### 6.3 The EDC Release process
 
-Generally speaking, EDC publishes `-SNAPSHOT` build artifacts to OSSRH Snapshots and release build artefacts to
+Generally speaking, EDC publishes `-SNAPSHOT` build artifacts to Snapshot Repository and release build artefacts to
 MavenCentral.
 
 We further distinguish our artifacts in "core" modules and "technology" modules. The earlier consists of the Connector,
