@@ -1,7 +1,7 @@
 ---
 title: Extensions
 description: Details how to add customizations, features, and new capabilities to EDC components.
-weight: 70
+weight: 90
 ---
 
 <!-- TOC -->

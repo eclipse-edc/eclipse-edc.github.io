@@ -1,7 +1,7 @@
 ---
 title: Testing
 description: Covers how to use EDC test runtimes.
-weight: 70
+weight: 100
 ---
 
 EDC provides a JUnit test fixture for running automated integration tests. The EDC JUnit runtime offers a number of advantages:
