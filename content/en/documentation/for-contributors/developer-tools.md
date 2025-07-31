@@ -1,46 +1,82 @@
 ---
-title: Autodoc Gradle plugin
+title: Developer Tools
 weight: 20
 ---
 
 <!-- TOC -->
   * [1. Introduction](#1-introduction)
-  * [2. Module structure](#2-module-structure)
-  * [3. Usage](#3-usage)
-    * [3.1 Add the plugin to the `buildscript` block of your `build.gradle.kts`:](#31-add-the-plugin-to-the-buildscript-block-of-your-buildgradlekts)
-    * [3.2 Apply the plugin to the project:](#32-apply-the-plugin-to-the-project)
-    * [3.3 Configure the plugin [optional]](#33-configure-the-plugin-optional)
-  * [4. Merging the manifests](#4-merging-the-manifests)
-  * [5. Rendering manifest files as Markdown or HTML](#5-rendering-manifest-files-as-markdown-or-html)
-  * [6. Using published manifest files (MavenCentral)](#6-using-published-manifest-files-mavencentral)
+  * [2. `edc-build`](#2-edc-build)
+    * [2.1. Usage](#21-usage)
+  * [3. `autodoc`](#3-autodoc)
+    * [3.1. Usage](#31-usage)
+      * [3.1.1. Add the plugin to the `buildscript` block of your `build.gradle.kts`:](#311-add-the-plugin-to-the-buildscript-block-of-your-buildgradlekts)
+      * [3.1.2. Apply the plugin to the project:](#312-apply-the-plugin-to-the-project)
+      * [3.1.3. Configure the plugin [optional]](#313-configure-the-plugin-optional)
+  * [3.2. Merging the manifests](#32-merging-the-manifests)
+    * [3.3. Rendering manifest files as Markdown or HTML](#33-rendering-manifest-files-as-markdown-or-html)
+  * [3.4. Using published manifest files (MavenCentral)](#34-using-published-manifest-files-mavencentral)
 <!-- TOC -->
 
 ## 1. Introduction
 
-In EDC, the autodoc plugin is intended to be used to generate metamodel manifests for every Gradle module, which can
-then transformed into Markdown or HTML files, and subsequently be rendered for publication in static web content.
+We provide two Gradle plugins that could be used to simplify your build/documentation efforts.
 
-The plugin code can be found in the [GradlePlugins GitHub Repository](https://github.com/eclipse-edc/GradlePlugins).
+The plugins are available on the [GradlePlugins GitHub Repository](https://github.com/eclipse-edc/GradlePlugins):
+- `edc-build`
+- `autodoc`
+
+## 2. `edc-build`
+
+The plugin consists essentially of these things:
+
+- _a plugin class_: extends `Plugin<Project>` from the Gradle API to hook into the Gradle task infrastructure
+- _extensions_: they are POJOs that are model classes for configuration.
+- _conventions_: individual mutations that are applied to the project. For example, we use conventions to add some
+  standard repositories to all projects, or to implement publishing to Snapshot Repository and MavenCentral in a generic way.
+- _tasks_: executable Gradle tasks that perform a certain action like merging OpenAPI Specification documents.
+
+It is important to note that a Gradle build is separated in _phases_, namely _Initialization_, _Configuration_ and
+_Execution_ (see [documentation](https://docs.gradle.org/current/userguide/build_lifecycle.html)). Some of our
+_conventions_ as well as other plugins have to be applied in the _Configuration_ phase.
+
+### 2.1. Usage
+
+The plugin is published on the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/org.eclipse.edc.edc-build), so
+it can be added to your project in the standard way suggested in the [Gradle documentation](https://docs.gradle.org/current/userguide/plugins.html.
+
+## 3. `autodoc`
+
+This plugin provides an automated way to generate basic documentation about extensions, plug points, SPI modules and
+configuration settings for every EDC extension module, which can then transformed into Markdown or HTML files, and
+subsequently be rendered for publication in static web content.
+
+To achieve this, simply annotate respective elements directly in Java code:
+
+```java
+@Extension(value = "Some supercool extension", categories = {"category1", "category2"})
+public class SomeSupercoolExtension implements ServiceExtension {
+
+  // default value -> not required
+  @Setting(value = "Some string config property", type = "string", defaultValue = "foobar", required = false)
+  public static final String SOME_STRING_CONFIG_PROPERTY = "edc.some.supercool.string";
+
+  //no default value -> required
+  @Setting(value = "Some numeric config", type = "integer", required = true)
+  public static final String SOME_INT_CONFIG_PROPERTY = "edc.some.supercool.int";
+
+  // ...
+}
+```
 
 The `autodoc` plugin hooks into the Java compiler task (`compileJava`) and generates a module manifest file that
 contains meta information about each module. For example, it exposes all required and provided dependencies of an EDC
 `ServiceExtension`.
 
-## 2. Module structure
-
-The `autodoc` plugin is located at `plugins/autodoc` and consists of four separate modules:
-
-- `autodoc-plugin`: contains the actual Gradle `Plugin` and an `Extension` to configure the plugin. This module is
-  published to MavenCentral.
-- `autodoc-processor`: contains an `AnnotationProcessor` that hooks into the compilation process and builds the manifest
-  file. Published to MavenCentral.
-- `autodoc-converters`: used to convert JSON manifests to Markdown or HTML
-
-## 3. Usage
+### 3.1. Usage
 
 In order to use the `autodoc` plugin we must follow a few simple steps. All examples use the Kotlin DSL.
 
-### 3.1 Add the plugin to the `buildscript` block of your `build.gradle.kts`:
+#### 3.1.1. Add the plugin to the `buildscript` block of your `build.gradle.kts`:
 
    ```kotlin
    buildscript {
@@ -55,9 +91,10 @@ In order to use the `autodoc` plugin we must follow a few simple steps. All exam
 }
    ```
 
-Please note that the `repositories` configuration can be omitted, if the release version of the plugin is used.
+Please note that the `repositories` configuration can be omitted, if the release version of the plugin is used or if used
+in conjunction with the `edc-build` plugin.
 
-### 3.2 Apply the plugin to the project:
+#### 3.1.2. Apply the plugin to the project:
 
 There are two options to apply a plugin. For multi-module builds this should be done at the root level.
 
@@ -74,7 +111,7 @@ There are two options to apply a plugin. For multi-module builds this should be 
    }
    ```
 
-### 3.3 Configure the plugin [optional]
+#### 3.1.3. Configure the plugin [optional]
 
 The `autodoc` plugin exposes the following configuration values:
 
@@ -90,7 +127,7 @@ The `autodoc` plugin exposes the following configuration values:
 
 _The plugin will then generate an `edc.json` file for every module/gradle project._
 
-## 4. Merging the manifests
+## 3.2. Merging the manifests
 
 There is a Gradle task readily available to merge all the manifests into one large `manifest.json` file. This comes in
 handy when the JSON manifest is to be converted into other formats, such as Markdown, HTML, etc.
@@ -122,7 +159,7 @@ rootProject.tasks.withType<MergeManifestsTask> {
 }
 ```
 
-## 5. Rendering manifest files as Markdown or HTML
+### 3.3. Rendering manifest files as Markdown or HTML
 
 Manifests get created as JSON, which may not be ideal for end-user consumption. To convert them to HTML or Markdown,
 execute the following Gradle task:
@@ -136,7 +173,7 @@ if merged the manifests before (`mergeManifests`), then the merged manifest file
 
 The resulting `*.md` or `*.html` files are located next to the `edc.json` file in `<module-path>/build/`.
 
-## 6. Using published manifest files (MavenCentral)
+## 3.4. Using published manifest files (MavenCentral)
 
 Manifest files (`edc.json`) are published alongside the binary jar files, sources jar and javadoc jar to MavenCentral
 for easy consumption by client projects. The manifest is published using `type=json` and `classifier=manifest`
