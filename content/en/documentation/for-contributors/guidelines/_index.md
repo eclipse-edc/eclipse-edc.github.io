@@ -7,19 +7,22 @@ weight: 900
 Thank you for your interest in the EDC! This document provides guidelines and steps members are asked to follow when
 contributing to the project.
 
-## Table of Contents
-
-* [Code Of Conduct](#code-of-conduct)
-* [How to Contribute](#how-to-contribute)
+<!-- TOC -->
+  * [Code Of Conduct](#code-of-conduct)
+  * [How to Contribute](#how-to-contribute)
     * [Creating an Issue](#creating-an-issue)
     * [Submitting a Pull Request](#submitting-a-pull-request)
+      * [Eclipse Contributor Agreement](#eclipse-contributor-agreement)
     * [Stale Issues and PRs](#stale-issues-and-prs)
     * [Reporting Flaky Tests](#reporting-flaky-tests)
-* [Project and Milestone Planning](#project-and-milestone-planning)
+  * [Non-Code Contributions](#non-code-contributions)
+  * [Project and Milestone Planning](#project-and-milestone-planning)
     * [Milestones](#milestones)
+      * [Issues](#issues)
+      * [Pull Requests](#pull-requests)
     * [Projects](#projects)
-    * [Releases](#releases)
-* [Contact Us](#contact-us)
+  * [Contact Us](#contact-us)
+<!-- TOC -->
 
 ## Code Of Conduct
 
@@ -153,10 +156,6 @@ It can be unassigned or moved to any other project that is provided.
 
 In every project, an issue passes four stages: `Backlog`, `In progress`, `Review in progress`, and `Done`,
 independent of their association to a specific milestone.
-
-### Releases
-
-Please find more information about our release approach [here](developer/releases.md).
 
 ## Contact Us
 

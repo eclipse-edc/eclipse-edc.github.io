@@ -4,7 +4,6 @@ weight: 10
 ---
 
 <!-- TOC -->
-* [Best practices and recommendations](#best-practices-and-recommendations)
   * [1. Preface](#1-preface)
   * [2. Security recommendations](#2-security-recommendations)
     * [2.1 Exposing APIs to the internet](#21-exposing-apis-to-the-internet)
