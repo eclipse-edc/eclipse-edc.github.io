@@ -34,7 +34,7 @@ services. It is recommended to separate the Control Plane and Data Plane so they
 #### The Control Plane
 
 The Control Plane is responsible for creating contract agreements that grant access to data, managing data transfers,
-and monitoring usage policy compliance. For example, a data consumer's control Plan initiates a contract negotiation
+and monitoring usage policy compliance. For example, a data consumer's Control Plane initiates a contract negotiation
 with a data provider's connector. The negotiation is an asynchronous process that results in a *contract agreement* if
 approved. The consumer connector then uses the contract agreement to initiate a *data transfer* with the provider
 connector. A data transfer can be a one-shot (finite) transfer, such as a discrete set of data, or an ongoing (
