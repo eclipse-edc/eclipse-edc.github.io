@@ -1,5 +1,24 @@
-# URL patterns to exclude from checking, one regex pattern per line
-# These links will be ignored by lychee
+# .lycheeignore - Link Checker Ignore Patterns
+#
+# This file contains regex patterns for URLs that should be ignored by the lychee link checker
+# during GitHub Actions workflows. One pattern per line.
+#
+# Pattern Categories:
+# - Example domains: Standard placeholder URLs
+# - Development URLs: Local development links (localhost, etc.)
+# - Social media links: Often have anti-scraping measures
+# - Restricted files: Files that may require authentication
+# - Local file paths: Paths that exist in production but not in CI
+# - GitHub patterns: To reduce API rate limiting issues
+# - Hugo-specific patterns: To handle Hugo path differences
+# - Protocol-specific links: Special protocols like mailto, slack, etc.
+#
+# Common Pattern Syntax:
+# - ^ = Start of the URL
+# - $ = End of the URL
+# - \. = Literal dot (escaped)
+# - .* = Any character, any number of times
+# - [^/]+ = One or more characters that are not a slash
 
 # Example domains
 ^https?://example\.com

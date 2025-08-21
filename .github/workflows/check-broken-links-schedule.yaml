@@ -1,10 +1,8 @@
 name: Scheduled Broken Links Check
 
 on:
-  # Run on schedule
   schedule:
-    - cron: "0 0 * * 0"  # Runs at 00:00 UTC every Sunday
-  # Manual trigger
+    - cron: "0 0 * * 0"
   workflow_dispatch:
 
 jobs:
@@ -12,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write  # Permission needed to create issues
+      issues: write
       
     steps:
       - name: Checkout repository
@@ -20,7 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Optimize caching strategy
       - name: Restore lychee cache
         uses: actions/cache@v4
         with:
@@ -30,7 +27,6 @@ jobs:
             cache-lychee-scheduled-
             cache-lychee-
 
-      # Check external links (HTTP/HTTPS URLs only)
       - name: Check external links
         id: lychee-external
         uses: lycheeverse/lychee-action@v2
