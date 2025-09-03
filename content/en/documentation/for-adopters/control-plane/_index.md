@@ -18,7 +18,9 @@ weight: 30
     * [Working with Asynchronous Messaging and Events](#working-with-asynchronous-messaging-and-events)
     * [Reliable Messaging](#reliable-messaging)
   * [Transfer Processes](#transfer-processes)
-    * [Consumer Pull and Provider Push Transfers](#consumer-pull-and-provider-push-transfers)
+    * [Flow Types](#flow-types)
+      * [Consumer Pull](#consumer-pull)
+      * [Provider Push](#provider-push)
       * [The Role of the Data Plane](#the-role-of-the-data-plane)
     * [Transfer Process States](#transfer-process-states)
     * [Policy Monitor](#policy-monitor)
@@ -318,6 +320,7 @@ The control plane first retrieves contract definitions and evaluates their acces
 ### Designing for Optimal Catalog Performance
 
 Careful consideration needs to be taken when designing contract definitions, particularly the level of granularity at which they operate. When a catalog request is made, The access and contract policies of all contract definitions are evaluated, and the passing ones are selected. The asset selector queries are then run from the resulting set. To optimize catalog generation, contract definitions should select groups of assets rather than correspond in a 1:1 relationship with an asset. In other words, limit contract definitions to a reasonable number and use them as a mechanism to filter groups of assets. Adding custom asset properties that serve as selection labels is an easy way to do this.
+
 ## Contract Negotiations
 
 Once a consumer has received a catalog, it can request access to a dataset by sending a DSP contract negotiation request using the Management API. The contract negotiation takes the dataset offer as a parameter. When the request is received, the provider will respond with an acknowledgment. ***Contract negotiations are asynchronous, which means they are not completed immediately but sometime in the future.***  A contract negotiation progresses through a series of states defined by the DSP specification (which we will not cover). Both the consumer and provider can transition the negotiation. When a transition is attempted, the initiating control plane sends a DSP message to the counterparty.
@@ -364,28 +367,37 @@ EDC implements reliable messaging for all interactions, so it is important to un
 
 ## Transfer Processes
 
-After a contract negotiation has been finalized, a consumer can request data associated with an asset by opening a *transfer process* via the Management API. A *finite* transfer process completes after the data, such as a file, has been transferred. Other types of data transfers, such as a data stream or access to an API endpoint, may be ongoing. These types of transfer processes are termed *non-finite* because there is no specified completion point. They continue until they are explicitly terminated or canceled.
+After a Contract Negotiation has been finalized, a consumer can request data associated with an asset by initiating a *Transfer Process* via the Management API.
+
+A *finite* transfer process completes after the data, such as a file, has been transferred. Other types of data transfers, such as a data stream or access to an API endpoint, may be ongoing. These types of transfer processes are termed *non-finite* because there is no specified completion point. They continue until they are explicitly terminated or canceled.
 
 ![Transfer Types](transfer-types.svg)
 
-> Pay careful attention to how data is modeled. In particular, model your assets in a way that minimizes the number of contract negotiations and transfer processes that need to be created. For large data sets such as machine-learning data, this is relatively straightforward: an asset can represent each individual data set. Consumers will typically need to transfer the data once or infrequently, so the number of contract negotiations and transfer processes will remain small, typically one contract negotiation and a few transfers.
+> Pay careful attention to how data is modeled. In particular, model your assets in a way that minimizes the number of Contract Negotiations and Transfer Processes that need to be created. For large data sets such as machine-learning data, this is relatively straightforward: an asset can represent individual data set. Consumers will typically need to transfer the data once or infrequently, so the number of Contract Negotiations and Transfer Processes will remain small, typically one Contract Negotiation and a few transfers.
 >
->Now, let's take as an example a supplier that wishes to expose parts data to their partners. Do not model each part as a separate asset, as that would require at least one contract negotiation and transfer process per part. If there are millions of parts, the number of contract negotiations and transfer processes will quickly grow out of control. Instead, have a single asset represent aggregate data, such as all parts, or a significant subset, such as a part type. Only one contract negotiation will be needed, and if the transfer process is non-finite and kept open, consumers can make multiple parts data requests (over the course of hours, days, months, etc.) without incurring additional overhead.
+> Now, let's take as an example a supplier that wishes to expose parts data to their partners. Do not model each part as a separate asset, as that would require at least one contract negotiation and transfer process per part. If there are millions of parts, the number of contract negotiations and transfer processes will quickly grow out of control. Instead, having a single asset represents aggregate data, such as all parts, or a significant subset, such as a part type. Only one Contract Negotiation will be needed, and if the Transfer Process is non-finite and kept open, consumers can make multiple parts data requests (over the course of hours, days, months, etc.) without incurring additional overhead.
 
-### Consumer Pull and Provider Push Transfers
+### Flow Types
 
-We'll explain how to open a transfer process in the next section. First, it is important to understand the two modes for sending data from a provider to a consumer that EDC supports. Consumer pull transfers require the consumer to initiate the data send operation. A common example of this is when a consumer makes an HTTP request to an endpoint and receives a response or pulls a message off a queue:
+We'll explain how to open a Transfer Process in the next section. First, it is important to understand the two modes for sending data from a provider to a consumer that EDC supports. 
+
+#### Consumer Pull
+
+It requires the consumer to initiate the data flow operation. A common example of this is when a consumer makes an HTTP request to an endpoint and receives a response or pulls a message off a queue:
 
 ![consumer-pull](consumer-pull.png)
 
-The second type, provider push transfers, involves the provider pushing data to the consumer:
+The EDR (Endpoint Data Reference) contains all the coordinates to reach the provider public endpoint where the data can be fetched. In the basic case, it is an HTTP endpoint, but it could be a message broker, an object storage and so on.
+
+#### Provider Push
+
+It requires the provider to actively push data to the consumer.
 
 ![provider-push](provider-push.png)
 
-An example of the latter is when a consumer wishes to receive a dataset at an object storage endpoint that it controls. This data may take the provider some time to create and process, so the consumer sends an access token to the provider when it opens a transfer process, which the provider then uses to push the data to the consumer when it is ready.
-#### The Role of the Data Plane
-
-Once a transfer process is initiated on the control planes of the consumer and provider, the respective data planes handle data send and receive operations. In the provider push scenario, the consumer control plane will signal to its data plane to be ready to receive data at an endpoint. The provider control plane will then signal to its data plane to begin the push operation. In the consumer pull scenario, the provider control plane will first signal to its data plane to make data available at an endpoint. The consumer control plane will then signal to its control plane to begin pulling the data from the provider endpoint.
+Note that, on the consumer side, the data plane role is to prepare the destination endpoint. \
+An example of provider push is when a consumer wishes to receive a dataset at an object storage endpoint that it controls. \
+Since the provider may need time to prepare the data, the consumer sends an access token when initiating a Transfer Process. The provider uses this token to push the data once it is ready.
 
 ### Transfer Process States
 

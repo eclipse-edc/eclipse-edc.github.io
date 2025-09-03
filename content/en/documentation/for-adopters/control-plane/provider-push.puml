@@ -1,7 +1,7 @@
 @startuml
 !pragma layout smetana
 
-!include diagram.styles.puml
+!include ../diagram.styles.puml
 
 autonumber
 
@@ -9,6 +9,7 @@ box "Consumer"
 participant "Client" as CC
 participant "Control Plane" as CCP
 participant "Data Plane" as CDP
+participant "Data Destination" as CDD
 end box
 
 box "Provider"
@@ -20,13 +21,14 @@ end box
 CC -> CCP: <color:red> Initiate
 group #F3F7FF Transfer Process Management
 CCP -> CDP: Provision
-CCP -> PCP: Data request
+CDP -> CDD: Prepare destination
+CCP -> PCP: Transfer request
 PCP -> PDP: Provision
-CCP <- PCP: Started
+CCP <- PCP: Transfer started
 end
 
 group #E3F7FF Data Transfer
-CDP <- PDP: Data push
+CDD <- PDP: Data push
 end
 
 

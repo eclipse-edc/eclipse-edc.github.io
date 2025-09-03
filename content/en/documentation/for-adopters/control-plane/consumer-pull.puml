@@ -1,7 +1,7 @@
 @startuml
 !pragma layout smetana
 
-!include diagram.styles.puml
+!include ../diagram.styles.puml
 
 autonumber
 
@@ -16,19 +16,19 @@ participant "Control Plane" as PCP
 participant "Data Plane" as PDP
 end box
 
-
 CC -> CCP: <color:red> Initiate
 group #F3F7FF Transfer Process Management
-CCP -> PCP: Data request
+CCP -> CDP: Provision
+CCP -> PCP: Transfer request
 PCP -> PDP: Provision
-CCP <- PCP: Started
+PCP -> PDP: Create EDR
+CCP <- PCP: Transfer started
 end
-CCP -> CC: <color:red> Callback
+CCP -> CC: <color:red> Callback EDR
 
-CC -> CDP: <color:red> Request data
 group #E3F7FF Data Transfer
-CDP -> PDP: Request data
-CDP <- PDP: Response
+CC -> PDP: <color:red> Request data using EDR
+CC <- PDP: Response
 end
 
 
