@@ -60,10 +60,4 @@ All submissions must include extensive test coverage and be fully documented:
 * Add meaningful unit tests and integration tests when appropriate to verify your submission acts as expected.
 * All code must be documented. Interfaces and implementation classes must have Javadoc. Include inline documentation
   where code blocks are not self-explanatory.
-* If a new module has been added or a significant part of the code has been changed, and you should be seen as the
-  contact person for any further changes, please add appropriate
-  information to the [CODEOWNERS](https://github.com/eclipse-edc/Connector/blob/main/CODEOWNERS)
-  file. You can find instructions on how to do this at <https://help.github.com/articles/about-codeowners/>.
-  Please note that this file does not represent all contributions to the code. What persons and organizations
-  actually contributed to each file can be seen on GitHub and is documented in the license headers.
 

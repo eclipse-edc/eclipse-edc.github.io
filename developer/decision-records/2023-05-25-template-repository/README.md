@@ -73,7 +73,7 @@ Suggested basic structure for new repositories:
 - `docs/developer/decision-records/README.md` _(empty list)_
 - [.gitattributes](https://github.com/eclipse-edc/Connector/blob/main/.gitattributes)
 - [.gitignore](https://github.com/eclipse-edc/Connector/blob/main/.gitignore) _(empty)_
-- [CODEOWNERS](https://github.com/eclipse-edc/Connector/blob/main/CODEOWNERS) _(empty list)_
+- [CODEOWNERS](https://github.com/eclipse-edc/Connector/blob/main/.github/CODEOWNERS) _(empty list)_
 - [LICENSE](https://github.com/eclipse-edc/Connector/blob/main/LICENSE)
 - [NOTICE.md](https://github.com/eclipse-edc/Connector/blob/main/NOTICE.md) _(empty list)_
 
