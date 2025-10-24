@@ -6,14 +6,14 @@ weight: 50
 ---
 
 Identity Hub (IH) manages organization identity resources such as credentials for a dataspace participant. It is designed
-for machine-to-machine interactions and does not manage personal verifiable credentials. Identity Hub implements the 
-[Decentralized Claims Protocol (DCP)](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol) and is 
-based on key decentralized identity standards, including [W3C DIDs](https://www.w3.org/TR/did-core/), the 
-[W3C did:web Method](https://w3c-ccg.github.io/did-method-web/), and the 
-[W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)specifications, so we recommend 
+for machine-to-machine interactions and does not manage personal verifiable credentials. Identity Hub implements the
+[Decentralized Claims Protocol (DCP)](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol) and is
+based on key decentralized identity standards, including [W3C DIDs](https://www.w3.org/TR/did-core/), the
+[W3C did:web Method](https://w3c-ccg.github.io/did-method-web/), and the
+[W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)specifications, so we recommend
 familiarizing yourself with those technologies first.
 
->One question that frequently comes up is whether Identity Hub supports [OpenID for Verifiable Credentials (OID4VC)](https://openid.net/sg/openid4vc/specifications/). The short answer is No. That's because OID4VC mandates human (end-user) interactions, while Identity Hub is designed for machine-to-machine interactions where humans are not in the loop. Identity Hub is built on many of the same decentralized identity standards as OID4VC but implements DCP, a protocol specifically designed for non-human flows.
+> One question that frequently comes up is whether Identity Hub supports [OpenID for Verifiable Credentials (OID4VC)](https://openid.net/sg/openid4vc/specifications/). The short answer is No. That's because OID4VC mandates human (end-user) interactions, while Identity Hub is designed for machine-to-machine interactions where humans are not in the loop. Identity Hub is built on many of the same decentralized identity standards as OID4VC but implements DCP, a protocol specifically designed for non-human flows.
 
 Identity Hub securely stores and manages W3C Verifiable Credentials, including handling presentation and issuance. But Identity Hub is more than an enterprise "wallet" since it handles key material and DID documents. Identity Hub manages the following identity resources:
 
@@ -31,16 +31,17 @@ As we will see, Identity Hub can be deployed to diverse topologies, from embedde
 
 Identity Hub is built on the [Decentralized Claims Protocol (DCP)](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol). This protocol overlays the [Dataspace Protocol (DSP)](https://github.com/eclipse-dataspace-protocol-base/DataspaceProtocol) by adding security and trust based on a decentralized identity model. To see how a decentralized identity system works, we will contrast it with a centralized approach.
 
-Protocols such as traditional OAuth2 grants adopt a centralized model where a single identity provider or set of federated providers issue tokens on behalf of a party. Data consumers request a token from an *identity provider*, which, in turn, generates and signs one along with a set of claims. The data consumer passes the signed token to the data provider, which verifies the token using public key material from the identity provider:
+Protocols such as traditional OAuth2 grants adopt a centralized model where a single identity provider or set of federated providers issue tokens on behalf of a party. Data consumers request a token from an _identity provider_, which, in turn, generates and signs one along with a set of claims. The data consumer passes the signed token to the data provider, which verifies the token using public key material from the identity provider:
 
 ![centralized identity](centralized-identity.svg)
 
 The centralized model is problematic for many dataspaces:
+
 - **It is prone to network outages.** If the identity provider goes down, the entire dataspace is rendered inoperable. Using federated providers only partially mitigates this risk while increasing complexity since large sections of a dataspace will still be subject to outage.
 - **It does not preserve privacy.** Since an identity provider issues and verifies tokens, it is privy to communications between data consumers and providers. While the provider may not know the content of the communications, it is aware of who is communicating with whom.
 - **Participants are not in control of their identity and credentials.** The identity provider creates identity tokens and manages credentials, not the actual dataspace participants.
 
-Identity Hub and the *Decentralized Claims Protocol* are designed to address these limitations by introducing a model where there is no single point of failure, privacy is maintained, and dataspace participants control their identities and credentials. This approach is termed *decentralized identity* and builds on foundational standards from the [W3C](https://www.w3.org/) and [Decentralized Identity Foundation](https://identity.foundation/).
+Identity Hub and the _Decentralized Claims Protocol_ are designed to address these limitations by introducing a model where there is no single point of failure, privacy is maintained, and dataspace participants control their identities and credentials. This approach is termed _decentralized identity_ and builds on foundational standards from the [W3C](https://www.w3.org/) and [Decentralized Identity Foundation](https://identity.foundation/).
 
 ### The Presentation Flow
 
@@ -58,11 +59,11 @@ This step only proves that the requesting control plane is operating on behalf o
 
 Once the VP is obtained, the provider can verify the VC to establish trust with the consumer control plane.
 
-Why not just include the VP in the token or another HTTP header and avoid the call to Identity Hub? There's a practical reason: VPs often exceed the header size limit imposed by HTTP infrastructure such as proxies. DSP and DCP could have devised the concept of a message envelope (remember WS-* and SOAP?) but chose not to because it ties credentials to outbound client requests. To see why this is limiting, consider the scenario where a consumer requests access to an ongoing data stream. The provider control plane may set up a *policy monitor* to periodically check the consumer's credentials while the stream is active. In the DCP model, the policy monitor can query the consumer's Identity Hub using the mechanism we described without the flow being initiated by the consumer.
+Why not just include the VP in the token or another HTTP header and avoid the call to Identity Hub? There's a practical reason: VPs often exceed the header size limit imposed by HTTP infrastructure such as proxies. DSP and DCP could have devised the concept of a message envelope (remember WS-\* and SOAP?) but chose not to because it ties credentials to outbound client requests. To see why this is limiting, consider the scenario where a consumer requests access to an ongoing data stream. The provider control plane may set up a _policy monitor_ to periodically check the consumer's credentials while the stream is active. In the DCP model, the policy monitor can query the consumer's Identity Hub using the mechanism we described without the flow being initiated by the consumer.
 
 #### Verifiable Presentation Generation
 
-When the data provider issues a presentation request, the consumer Identity Hub generates a Verifiable Presentation based on the query received in the request. DSP defines two ways to specify a query: using a list of string-based *scopes* or a [DIF Presentation Exchange presentation definition](https://identity.foundation/presentation-exchange/spec/v2.0.0/#presentation-definition). Identity Hub does not yet support DIF Presentation Exchange (this feature is in development), so scopes are currently the only supported mechanism for requesting a set of credentials be included.
+When the data provider issues a presentation request, the consumer Identity Hub generates a Verifiable Presentation based on the query received in the request. DSP defines two ways to specify a query: using a list of string-based _scopes_ or a [DIF Presentation Exchange presentation definition](https://identity.foundation/presentation-exchange/spec/v2.0.0/#presentation-definition). Identity Hub does not yet support DIF Presentation Exchange (this feature is in development), so scopes are currently the only supported mechanism for requesting a set of credentials be included.
 
 The default setup for Identity Hub translates a scope string to a Verifiable Credential type. For example, the following presentation query includes the `AuditCertificationCredential`:
 
@@ -81,7 +82,7 @@ Identity Hub will process this as a request for the `AuditCertificationCredentia
 
 > The default scope mapping behavior can be overridden by creating a custom extension that provides an implementation of the `ScopeToCriterionTransformer` interface.
 
-Two VP formats are supported: JWT-based and Linked-Data Proof. The JWT-based format is the default and recommended format because, in testing, it exhibited an order of magnitude better performance than the Linked-Data Proof format.  It's possible to override the default JWT format by either implementing `VerifiablePresentationService` or providing a configuration of `VerifiablePresentationServiceImpl`.
+Two VP formats are supported: JWT-based and Linked-Data Proof. The JWT-based format is the default and recommended format because, in testing, it exhibited an order of magnitude better performance than the Linked-Data Proof format. It's possible to override the default JWT format by either implementing `VerifiablePresentationService` or providing a configuration of `VerifiablePresentationServiceImpl`.
 
 > When DIF Present Exchange is supported, client requests will be able to specify the presentation format to generate.
 
@@ -100,7 +101,6 @@ Issuance can use the same claims verification as the presentation flow. For exam
 Identity Hub is built using the EDC modularity and extensibility system. It relies on core EDC features, including
 cryptographic primitives, Json-Ld processing, and DID resolution. This architecture affords a great deal of deployment flexibility. Let's break down the different supported deployment scenarios.
 
-
 ![ih deployments](ih-deployments.svg)
 
 ### Organizational Component
@@ -117,7 +117,7 @@ Identity Hub is designed to scale down for edge-style deployments where footprin
 
 ## Identity Hub APIs and Resources
 
-Identity Hub supports two main APIs: the *Identity API* for managing resources and the *DCP API*, which implements the wire protocol defined by the Decentralized Claims Protocol Specification. End-users generally do not interact with the DCP API, so we won't cover it here. The *Identity API* is the primary way operators and third-party applications interact with the Identity Hub. Since the API provides access to highly sensitive resources, it's essential to secure it. **Above all, the API should never be exposed over a public network such as the Internet.**
+Identity Hub supports two main APIs: the _Identity API_ for managing resources and the _DCP API_, which implements the wire protocol defined by the Decentralized Claims Protocol Specification. End-users generally do not interact with the DCP API, so we won't cover it here. The _Identity API_ is the primary way operators and third-party applications interact with the Identity Hub. Since the API provides access to highly sensitive resources, it's essential to secure it. **Above all, the API should never be exposed over a public network such as the Internet.**
 
 The best way to understand the Identity API is to start with the resources it is designed to manage. This will give you a solid grounding for reviewing the OpenAPI documentation and using its RESTful interface. It's also important to note that since the Identity Hub is extensible, additional resource types may be added by third parties to enable custom use cases.
 
@@ -125,9 +125,9 @@ The best way to understand the Identity API is to start with the resources it is
 
 The Identity API includes CRUD operations for managing participant contexts. This API requires elevated administrative privileges.
 
-A *participant context* is a unit of control for resources in Identity Hub. A participant context is tied to a dataspace participant identity. Most of the time, an organization will have a single identity and use the same Web DID in multiple dataspaces. Its Identity Hub, therefore, will be configured with exactly one participant context to manage identity and credential resources.
+A _participant context_ is a unit of control for resources in Identity Hub. A participant context is tied to a dataspace participant identity. Most of the time, an organization will have a single identity and use the same Web DID in multiple dataspaces. Its Identity Hub, therefore, will be configured with exactly one participant context to manage identity and credential resources.
 
-If an organization uses different identities in multiple dataspaces, its Identity Hub will contain one participant context per identity. All resources are contained and accessed through a participant context. The participant context acts as both a *scope* and *security* boundary. Access control for public client API endpoints is scoped to a specific participant context. For example, the JWT access token sent to data providers described above is associated with a specific context and may not be used to access resources in another context. Furthermore, the lifecycle of participant resources is bound to their containing context; if a participant context is removed, the operation will cascade to all contained resources.
+If an organization uses different identities in multiple dataspaces, its Identity Hub will contain one participant context per identity. All resources are contained and accessed through a participant context. The participant context acts as both a _scope_ and _security_ boundary. Access control for public client API endpoints is scoped to a specific participant context. For example, the JWT access token sent to data providers described above is associated with a specific context and may not be used to access resources in another context. Furthermore, the lifecycle of participant resources is bound to their containing context; if a participant context is removed, the operation will cascade to all contained resources.
 
 A participant context can be in one of three states:
 
@@ -168,7 +168,7 @@ For security reasons, key pair resources should be periodically rotated and repl
 
 For example, let's assume private key A is used to sign Credential CA and public key A' is used to verify CA. If the key pair A-A' is immediately revoked, CA can no longer be validated, which may cause a service disruption. Key rotation can be used to avoid this. When the key pair A-A' is rotated, a new key pair, B-B', is created and used to sign resources. The private key A is immediately destroyed. A', however, will remain as a verification method in the DID document associated with the participant context. CA validation will continue to work. When CA and all other resources signed by A expire, A' can safely be removed from the DID document.
 
->It's important to perform key rotation periodically to enhance overall system security. This implies that signed resources should have a validity period less than the rotation period of the key used to sign them and should also be reissued on a frequent basis.
+> It's important to perform key rotation periodically to enhance overall system security. This implies that signed resources should have a validity period less than the rotation period of the key used to sign them and should also be reissued on a frequent basis.
 
 #### Key Revocation
 
@@ -187,6 +187,7 @@ Identity Hub implements transactional guarantees when resource operations are pe
 #### Create
 
 When a participant context is created, the following sequence is performed:
+
 - A transaction is opened.
 - An API key is generated to access the context via the Identity API
 - A DID document is created and added to storage.
@@ -197,6 +198,7 @@ When a participant context is created, the following sequence is performed:
 #### Delete
 
 When a participant context is deleted, the following sequence is performed:
+
 - A transaction is opened.
 - The DID document is unpublished if the resource is in the `PUBLISHED` state.
 - The DID document resource is removed from storage.
@@ -212,6 +214,7 @@ If destroying private keys fails, manual intervention will be required to clean 
 A participant context cannot be activated without a default key pair.
 
 When a participant context is activated, the following sequence is performed:
+
 - A transaction is opened.
 - The context is updated in storage.
 - The DID document is published.
@@ -220,6 +223,7 @@ When a participant context is activated, the following sequence is performed:
 #### Deactivate
 
 When a participant context is deactivated, the following sequence is performed:
+
 - A transaction is opened.
 - The context is updated in storage.
 - The DID document is unpublished.
@@ -234,6 +238,7 @@ There is a `force` option that will commit the transaction if the DID document u
 This operation can only be performed when the participant context is in the `CREATED` or `ACTIVATED` state.
 
 When a key pair is activated, the following sequence is performed:
+
 - A transaction is opened.
 - The new key pair is added to storage.
 - If the DID document resource is in the `PUBLISHED` state, the DID document is published with all verification methods for public keys in the `ACTIVATED` state.
@@ -244,6 +249,7 @@ If the transaction commit fails, the DID document must be manually repaired. Thi
 #### Rotate
 
 When a key pair is rotated and a new one is added, the following sequence is performed:
+
 - A transaction is opened.
 - The new key pair is added to storage.
 - If the DID document resource is in the `PUBLISHED` state, the DID document is published with a verification method for the new public key.
@@ -255,6 +261,7 @@ When a key pair is rotated and a new one is added, the following sequence is per
 When a key pair is rotated, the following sequence is performed:
 
 When a key pair is revoked, the following sequence is performed:
+
 - A transaction is opened.
 - The key pair state is updated.
 - If the DID document resource is in the `PUBLISHED` state, the DID document is published with a verification method for the rotated public key removed.
