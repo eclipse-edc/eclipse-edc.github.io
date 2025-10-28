@@ -3,14 +3,13 @@ title: Json LD
 weight: 10
 ---
 
+<!-- TOC -->
 
-<!-- TOC -->
-* [JSON-LD in EDC](#json-ld-in-edc)
-  * [1. JSON-LD in EDC](#1-json-ld-in-edc)
-  * [1.1 Compact IRI](#11-compact-iri)
-  * [1.2 Custom Remote Context](#12-custom-remote-context)
-    * [1.1 JSON-LD Validation](#11-json-ld-validation)
-<!-- TOC -->
+- [JSON-LD in EDC](#1-json-ld-in-edc)
+  - [1. JSON-LD in EDC](#1-json-ld-in-edc)
+  - [1.1 Compact IRI](#11-compact-iri)
+  - [1.2 Custom Remote Context](#12-custom-remote-context) \* [1.1 JSON-LD Validation](#11-json-ld-validation)
+  <!-- TOC -->
 
 Here is a simple example taken from [json-ld.org](https://json-ld.org)
 
@@ -32,7 +31,6 @@ The `@id` is used to uniquely identify an object.
 The `@context` is used to define how [terms](https://www.w3.org/TR/json-ld/#dfn-term) should be interpreted and help
 expressing specific identifier with short-hand names instead
 of [IRI](https://datatracker.ietf.org/doc/html/rfc3987#section-2).
-
 
 > Exhausting reserved keywords list and their meaning is
 > available [here](https://www.w3.org/TR/json-ld11/#syntax-tokens-and-keywords)
@@ -156,12 +154,8 @@ limits the network request required when processing the JSON-LD and reduces the 
 context is compromised.
 
 > By default EDC make usage of [`@vocab`](https://www.w3.org/TR/json-ld/#default-vocabulary) for processing input/output
-> JSON-LD document. This can provide a default vocabulary for extensible properties. An on-going initiative is available
-> with
->
-this [extension](https://github.com/eclipse-edc/Connector/tree/main/extensions/common/api/management-api-json-ld-context)
-> in order to provide a cached terms mapping (context) for EDC management API. The remote context definition is
-> available [here](https://w3id.org/edc/connector/management/v0.0.1).
+> JSON-LD document. This can provide a default vocabulary for extensible properties. The remote context definition is
+> available [on W3ID](https://w3id.org/edc/connector/management/v0.0.1).
 
 Implementors that need additional `@context` and `namespaces` to be supported in EDC runtime, should develop a custom
 extension that registers the required `@context` and `namespace`.
@@ -315,7 +309,7 @@ public class MyExtension implements ServiceExtension {
 ```
 
 With this configuration the JSON-LD will be representend without the `sw` prefix, since the terms mapping is defined in
-the remote context   `http://w3id.org/starwars/context.jsonld`:
+the remote context `http://w3id.org/starwars/context.jsonld`:
 
 ```json
 {

@@ -8,26 +8,27 @@ Thank you for your interest in the EDC! This document provides guidelines and st
 contributing to the project.
 
 <!-- TOC -->
-  * [Code Of Conduct](#code-of-conduct)
-  * [How to Contribute](#how-to-contribute)
-    * [Creating an Issue](#creating-an-issue)
-    * [Submitting a Pull Request](#submitting-a-pull-request)
-      * [Eclipse Contributor Agreement](#eclipse-contributor-agreement)
-    * [Stale Issues and PRs](#stale-issues-and-prs)
-    * [Reporting Flaky Tests](#reporting-flaky-tests)
-  * [Non-Code Contributions](#non-code-contributions)
-  * [Project and Milestone Planning](#project-and-milestone-planning)
-    * [Milestones](#milestones)
-      * [Issues](#issues)
-      * [Pull Requests](#pull-requests)
-    * [Projects](#projects)
-  * [Contact Us](#contact-us)
+
+- [Code Of Conduct](#code-of-conduct)
+- [How to Contribute](#how-to-contribute)
+  - [Creating an Issue](#creating-an-issue)
+  - [Submitting a Pull Request](#submitting-a-pull-request)
+    - [Eclipse Contributor Agreement](#eclipse-contributor-agreement)
+  - [Stale Issues and PRs](#stale-issues-and-prs)
+  - [Reporting Flaky Tests](#reporting-flaky-tests)
+- [Non-Code Contributions](#non-code-contributions)
+- [Project and Milestone Planning](#project-and-milestone-planning)
+  - [Milestones](#milestones)
+    - [Issues](#issues)
+    - [Pull Requests](#pull-requests)
+  - [Projects](#projects)
+- [Contact Us](#contact-us)
 <!-- TOC -->
 
 ## Code Of Conduct
 
 All community members are expected to adhere to
-the [Eclipse Code of Conduct](https://www.eclipse.org/org/documents/Community_Code_of_Conduct.php").
+the [Eclipse Code of Conduct](https://www.eclipse.org/org/documents/Community_Code_of_Conduct.php).
 
 ## How to Contribute
 
@@ -39,7 +40,7 @@ see if it has already been raised. If not, open a discussion (not an issue).
 - For general topics (including project planning, relationship to other projects, etc.) use the [EDC
   organization discussions](https://github.com/orgs/eclipse-edc/discussions).
 - To get a list of issues whereas a new contributor you can contribute to, please take a look at
-  [this page](https://github.com/search?q=org%3Aeclipse-edc+label%3A%22good+first+issue%22+state%3Aopen&type=issues&ref=advsearch). 
+  [this page](https://github.com/search?q=org%3Aeclipse-edc+label%3A%22good+first+issue%22+state%3Aopen&type=issues&ref=advsearch).
 
 ### Creating an Issue
 
@@ -58,12 +59,12 @@ a new issue in the appropriate GitHub repository. Keep in mind the following:
 
 Before submitting code to EDC, you should complete the following prerequisites:
 
-* **DO NOT** submit a PR without first filing an issue (bug) or opening a discussion (new feature).
-* Have a thorough understanding of the EDC codebase, including all technical documentation and Decision Records in the
+- **DO NOT** submit a PR without first filing an issue (bug) or opening a discussion (new feature).
+- Have a thorough understanding of the EDC codebase, including all technical documentation and Decision Records in the
   relevant repositories.
-* Review the [Eclipse Project Handbook](https://www.eclipse.org/projects/handbook/#contributing).
-* Review the [EDC Pull-Request Etiquette](pr-etiquette).
-* Follow the [EDC Pull-Request Checklist](pr-checklist).
+- Review the [Eclipse Project Handbook](https://www.eclipse.org/projects/handbook/#contributing).
+- Review the [EDC Pull-Request Etiquette](pr-etiquette).
+- Follow the [EDC Pull-Request Checklist](pr-checklist).
 
 #### Eclipse Contributor Agreement
 
@@ -76,14 +77,13 @@ an [Eclipse Contributor Agreement (ECA)](http://www.eclipse.org/legal/ecafaq.php
 
 Be sure to use the same email address in your Eclipse Account that you intend to use when committing to GitHub.
 
-
 ### Stale Issues and PRs
 
 In order to keep our backlog clean, EDC uses a bot that labels and closes old issues and PRs. The following table
 outlines this process:
 
 |                        | Stale After | Closed After Stale |
-|:-----------------------|------------:|-------------------:|
+| :--------------------- | ----------: | -----------------: |
 | Issue without assignee |     14 days |             7 days |
 | Issue with assignee    |     28 days |             7 days |
 | PR                     |      7 days |             7 days |
@@ -114,11 +114,11 @@ Note that issues labeled with `Bug` and `FlakyTest` are prioritized.
 Non-code contributions are another valued way to contribute. Examples include:
 
 - Evangelizing EDC
-    - Helping to develop the community by hosting events, meetups, summits, and hackathons
+  - Helping to develop the community by hosting events, meetups, summits, and hackathons
 - Community education
-    - Answering questions on GitHub, Discord, etc.
-    - Writing documentation
-    - Other writing (Blogs, Articles, Interviews)
+  - Answering questions on GitHub, Discord, etc.
+  - Writing documentation
+  - Other writing (Blogs, Articles, Interviews)
 
 ## Project and Milestone Planning
 
