@@ -35,7 +35,7 @@ jobs:
       # Git is needed for Hugo Modules resolution
       - name: Install git
         run: |
-          apk add --no-cache git
+          apk add --no-cache git tar
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       # Cache Hugo's module/remote cache
