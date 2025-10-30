@@ -1,7 +1,9 @@
-name: Build & Deploy (Docker)
+name: Build & Deploy
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
     branches: [ main ]
   workflow_dispatch:
 
@@ -11,33 +13,32 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: github-pages
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: floryn90/hugo:0.124.0-ext-alpine
+    # Run all steps inside the Hugo + Node container
+    container:
+      image: floryn90/hugo:ext-alpine
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Install PostCSS deps (inside container)
+      # Git is needed for Hugo Modules resolution
+      - name: Install git
         run: |
-          apk add --no-cache nodejs npm git
-          npm install -g postcss postcss-cli autoprefixer
-          git config --global --add safe.directory $GITHUB_WORKSPACE
+          apk add --no-cache git
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
+      # Cache Hugo's module/remote cache (no vendoring)
       - name: Cache Hugo modules
         uses: actions/cache@v4
         with:
           path: /root/.cache/hugo
           key: ${{ runner.os }}-hugo-${{ hashFiles('**/go.mod', '**/go.sum') }}
           restore-keys: ${{ runner.os }}-hugo-
-
-      - name: Tidy & (optionally) vendor modules
-        run: |
-          hugo mod tidy
-          # hugo mod vendor   # uncomment if you vendor modules
 
       - name: Build site
         run: hugo --gc --minify
@@ -48,6 +49,8 @@ jobs:
           path: ./public
 
   deploy:
+    # Deploy only for main branch pushes (skip PRs)
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

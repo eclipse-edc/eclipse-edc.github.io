@@ -5,4 +5,4 @@ RUN apk add --no-cache git && \
     git config --global --add safe.directory /src
 
 WORKDIR /src
-CMD ["hugo", "server", "--bind", "0.0.0.0", "-D", "--ignoreCache"]
+CMD ["server", "--bind", "0.0.0.0", "-D", "--ignoreCache"]
