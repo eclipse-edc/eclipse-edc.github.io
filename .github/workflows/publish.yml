@@ -26,13 +26,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Computes the correct base URL
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
       # Git is needed for Hugo Modules resolution
       - name: Install git
         run: |
           apk add --no-cache git
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      # Cache Hugo's module/remote cache (no vendoring)
+      # Cache Hugo's module/remote cache
       - name: Cache Hugo modules
         uses: actions/cache@v4
         with:
