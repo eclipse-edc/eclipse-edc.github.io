@@ -1,60 +1,58 @@
-name: publish
+name: Build & Deploy (Docker)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: floryn90/hugo:0.124.0-ext-alpine
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0 # Fetch all history for .GitInfo and .Lastmod
-      - uses: actions/setup-node@v4
-      - run: npm i -D postcss postcss-cli autoprefixer
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: "0.134.1"
-          extended: true
 
-      - name: Build
-        run: hugo --minify
-
-      - name: Archive artifact
-        shell: sh
+      - name: Install PostCSS deps (inside container)
         run: |
-          echo ::group::Archive artifact
-          tar \
-            --dereference --hard-dereference \
-            --directory "public" \
-            -cvf "$RUNNER_TEMP/artifact.tar" \
-            --exclude=.git \
-            --exclude=.github \
-            .
-          echo ::endgroup::
-      - uses: actions/upload-artifact@v4
-        with:
-          name: github-pages
-          path: ${{ runner.temp }}/artifact.tar
-          retention-days: 1
-          if-no-files-found: error
+          apk add --no-cache nodejs npm git
+          npm install -g postcss postcss-cli autoprefixer
+          git config --global --add safe.directory $GITHUB_WORKSPACE
 
-  publish:
+      - name: Cache Hugo modules
+        uses: actions/cache@v4
+        with:
+          path: /root/.cache/hugo
+          key: ${{ runner.os }}-hugo-${{ hashFiles('**/go.mod', '**/go.sum') }}
+          restore-keys: ${{ runner.os }}-hugo-
+
+      - name: Tidy & (optionally) vendor modules
+        run: |
+          hugo mod tidy
+          # hugo mod vendor   # uncomment if you vendor modules
+
+      - name: Build site
+        run: hugo --gc --minify
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
