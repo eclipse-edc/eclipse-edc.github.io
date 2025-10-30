@@ -36,8 +36,8 @@ jobs:
       - name: Install git
         run: |
           apk add --no-cache git tar nodejs npm
+          npm i -D postcss postcss-cli autoprefixer
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-        run: npm i -D postcss postcss-cli autoprefixer
 
       # Cache Hugo's module/remote cache
       - name: Cache Hugo modules
