@@ -1,5 +1,5 @@
 # Basic page settings
-baseURL = "https://mspiekermann.github.io/eclipse-edc.github.io/"
+baseURL = "https://eclipse-edc.github.io/"
 canonifyURLs = true
 title = "EDC"
 
