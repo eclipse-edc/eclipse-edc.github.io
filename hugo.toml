@@ -1,4 +1,6 @@
 baseURL = "https://eclipse-edc.github.io/"
+# Ensures Hugo rewrites URLs using your baseURL
+canonifyURLs = true
 title = "EDC"
 
 # Language settings
