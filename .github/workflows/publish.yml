@@ -48,7 +48,7 @@ jobs:
           restore-keys: ${{ runner.os }}-hugo-
 
       - name: Build site
-        run: hugo --gc --minify
+        run: hugo --gc --minify "${{ steps.pages.outputs.base_url }}"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
