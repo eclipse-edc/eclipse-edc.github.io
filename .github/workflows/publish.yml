@@ -34,7 +34,8 @@ jobs:
 
       # BusyBox tar in Alpine doesn't support --hard-dereference; install GNU tar
       - name: Install tar
-        run: apk add --no-cache tar
+        run: |
+          apk add --no-cache tar
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       # Cache Hugo's module/remote cache
