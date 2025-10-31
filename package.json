@@ -2,8 +2,5 @@
   "name": "eclipse-edc-website",
   "version": "0.14.0",
   "private": true,
-  "description": "Eclipse EDC website built with Hugo and Docsy, deployed via Docker and GitHub Pages.",
-  "scripts": {
-    "dev": "docker compose up"
-  }
+  "description": "Eclipse EDC website built with Hugo and Docsy, deployed via Docker and GitHub Pages."
 }
