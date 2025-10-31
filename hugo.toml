@@ -1,4 +1,6 @@
+# Basic page settings
 baseURL = "https://eclipse-edc.github.io/"
+canonifyURLs = true
 title = "EDC"
 
 # Language settings

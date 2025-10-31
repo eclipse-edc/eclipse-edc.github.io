@@ -2,59 +2,68 @@ name: publish
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Run all steps inside the Hugo + Node container
+    container:
+      image: floryn90/hugo:ext-alpine
+      options: --user 0
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0 # Fetch all history for .GitInfo and .Lastmod
-      - uses: actions/setup-node@v4
-      - run: npm i -D postcss postcss-cli autoprefixer
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: "0.134.1"
-          extended: true
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Build
-        run: hugo --minify
+      # Computes the correct base URL
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
 
-      - name: Archive artifact
-        shell: sh
+      # BusyBox tar in Alpine doesn't support --hard-dereference; install GNU tar
+      - name: Install tar
         run: |
-          echo ::group::Archive artifact
-          tar \
-            --dereference --hard-dereference \
-            --directory "public" \
-            -cvf "$RUNNER_TEMP/artifact.tar" \
-            --exclude=.git \
-            --exclude=.github \
-            .
-          echo ::endgroup::
-      - uses: actions/upload-artifact@v4
-        with:
-          name: github-pages
-          path: ${{ runner.temp }}/artifact.tar
-          retention-days: 1
-          if-no-files-found: error
+          apk add --no-cache tar
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-  publish:
+      # Cache Hugo's module/remote cache
+      - name: Cache Hugo modules
+        uses: actions/cache@v4
+        with:
+          path: /root/.cache/hugo
+          key: ${{ runner.os }}-hugo-${{ hashFiles('**/go.mod', '**/go.sum') }}
+          restore-keys: ${{ runner.os }}-hugo-
+
+      - name: Build site
+        env:
+          HUGO_BASEURL: ${{ steps.pages.outputs.base_url }}
+        run: hugo --gc --minify
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    # Deploy only for main branch pushes (skip PRs)
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
