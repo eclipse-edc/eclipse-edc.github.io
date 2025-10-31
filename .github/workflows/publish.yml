@@ -32,11 +32,9 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
-      # Git is needed for Hugo Modules resolution
-      - name: Install git
-        run: |
-          apk add --no-cache git tar nodejs npm
-          npm i -D postcss postcss-cli autoprefixer
+      # BusyBox tar in Alpine doesn't support --hard-dereference; install GNU tar
+      - name: Install tar
+        run: apk add --no-cache tar
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
       # Cache Hugo's module/remote cache
