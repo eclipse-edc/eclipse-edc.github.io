@@ -65,7 +65,7 @@ issuance and re-issuance process.
 EDC components are deployed to create a dataspace ecosystem. It is important to understand that there is no such thing
 as "dataspace software." At its most basic level, a dataspace is simply a context between two participants:
 
-![Big Picture](big-picture.svg)
+![](big-picture.svg)
 
 The **Federated Catalog** fetches data catalogs from other participants. A **Connector** negotiates a contract agreement
 for data access between two participants and manages data transfers using a data plane technology. The **Identity Hub**
