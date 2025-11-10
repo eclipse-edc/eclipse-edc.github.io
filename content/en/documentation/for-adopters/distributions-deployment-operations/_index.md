@@ -65,7 +65,7 @@ To simplify things, we will focus on how a catalog server, control plane, and da
 A single management domain deploys EDC components under one unified operations setup. In this topology, EDC components
 can be deployed to a single, collocated process (management domains are represented by the black bounding box):
 
-![](single.instance.svg)
+![](single-instance.svg)
 
 **_Type 1: One management domain controlling a single instance_**
 
