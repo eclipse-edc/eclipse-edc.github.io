@@ -76,7 +76,7 @@ The SPI pattern is further used to define *extension points*. An extension point
 
 ### Providing and Injecting Services
 
-The EDC module system assembles extensions into a runtime by wiring services to `ServiceExtensions` that require them and initialing the latter.  An extension can *provide* services that are used by other extensions. This is done by annotating a factory method with the `org.eclipse.edc.runtime.metamodel.annotation.Provider` annotation:
+The EDC module system assembles extensions into a runtime by wiring services to `ServiceExtensions` that require them and instantiating the latter.  An extension can *provide* services that are used by other extensions. This is done by annotating a factory method with the `org.eclipse.edc.runtime.metamodel.annotation.Provider` annotation:
 
 ```java
 public class SampleExtension implements ServiceExtension {
@@ -334,7 +334,7 @@ The EDC eventing system is a powerful way to add capabilities to a runtime. All 
 - Contract negotiations
 - Transfer processes
 
-To receive an event, register and `EventSubscriber` with the `org.eclipse.edc.spi.event.EventRouter`. Events can be received either synchronously or asynchronously. Synchronous listeners are useful when executed transactionally in combination with the event operation. For example, a listener may wish to record audit information when an `AssetUpdated` event is emitted. The transaction and asset update should be rolled back if the record operation fails. Asynchronous listeners are invoked in the context of a different thread. They are useful when a listener takes a long time to complete and is fire-and-forget.
+To receive an event, register an `EventSubscriber` with the `org.eclipse.edc.spi.event.EventRouter`. Events can be received either synchronously or asynchronously. Synchronous listeners are useful when executed transactionally in combination with the event operation. For example, a listener may wish to record audit information when an `AssetUpdated` event is emitted. The transaction and asset update should be rolled back if the record operation fails. Asynchronous listeners are invoked in the context of a different thread. They are useful when a listener takes a long time to complete and is fire-and-forget.
 
 ### Monitor
 
