@@ -124,7 +124,7 @@ Detailed documentation about entities can be found [here](./control-plane/entiti
 
 ### 2.2 Policy Monitor
 
-The policy monitor is a component that watches over on-going transfers and ensures that the policies associated with the
+The policy monitor is a component that watches over ongoing transfers and ensures that the policies associated with the
 transfer are still valid.
 
 Detailed documentation about the policy monitor can be found [here](./control-plane/policy-monitor.md)

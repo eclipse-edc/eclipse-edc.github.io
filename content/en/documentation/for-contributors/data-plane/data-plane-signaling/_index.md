@@ -31,7 +31,7 @@ control plane and dataplane to control data flows.
 When the control plane signals to the data plane to start a client pull transfer process, the data plane returns a
 `DataAddress`. This is only true for consumer-pull transfers - provider push transfers **do not return** a
 `DataAddress`. This `DataAddress` contains information the client can use to resolve the provider's data plane endpoint.
-It also contain an access token (cf. [authorization](#52-public-api-authorization)).
+It also contains an access token (cf. [authorization](#52-public-api-authorization)).
 
 This `DataAddress` is returned by the provider control plane to the consumer in a `TransferProcessStarted` DSP message.
 Its purpose is to inform the consumer where they can obtain the data, and which authorization token to use.
@@ -185,7 +185,7 @@ consumer can initiate a new process before or after that period.
 
 When the `DataPlaneManager` receives a `DataFlowStartMessage` to start the data transmission, it uses the
 `DataPlaneAuthorizationService` to generate an access token (in JWT format) and a `DataAddress`, that contains the
-follwing information:
+following information:
 
 - `endpoint`: the URL of the public API
 - `endpointType`: should be `https://w3id.org/idsa/v4.1/HTTP` for HTTP pull transfers
@@ -292,7 +292,7 @@ registered data plane. To do that, it simply sends a REST request to the `/v1/da
 plane. If that returns successfully, the dataplane is still up and running.
 If not, the control plane will consider the data plane as "unavailable".
 
-In addition to availability, the control plane also records the _capabilities_ of each data plane, i.e. which which
+In addition to availability, the control plane also records the _capabilities_ of each data plane, i.e. which
 source data types and transfer types are supported. Each data plane must declare where it can transfer data _from_
 (source type, e.g. `AmazonS3`) and _how_ it can transfer data (transfer type, e.g. `Http-PULL`).
 

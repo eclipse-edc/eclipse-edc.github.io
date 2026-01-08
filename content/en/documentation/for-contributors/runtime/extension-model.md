@@ -123,7 +123,7 @@ Best practices when handling configuration:
   extension's `initialize()` method.
 - don't pass the context: it is a code smell if the `ServiceExtensionContext` is passed into a service to resolve config
 - annotate: every setting should have a `@Setting` annotation
-- no magic defaults: default values should be declard as constants in the extension class and documented in the
+- no magic defaults: default values should be declared as constants in the extension class and documented in the
   `@Setting` annotation.
 - no secrets: configuration is the wrong place to store secrets
 - naming convention: every config value should start with `edc.`

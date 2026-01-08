@@ -29,7 +29,7 @@ It's similar on how a `Person` would be represented in JSON, with additional kno
 The `@id` is used to uniquely identify an object.
 
 The `@context` is used to define how [terms](https://www.w3.org/TR/json-ld/#dfn-term) should be interpreted and help
-expressing specific identifier with short-hand names instead
+expressing specific identifier with shorthand names instead
 of [IRI](https://datatracker.ietf.org/doc/html/rfc3987#section-2).
 
 > Exhausting reserved keywords list and their meaning is
@@ -110,7 +110,7 @@ For playing around JSON-LD and processing algorithm the [playground](https://jso
 ## 1. JSON-LD in EDC
 
 EDC uses JSON-LD as primary serialization format at API layer and at runtime EDC manages the objects in their expanded
-form, for example when transforming `JsonObject` into EDC entities and and backwards
+form, for example when transforming `JsonObject` into EDC entities and backwards
 in [transformers](programming-primitives.md#2-transformers) or when [validating](#11-json-ld-validation) input
 `JsonObject` at API level.
 
@@ -129,7 +129,7 @@ Fist EDC embraces different protocols and standards such as:
 
 and they all rely on JSON-LD as serialization format.
 
-The second reason is that EDC allows to extends entities like `Asset` with custom properties, and uses JSON-LD as the
+The second reason is that EDC allows to extend entities like `Asset` with custom properties, and uses JSON-LD as the
 way to extend objects with custom namespaces.
 
 EDC handles JSON-LD through the `JsonLd` SPI. It supports different operation and configuration for managing JSON-LD in
@@ -147,13 +147,13 @@ and allows the configuration of which `@context` and `namespaces` to use when pr
 scope.
 
 For example when using the `JsonLd` service in the management API the `@context` and `namespaces` configured might
-differs when using the same service in the `dsp` layer.
+differ when using the same service in the `dsp` layer.
 
 The `JsonLd` service also can configure cached contexts by allowing to have a local copy of the remote context. This
 limits the network request required when processing the JSON-LD and reduces the attack surface if the remote host of the
 context is compromised.
 
-> By default EDC make usage of [`@vocab`](https://www.w3.org/TR/json-ld/#default-vocabulary) for processing input/output
+> By default,  EDC make usage of [`@vocab`](https://www.w3.org/TR/json-ld/#default-vocabulary) for processing input/output
 > JSON-LD document. This can provide a default vocabulary for extensible properties. The remote context definition is
 > available [on W3ID](https://w3id.org/edc/connector/management/v0.0.1).
 
@@ -187,7 +187,7 @@ The input JSON would look like this:
 }
 ```
 
-Even if we don't register a any additional `@context` or `namespace` prefix in the EDC runtime,
+Even if we don't register any additional `@context` or `namespace` prefix in the EDC runtime,
 the [Asset](./entities.md#1-assets) will still be persisted correctly since the JSON-LD gets expanded correctly and
 stored in the expanded form.
 
@@ -272,8 +272,8 @@ JSON-LD:
 
 ## 1.2 Custom Remote Context
 
-An improved version requires developers to draft a context (which should be resolvable with an URL), for example
-`http://w3id.org/starwars/context.jsonld`, that contains the terms definition.
+An improved version requires developers to draft a context (which should be resolvable with a URL), for example
+`http://w3id.org/starwars/context.jsonld`, that contains the term definition.
 
 An example of a definition might look like this:
 
@@ -290,7 +290,7 @@ An example of a definition might look like this:
 }
 ```
 
-Then in a an extension the context URL should be registered in the desired scope and cached:
+Then in an extension the context URL should be registered in the desired scope and cached:
 
 ```java
 public class MyExtension implements ServiceExtension {
@@ -308,7 +308,7 @@ public class MyExtension implements ServiceExtension {
 }
 ```
 
-With this configuration the JSON-LD will be representend without the `sw` prefix, since the terms mapping is defined in
+With this configuration the JSON-LD will be represented without the `sw` prefix, since the terms mapping is defined in
 the remote context `http://w3id.org/starwars/context.jsonld`:
 
 ```json
@@ -345,8 +345,8 @@ the remote context `http://w3id.org/starwars/context.jsonld`:
 
 EDC provides a mechanism to validate JSON-LD objects. The validation phase is typically handled at the
 network/controller layer. For each entity identified by it's own `@type`, it is possible to register a custom
-`Validator<JsonObject>` using the registry `JsonObjectValidatorRegistry`. By default EDC provides validation for all the
-entities it manages like `Asset`, `ContractDefinition` ..etc.
+`Validator<JsonObject>` using the registry `JsonObjectValidatorRegistry`. By default, EDC provides validation for all the
+entities it manages like `Asset`, `ContractDefinition`, etc.
 
 For custom validator it is possible to either implements `Validator<JsonObject>` interface (not recommended) or
 or use the bundled `JsonObjectValidator`, which is a declarative way of configuring a validator for an object through

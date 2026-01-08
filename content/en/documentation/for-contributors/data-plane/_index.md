@@ -169,7 +169,7 @@ public class FileDataSource implements DataSource {
 }
 ```
 
-The relevant method is the `openPartStream`, which will be called for connecting the source and sink. The `openPartStream` returns a `Stream` of `Part` objects, as the `DataSource` can be composed by more that one part (e.g. folders, files, etc.). The `openPartStream` does not actually open a Java `InputStream`, but returns a stream of `Part`s.
+The relevant method is the `openPartStream`, which will be called for connecting the source and sink. The `openPartStream` returns a `Stream` of `Part` objects, as the `DataSource` can be composed by more than one part (e.g. folders, files, etc.). The `openPartStream` does not actually open a Java `InputStream`, but returns a stream of `Part`s.
 
 Transforming a `Part` into an `InputStream` is the main task of the `DataSource` implementation. In our case the `FileStreamPart#openStream` just returns a `FileInputStream` from the input `File`.
 
@@ -209,7 +209,7 @@ public class FileDataSourceFactory implements DataSourceFactory {
 
 For our implementation we express in the `supportedType` method that the
 the `sourceDataAddress` should be of type `File` and in the `validateRequest` method
-that it should contains a property `sourceFile` containing the path of the file to be transferred.
+that it should contain a property `sourceFile` containing the path of the file to be transferred.
 
 The `FileDataSourceFactory` then should be registered in the `PipelineService`:
 

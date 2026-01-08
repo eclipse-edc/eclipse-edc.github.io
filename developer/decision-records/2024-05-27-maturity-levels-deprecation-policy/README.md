@@ -39,7 +39,7 @@ API elements may only be removed by incrementing the API group version number, r
 
 ### Rule 2: API objects must round-trip. 
 
-API objects must round-trip between API versions in a given release without information loss, with the exception of resources that do not exist in some versions.
+API objects must round-trip between API versions in a given release without information loss, except for resources that do not exist in some versions.
 
 ### Rule 3: An API version may not be replaced by a less stable API version.
 
@@ -50,7 +50,7 @@ API objects must round-trip between API versions in a given release without info
 ### Rule 4: API lifetime is determined by the API stability level 
 
 - GA API versions may be marked as deprecated when a new GA version is available, but must not be removed within two major versions of EDC.
-- GA API versions are removed no less that 3 months after deprecation. The minimum lifetime of an API version is therefore 18 weeks.
+- GA API versions are removed no less than 3 months after deprecation. The minimum lifetime of an API version is therefore 18 weeks.
 - Beta API versions may be marked as deprecated when a subsequent beta version is made available.
 - Beta API versions are removed no less than 6 weeks after deprecation if one subsequent beta version is available or if two subsequent beta versions have been made available.
 - Beta API versions may be removed if a GA version is made available. 

@@ -35,7 +35,7 @@ This document is not an exhaustive list of prescribed steps, that will shield ad
 danger, but rather should serve as starting point for engineers to build upon.
 
 Finally, it should go without saying that the software of the EDC project is distributed "as is" and committers of EDC
-take no responsibility or liability, direct or indirect, for any harm or damage caused by the us`e of it. This document
+take no responsibility or liability, direct or indirect, for any harm or damage caused by the use of it. This document
 does not change that.
 
 ## 2. Security recommendations
@@ -65,12 +65,12 @@ purpose of performing authentication, authorization, rate limiting, IP blacklist
 There is a plethora of ready-made components available, both commercial and open-source, therefor the EDC project _will
 not provide that functionality._ Feature requests and issues to that effect will be ignored.
 
-In the particular case of the DSP API, the same principle holds, although with the exception of authentication and
+In the particular case of the DSP API, the same principle holds, although except for authentication and
 authorization. That is handled by the [DSP protocol
 itself](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol).
 
 We have a rudimentary token-based API security module available, which can be used to secure the connection API gateway
-<-> connector if so desired. It should be noted that it is _not designed to act as a ingress point!_
+<-> connector if so desired. It should be noted that it is _not designed to act as an ingress point!_
 
 > TL;DR: don't expose any APIs if you can help it, but if you must, use available tools to harden the ingress
 
@@ -79,7 +79,7 @@ We have a rudimentary token-based API security module available, which can be us
 Typically, JVMs ship with trust stores that contain a number of widely accepted CAs. Any attempts to package additional
 CAs/certificates with runtime base images are _discouraged_, as that would be problematic because:
 
-- scalability: in a heterogenous networks one cannot assume such a custom CA to be accepted by the counterparty
+- scalability: in a heterogeneous networks one cannot assume such a custom CA to be accepted by the counterparty
 - maintainability: TLS certificates expire, so there is a chance that mandatory software rollouts become necessary
   because of expired certificates lest the network breaks down completely.
 - security: there have been a number of issues with CAs

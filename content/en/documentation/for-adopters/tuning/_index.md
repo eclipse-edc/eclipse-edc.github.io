@@ -13,7 +13,7 @@ weight: 80
 Out of the box the EDC provides a set of default configurations that aim to find a good balance for performances.
 The extensibility nature of the EDC permits the user to configure it deeply.
 
-We will explain how these settings can be fine tuned
+We will explain how these settings can be fine-tuned.
 
 ## State Machines
 At the core of the EDC there is the [`State Machine`](../../for-contributors/runtime/programming-primitives.md#1-state-machines) 
@@ -30,7 +30,7 @@ The most important settings for configuring a state machine are:
     pessimistically against mutual access, so for the time of the processing no other connector instances can read
     the same entities.
 - `send.retry.limit`
-  - how many time a failing process execution can be tried before failure.
+  - how many times a failing process execution can be tried before failure.
 - `send.retry.base-delay.ms`
   - how many milliseconds have to pass before the first retry after a failure. Next retries are calculated with an
     exponential function (e.g. if the first delay is 10ms)

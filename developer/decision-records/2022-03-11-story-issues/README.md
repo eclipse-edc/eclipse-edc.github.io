@@ -3,7 +3,7 @@
 ## Decision
 
 For larger features, for which it seems reasonable to create more than one issue, we will create overarching issues which 
-we'll name "story issues". Every story issues has several sub-issues a.k.a sub-tasks.
+we'll name "story issues". Every story issues has several sub-issues a.k.a. sub-tasks.
 
 ## Rationale
 

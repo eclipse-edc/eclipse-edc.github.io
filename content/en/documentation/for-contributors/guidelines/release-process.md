@@ -50,7 +50,7 @@ with the 2 workflows:
   - if the `source branch` is `main`, it bumps the version number there to the next snapshot version, to let the development
     cycle flow there
   - if the `source branch` is not `main`, we're preparing a bugfix version, so the workflow will publish the snapshot version
-    of the artifacts. no need to do it for `main` because these will already exists as published on every commit on the `main`
+    of the artifacts. no need to do it for `main` because these will already exist as published on every commit on the `main`
     branch
 - [release](https://github.com/eclipse-edc/Release/actions/workflows/release.yml) has as inputs:
   - use workflow from: always `main`
