@@ -104,7 +104,7 @@ This enables the IssuerService to link additional data to the holder, which may 
 `credentialSubject` of the Verifiable Credential. Furthermore, the IssuerService can enforce that only known holders are
 allowed to request credentials.
 
-There may, however, be use cases where is is _not_ necessary, or even desirable, to pre-register holders in the
+There may, however, be use cases where it is _not_ necessary, or even desirable, to pre-register holders in the
 IssuerService. In such cases, the IssuerService can be configured to allow anonymous credential requests, i.e., holders
 can simply make a CredentialRequest without being pre-registered in the IssuerService.
 
@@ -244,7 +244,7 @@ Please check out the full [OpenAPI specification of the IssuerService Administra
 
 ## Deployment Options
 
-As all other EDC components, the IssuerService is comprised of a set of Java modules that can be packaged and deployed
+As all other EDC components, the IssuerService is composed of a set of Java modules that can be packaged and deployed
 in various ways.
 
 The clear recommendation is to deploy the IssuerService as a standalone runtime with its own HSM (vault) and its own

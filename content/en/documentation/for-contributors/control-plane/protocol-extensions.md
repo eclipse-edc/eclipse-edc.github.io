@@ -31,7 +31,7 @@ At the heart of EDC message exchange mechanism lies the `RemoteMessage` interfac
 Each `RemoteMessage` is:
 
 - Delivered to the counter-party using a [RemoteMessageDispatcher](#11-delivering-messages-with-remotemessagedispatcher).
-- Received by the counter-party through the protocol implementation (e.g HTTP) and handled by the [protocol services](#11-handling-ingress-messages-with-protocol-services) layer.
+- Received by the counter-party through the protocol implementation (e.g. HTTP) and handled by the [protocol services](#11-handling-ingress-messages-with-protocol-services) layer.
 
 
 ### 1.1 Delivering messages with RemoteMessageDispatcher
@@ -68,7 +68,7 @@ which handle respectively `Catalog`, `ContractNegotiation` and `TransferProcess`
 
 ## 2. DSP protocol implementation
 
-The [Dataspace protocol](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol) protocol implementation is available under the `data-protocol/dsp` subfolder in the [Connector](https://github.com/eclipse-edc/Connector) repository and it is identified by the key `dataspace-protocol-http`.
+The [Dataspace protocol](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol) implementation is available under the `data-protocol/dsp` subfolder in the [Connector](https://github.com/eclipse-edc/Connector) repository and it is identified by the key `dataspace-protocol-http`.
 
 It extends the `RemoteMessageDispatcher` with the interface `DspHttpRemoteMessageDispatcher` (`dsp-spi`), which adds an additional method for registering message [handlers](#21-remotemessage-handlers).
 

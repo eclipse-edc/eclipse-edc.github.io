@@ -217,7 +217,7 @@ testImplementation(testFixtures("org.eclipse.edc:management-api-test-fixtures:<v
 In some circumstances it is necessary to launch an EDC runtime and execute tests against it. This could be a
 fully-fledged connector runtime, replete with persistence and all bells and whistles, or this could be a partial runtime
 that contains lots of mocks and stubs. One prominent example of this is API tests. At some point, you'll want to run
-REST requests using a HTTP client against the _actual_ EDC runtime, using JSON-LD expansion, transformation etc. and
+REST requests using an HTTP client against the _actual_ EDC runtime, using JSON-LD expansion, transformation etc. and
 real database infrastructure.
 
 EDC provides a nifty way to launch any runtime from within the JUnit process, which makes it easy to configure and debug

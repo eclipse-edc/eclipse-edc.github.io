@@ -3,7 +3,7 @@
 ## Decision
 
 The EDC project will Bill-of-Material (BOM) files with the goal of simplifying the creation of runtimes for downstream
-projects. For example, creating a connector runtime should take no more an a couple of EDC dependencies.
+projects. For example, creating a connector runtime should take no more a couple of EDC dependencies.
 
 ## Rationale
 

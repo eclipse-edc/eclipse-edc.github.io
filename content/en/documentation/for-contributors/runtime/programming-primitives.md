@@ -25,7 +25,7 @@ EDC is asynchronous by design, which means that processes are processed in such 
 runtime nor the caller. For example starting a contract negotiation is a long-running process and every contract
 negotiation has to traverse a series of
 [states](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/contract-negotiation/contract.negotiation.protocol#id-1.2-state-machine),
-most of which involve sending remote messages to the counter party. These state transitions are not guaranteed to happen
+most of which involve sending remote messages to the counterparty. These state transitions are not guaranteed to happen
 within a certain time frame, they could take hours or even days.
 
 From that it follows that an EDC instance must be regarded as ephemeral (= they can't hold state in memory), so the
@@ -200,7 +200,7 @@ about service layers](service-layers.md).
 ### 2.3 Reporting transformation errors
 
 Generally speaking, input validation should be performed by [validators](service-layers.md#2-validators). However, it
-is still possible that an object cannot be serialized/deserialized correctly, for example when a property has has the
+is still possible that an object cannot be serialized/deserialized correctly, for example when a property has the
 wrong type, wrong multiplicity, cannot be parsed, unknown property, etc. Those types of errors should be reported to the
 `TransformerContext`:
 
@@ -240,7 +240,7 @@ var token = tokenGenerationService.generate("my-private-key-id", jtiDecorator, t
 ```
 
 In the EDC code base the `TokenGenerationService` is not intended to be injectable, because client code typically should
-be opinionated with regards to the token technology.
+be opinionated with respect to the token technology.
 
 ## 4. Token validation and rules
 

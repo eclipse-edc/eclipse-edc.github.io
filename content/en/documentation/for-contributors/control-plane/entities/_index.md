@@ -64,7 +64,7 @@ A very simplistic `Asset` could look like this:
 ```
 
 The `Asset` also contains a `DataAddress` object, which can be understood as a "pointer into the physical world". It
-contains information about where the asset is physically located. This could be a HTTP URL, or a complex object. In the
+contains information about where the asset is physically located. This could be an HTTP URL, or a complex object. In the
 S3 example, that `DataAddress` might contain the bucket name, region and potentially other information. Notice that the
 _schema_ of the `DataAddress` will depend on where the data is physically located, for instance a `HttpDataAddress` has
 different properties from an S3 `DataAddress`. More precisely, Assets and DataAddresses are _schemaless_, so there is no
@@ -76,7 +76,7 @@ recommend using the JDK `UUID` implementation.
 
 Second, _never_ store access credentials such as passwords, tokens, keys etc. in the `dataAddress` or even the
 `privateProperties` object. While the latter does not get serialized over DSP, both properties are persisted in the
-database. Always use a HSM to store the credential, and hold a reference to the secret in the DataAddress. Checkout
+database. Always use an HSM to store the credential, and hold a reference to the secret in the DataAddress. Checkout
 [the best practices](../contributor-handbook.md#4-development-best-practices) for details.
 
 By design, Assets are extensible, so users can store any metadata they want in it. For example, the `properties` object
@@ -220,7 +220,7 @@ an invalid operator should raise an exception.
 
 ### 2.1 Policy vs PolicyDefinition
 
-In EDC we have two general use cases under which we handle and persist policies:
+In EDC, we have two general use cases under which we handle and persist policies:
 
 1. for use in contract definitions
 2. during contract negotiations
@@ -231,7 +231,7 @@ definitions.
 > Side note: the ODRL context available at `http://www.w3.org/ns/odrl.jsonld` simply defines `uid` as an alias to the
 > `@id` property. This means, whether we use `uid` or `@id` doesn't matter, both expand to the same property `@id`.
 
-However in the second case we are dealing with DCAT objects, that have no concept of Offers, Policies or Assets. Rather,
+However, in the second case we are dealing with DCAT objects, that have no concept of Offers, Policies or Assets. Rather,
 their vocabulary includes Datasets, Dataservices etc. So when deserializing those DCAT objects there is no way to
 reconstruct `Policy#uid`, because the JSON-LD structure does not contain it.
 
@@ -405,12 +405,12 @@ Let's revisit our headquarter policy from earlier and change it a little:
 }
 ```
 
-This means two things. One, our policy has changed its semantics: now we require the headquarter to be in the EU, or to
+This means two things. One, our policy has changed its semantics: now we require the headquarters to be in the EU, or to
 have more than 5000 employees.
 
 #### 2.5.3 Policy Validation and Evaluation Plan
 
-By default ODRL policies are validated only in their structure (e.g. fields missing). In the latest
+By default, ODRL policies are validated only in their structure (e.g. fields missing). In the latest
 version of EDC an additional layer of validation has been introduced which leverages the `PolicyEngine` configuration in the `runtime` as described [above](#22-policy-scopes-and-bindings)
 in order to have a more domain-specific validation. 
 
@@ -457,7 +457,7 @@ Let's take this policy as example:
 }
 ```
 
-> Since we are using `@vocab`, the `leftOperand` `headquarter.location` vaule defaults to the `edc` namespace, i.e. will get transformed during JSON-LD expansion to `"https://w3id.org/edc/v0.0.1/ns/headquarter.location"`
+> Since we are using `@vocab`, the `leftOperand` `headquarter.location` value defaults to the `edc` namespace, i.e. will get transformed during JSON-LD expansion to `"https://w3id.org/edc/v0.0.1/ns/headquarter.location"`
 
 
 and let's assume that we didn't bind the policy to any function or scope, the output of the validation might look like this:
@@ -483,14 +483,14 @@ Since the `leftOperand` is not bound to a scope and there is no function associa
 The kind validation can be called using the `/v3.1alpha/policydefinitions/{id}/validate` or can be
 enabled by default on policy definition creation.
 
-> The settings is `edc.policy.validation.enabled` and is set to `false` by default
+> The setting is `edc.policy.validation.enabled` and is set to `false` by default
 
 #### 2.5.3.2 Policy Evaluation Plan
 
 Even if the validation phase of a policy is successful, it might happen that evaluation of a `Policy` does not behave as expected if the `PolicyEngine`
 was not configured properly.
 
-One suche example would be if a function is bound only to a `leftOperand` in the `catalog` scope, but the desired behavior is to execute the policy function also in the `contract.negotiation` and in the `transfer.process` scopes.
+One such example would be if a function is bound only to a `leftOperand` in the `catalog` scope, but the desired behavior is to execute the policy function also in the `contract.negotiation` and in the `transfer.process` scopes.
 In those scenarios, the new API called the "evaluation plan API" has been introduced to get an overview of all the steps that the `PolicyEngine` will take while evaluating a `Policy` within a scope without actually running the evaluation.
 
 By using the same policy example, we could run an evaluation plan for the `contract.negotiation` scope:
@@ -563,7 +563,7 @@ expressing which policies are in effect for an asset. So when an asset (or sever
 a contract definition is used to express under what conditions they are offered. Those conditions are comprised of a
 _contract policy_ and an _access policy_. The _access policy_ determines, whether a participant will even get the offer,
 and the contract policy determines whether they can negotiate a contract for it. Those policies are referenced by ID,
-but foreign-key constrainta are not enforced. This means that contract definitions can be created _ahead of time_.
+but foreign-key constraints are not enforced. This means that contract definitions can be created _ahead of time_.
 
 It is important to note that contract definitions are _implementation details_ (i.e. _internal objects_), which means
 they **never** leave the realm of the provider, and they are **never** sent to the consumer via DSP.
@@ -910,7 +910,7 @@ where:
   how and where the data transfer should happen.
 - [`callbackAddresses`](#73-transfer-process-callbacks) custom hooks in order bo be notified about state transition of
   the transfer process.
-- `privateProperties`: custom properties not shared with the counter party.
+- `privateProperties`: custom properties not shared with the counter-party.
 
 ### 7.1 Transfer and data flows types
 
@@ -948,9 +948,9 @@ Then it's up to the consumer to use this information for pulling the data.
    can either decide to receive the `DataAddress` using the eventing
    system [callbacks](#73-transfer-process-callbacks) using the `transfer.process.started` type, or use
    the [EDRs](#8-endpoint-data-references) extensions for automatically store it on consumer control plane side.
-10. With the informations in the `DataAddress` such as the `endpointUrl` and the `Authorization` data can be fetched.
+10. With the information in the `DataAddress` such as the `endpointUrl` and the `Authorization` data can be fetched.
 11. The Provider Data plane validates and authenticates the incoming request and retrieves the source `DataAddress`.
-12. The he provider data plane proxies the validated request to the configured backend in the source `DataAddress`.
+12. The provider data plane proxies the validated request to the configured backend in the source `DataAddress`.
 
 #### 7.1.2 Provider Push
 
@@ -971,24 +971,24 @@ A push transfer is when the Provider data plane initiates sending data to the de
    through [data plane signaling](../contributor-handbook.md#210-data-plane-signaling) protocol.
 6. The Provider Data Plane validates the incoming request
 7. If request is valid, the Provider Data Plane returns acknowledgement
-8. The `DataPlaneManager` of the the Provider Data Plane processes the request: it creates a `DataSource`/`DataSink`pair
+8. The `DataPlaneManager` of the Provider Data Plane processes the request: it creates a `DataSource`/`DataSink`pair
    based on the source/destination data addresses
 9. The Provider Data Plane fetches data from the actual data source (see `DataSource`)
 10. The Provider Data Plane pushes data to the consumer services (see `DataSink`)
 
 #### 7.1.2 Finite and Non-Finite Data
 
-The charaterization of the data applies to either `push` and `pull` transfers. Finite data transfers cause the transfer
-process to transitition to the state `COMPLETED`, once the transmission has finished. For example a transfer of a single
+The characterization of the data applies to either `push` and `pull` transfers. Finite data transfers cause the transfer
+process to transition to the state `COMPLETED`, once the transmission has finished. For example a transfer of a single
 file that is hosted and transferred into a cloud storage system.
 
 Non-finite data means that once the transfer process request has been accepted by the provider the transfer process is
-in the `STARTED` state until it gets terminated by the consumer or the provider. Exampes of Non-finite data are streams
-or API endpoins.
+in the `STARTED` state until it gets terminated by the consumer or the provider. Examples of Non-finite data are streams
+or API endpoints.
 
 On the provider side transfer processes can also be terminated by
 the [policy monitor](../contributor-handbook.md#27-policy-monitor) that
-periodically watches over the on going transfer and checks if the
+periodically watches over the ongoing transfer and checks if the
 associated [contract agreement](#5-contract-agreements) still fulfills the contract [policy](#2-policies).
 
 ### 7.2 About Data Destinations
@@ -1139,14 +1139,14 @@ payload for filtering the datasets:
 
 Entities are backed by [stores](./service-layers.md#51-in-memory-stores) for doing CRUD operations. For each entity
 there is an associated store interface (SPI). Most of the stores SPI have a `query` like method which takes a
-`QuerySpec` type as input and returns the matched entities in a collection. Indivitual implementations are then
+`QuerySpec` type as input and returns the matched entities in a collection. Individual implementations are then
 responsible for translating the `QuerySpec` to a proper fetching strategy.
 
 The description on how the translation and mapping works will be explained in each implementation. Currently EDC support
 out of the box:
 
 - [In-memory stores](./service-layers.md#51-in-memory-stores) (default implementation).
-- [SQL stores](../contributor-handbook.md#29-postgre-sql-persistence) provied as extensions for each store, mostly
+- [SQL stores](../contributor-handbook.md#29-postgre-sql-persistence) provided as extensions for each store, mostly
   tailored for and tested with
   PostgreSQL.
 

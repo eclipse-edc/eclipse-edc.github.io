@@ -15,7 +15,7 @@ the data consumer. This section provides an overview of how data planes work and
 
 Although a data plane can be collocated in the same process as a control plane, this is not a recommended setup. Typically,
 a data plane component is deployed as a separate set of instances to an independent environment such as a Kubernetes cluster.
-This allows the data plane to be operated and scaled independently from the control plane. At runtime, a data plane must
+This allows the data plane to be operated and scaled independently of the control plane. At runtime, a data plane must
 register with a control plane, which in turn directs the data plane using the *Data Plane Signaling API*. EDC does not
 ship with an out-of-the-box data plane. Rather, it provides the *Data Plane Framework (DPF)*, a platform for building
 custom data planes. You can choose to start with the DPF or build your own data plane using your programming language

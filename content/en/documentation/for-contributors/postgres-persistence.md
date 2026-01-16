@@ -199,7 +199,7 @@ we must recursively descend into the model graph and resolve the correct SQL exp
 #### Option 2a: encoding the object
 
 Another popular way to store complex objects is to encode them in JSON and store them in a `VARCHAR` column. In
-PostgreSQL we use the specific `JSON` type instead of `VARCHAR`. For example, the `TranferProcess` is stored in a table
+PostgreSQL, we use the specific `JSON` type instead of `VARCHAR`. For example, the `TranferProcess` is stored in a table
 called `edc_transfer_process`, its `DataAddress` property is encoded in JSON and stored in a `JSON` field.
 
 Querying for `TransferProcess` objects: when mapping the filter expression

@@ -52,7 +52,7 @@ PRs should adhere to the following rules.
 - No surprise PRs. Before submitting a PR, open a discussion or an issue outlining the planned work and give
   people time to comment. Unsolicited PRs may get ignored or rejected.
 - Create focused PRs. Work should be focused on one particular feature or bug. Do not create broad-scoped PRs that
-  solve multiple issues or span signficant portions of the codebase as they will be rejected outright.
+  solve multiple issues or span significant portions of the codebase as they will be rejected outright.
 - Provide a clear PR description and motivation. This makes the reviewer's life much
   easier. It is also helpful to outline the broad changes that were made, e.g. "Changes the schema of XYZ-Entity:
   the `age` field changed from `long` to `String`".

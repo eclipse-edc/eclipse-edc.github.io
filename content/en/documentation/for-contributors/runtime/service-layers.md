@@ -180,7 +180,7 @@ public void initialize(ServiceExtensionContext context) {
 ```
 
 This registers the request filter for the web context, and registers the authentication service within the request
-filter. That way, whenever a HTTP request hits the `"yourcontext"` servlet container, the request filter gets invoked,
+filter. That way, whenever an HTTP request hits the `"yourcontext"` servlet container, the request filter gets invoked,
 delegating to the `SuperCustomAuthService` instance.
 
 
@@ -277,7 +277,7 @@ is referenced by a `ContractNegotiation`, and - if not - delete the asset. For t
 services, an `AssetIndex` and a `ContractNegotiationStore`.
 
 Likewise, when creating assets, the `AssetService` would first perform some validation, then create the asset (again
-using the `AssetIndex`) and the emit an [event](#6-events-and-callbacks).
+using the `AssetIndex`) and then emit an [event](#6-events-and-callbacks).
 
 Note that the validation mentioned here is different from [API validators](#2-validators). API validators only
 validate the _structure_ of a JSON object, so check if mandatory fields are missing etc., whereas _service validation_
@@ -317,7 +317,7 @@ Typically, stores fulfill the following contract:
 
 ### 5.1 In-Memory stores
 
-By default and unless configured otherwise, EDC provides in-memory store
+By default, and unless configured otherwise, EDC provides in-memory store
 implementations [by default](./dependency-injection.md#12-provide-defaults). These are light-weight, thread-safe `Map`
 -based implementations, that are intended for
 **testing, demonstration and tutorial purposes only**.
