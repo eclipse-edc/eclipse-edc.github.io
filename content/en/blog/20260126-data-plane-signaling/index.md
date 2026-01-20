@@ -8,9 +8,9 @@ description: >
 Data Plane Signaling is a specification for interoperable communication between Dataspace Protocol Control Planes and 
 Data Planes ([github project](https://github.com/eclipse-dataplane-signaling)).
 
-We decided to fully adopt this specification and to deprecate the current one. This will cause the current implementation
-of communication layer between Control Plane and Data Plane to be deprecatedas well, together with the implementation of
-the EDC Data Plane Framework.
+We decided to fully adopt this specification and to deprecate the current approach. This will involve deprecating the
+current implementation of the communication layer between the Control Plane and Data Plane in addition to the EDC Data
+Plane Framework.
 
 ## Rationale
 
@@ -25,12 +25,12 @@ sovereign applications, rather than a connector-centric task.
 
 The implementation of the Data Plane Signaling protocol in the EDC Control Plane is already progressing
 ([issue](https://github.com/eclipse-edc/Connector/issues/5323)), we expect to have a fully compliant version as soon as
-the Data Plane Signaling specification will be released in a stable manner.
+a stable version of the Data Plane Signaling specification is released.
 
 At that point, we will deprecated the EDC Data Plane Framework in its entirety, and after 2 releases, it will be eligible
-for removal from the codebase, so if you are an EDC adopter we recommend you to start prototyping your Data Plane(s) 
+for removal from the codebase. If you are an EDC adopter, we recommend to start prototyping your Data Plane(s)
 following the current specification. The dataplane-signaling team is already providing SDKs library in different
-languages (Go, Rust, Java, .Net) so you can focus only on the actual data flow management.
+languages (Go, Rust, Java, .NET) to help with this transition.
 
 Let's see from the technical point of view what are the advantages brought by this approach.
 
@@ -54,7 +54,7 @@ Two issues become apparent just by looking at the diagrams:
 
 Just a glance at the diagrams shows that a strong focus has been placed on separating the dataspace layer from the
 “use case/application” layer.  
-This is not to say they were not separated before, but this specification formalizes it: the Control Plane and Pata
+This is not to say they were not separated before, but this specification formalizes it: the Control Plane and Data
 Plane are two distinct architectural components serving different purposes.  
 While the Control Plane is responsible for wire protocol (DSP) communication and dataspace authentication, the Data
 Plane handles the actual transfer and receipt of data, managing authentication for the chosen data flow protocol.
