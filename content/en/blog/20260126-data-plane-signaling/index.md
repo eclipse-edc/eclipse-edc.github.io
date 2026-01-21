@@ -27,10 +27,14 @@ The implementation of the Data Plane Signaling protocol in the EDC Control Plane
 ([issue](https://github.com/eclipse-edc/Connector/issues/5323)), we expect to have a fully compliant version as soon as
 a stable version of the Data Plane Signaling specification is released.
 
-At that point, we will deprecated the EDC Data Plane Framework in its entirety, and after 2 releases, it will be eligible
+At that point, we will deprecate the EDC Data Plane Framework in its entirety, and after 2 releases, it will be eligible
 for removal from the codebase. If you are an EDC adopter, we recommend to start prototyping your Data Plane(s)
 following the current specification. The dataplane-signaling team is already providing SDKs library in different
-languages (Go, Rust, Java, .NET) to help with this transition.
+languages ([Go](https://github.com/eclipse-dataplane-core/dataplane-sdk-go),
+[Rust](https://github.com/eclipse-dataplane-core/dataplane-sdk-rust),
+[Java](https://github.com/[eclipse-dataplane-core/dataplane-sdk-java](https://github.com/eclipse-dataplane-core/dataplane-sdk-java)),
+[.NET](https://github.com/[eclipse-dataplane-core/dataplane-sdk-net](https://github.com/eclipse-dataplane-core/dataplane-sdk-net)))
+to help with this transition.
 
 Let's see from the technical point of view what are the advantages brought by this approach.
 
