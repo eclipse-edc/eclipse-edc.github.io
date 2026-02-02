@@ -1,4 +1,6 @@
 (function () {
+    console.log('custom javascript loaded')
+
     function norm(s) {
         return (s || "").toLowerCase().trim();
     }
