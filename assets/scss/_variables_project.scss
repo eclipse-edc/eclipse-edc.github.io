@@ -49,6 +49,16 @@ $primary-bg-subtle-dark: #3c3f44;
   }
 }
 
+/* Filtertable (scoped, won’t affect other tables) */
+.table-filter input[type="search"]{
+  max-width: 36rem;
+  width: 100%;
+  padding: .5rem .75rem;
+}
 
+.ft-controls { margin: 1rem 0; }
+.ft-label { display:block; font-weight: 600; margin-bottom: .25rem; }
+.ft-input { width: 100%; max-width: 46rem; padding: .5rem .75rem; box-sizing: border-box; }
+.ft-status { margin-top: .35rem; font-size: .9rem; opacity: .85; }
 
 
