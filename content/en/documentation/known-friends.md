@@ -3,6 +3,9 @@ title: Known Friends
 weight: 90
 ---
 
+To get to know how we define "adoptions" and see how to submit a feature, please take a look at our
+[guidelines for submitting adoption requests](adoption.md).
+
 {{<  filtertable >}}
 
 | Title                                                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Links                                                                                                                                                |
