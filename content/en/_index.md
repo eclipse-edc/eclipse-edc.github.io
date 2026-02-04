@@ -39,7 +39,7 @@ to deliver innovative solutions for data exchange networks.
     <div><img height="80" src="images/logos/sap.png"></div>
     <div><img height="80" src="images/logos/soprasteria.png"></div>
     <div><img height="80" src="images/logos/sovity.png"></div>
-    <div><img height="80" src="images/logos/technalia.png"></div>
+    <div><img height="80" src="images/logos/tecnalia.png"></div>
     <div><img height="80" src="images/logos/thinkit.png"></div>
     <div><img height="80" src="images/logos/tsystems.png"></div>
     <div><img height="80" src="images/logos/zf.png"></div>
