@@ -1,7 +1,6 @@
 (function () {
-    console.log('custom javascript loaded')
 
-    function norm(s) {
+    function normalizeString(s) {
         return (s || "").toLowerCase().trim();
     }
 
@@ -23,7 +22,7 @@
         var titleIdx = -1, descIdx = -1;
 
         $ths.each(function (i) {
-            var t = norm($(this).text());
+            var t = normalizeString($(this).text());
             if (t === "title") titleIdx = i;
             if (t === "description") descIdx = i;
         });
@@ -40,23 +39,18 @@
             haystacks.push((title + " " + desc).toLowerCase());
         });
 
-        function setStatus(shown, q) {
-            if (!$status.length) return;
-            $status.text(q ? ("Showing " + shown + " of " + total + " rows") : ("Showing " + total + " rows"));
-        }
-
         function apply() {
-            var q = norm($input.val());
+            var query = normalizeString($input.val());
             var shown = 0;
 
             $rows.each(function (i) {
-                var match = !q || haystacks[i].indexOf(q) !== -1;
+                var match = !q || haystacks[i].indexOf(query) !== -1;
                 // Use toggling display rather than hidden attribute for widest compatibility
                 $(this).toggle(match);
                 if (match) shown++;
             });
 
-            setStatus(shown, q);
+            $status.length && $status.text(query ? `Showing ${shown} of ${total} rows`: `Showing ${total} rows`);
         }
 
         $input.on("input", apply);
