@@ -65,7 +65,7 @@ jobs:
           fi
 
       - name: Create issue
-        if: steps.lychee-external.outputs.exit_code != 0 && steps.check-report.outputs.broken_links == 'true'
+        if: steps.check-report.outputs.broken_links == 'true'
         uses: peter-evans/create-issue-from-file@v5
         with:
           title: 🔍 External Broken Links Report
