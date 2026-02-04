@@ -55,17 +55,17 @@ jobs:
           format: markdown
           output: ./lychee-external-report.md
 
-      - name: Check report content
-        id: check-report
-        run: |
-          if [ -f ./lychee-external-report.md ] && [ -s ./lychee-external-report.md ] && grep -q "Broken links found" ./lychee-external-report.md; then
-            echo "broken_links=true" >> $GITHUB_OUTPUT
-          else
-            echo "broken_links=false" >> $GITHUB_OUTPUT
-          fi
+#      - name: Check report content
+#        id: check-report
+#        run: |
+#          if [ -f ./lychee-external-report.md ] && [ -s ./lychee-external-report.md ] && grep -q "Broken links found" ./lychee-external-report.md; then
+#            echo "broken_links=true" >> $GITHUB_OUTPUT
+#          else
+#            echo "broken_links=false" >> $GITHUB_OUTPUT
+#          fi
 
       - name: Create issue
-        if: steps.check-report.outputs.broken_links == 'true'
+        if: steps.lychee-external.outputs.exit_code != '0'
         uses: peter-evans/create-issue-from-file@v5
         with:
           title: 🔍 External Broken Links Report
