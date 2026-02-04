@@ -44,7 +44,7 @@
             var shown = 0;
 
             $rows.each(function (i) {
-                var match = !q || haystacks[i].indexOf(query) !== -1;
+                var match = !query || haystacks[i].indexOf(query) !== -1;
                 // Use toggling display rather than hidden attribute for widest compatibility
                 $(this).toggle(match);
                 if (match) shown++;
