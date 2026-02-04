@@ -1,0 +1,25 @@
+{{- $id := .Get "id" | default (printf "ft-%d" now.UnixNano) -}}
+{{- $placeholder := .Get "placeholder" | default "Filter by title or description…" -}}
+{{- $titleHeader := .Get "titleHeader" | default "Title" -}}
+{{- $descHeader := .Get "descHeader" | default "Description" -}}
+
+<div class="ft" data-ft
+     data-ft-title-header="{{ $titleHeader }}"
+     data-ft-desc-header="{{ $descHeader }}">
+
+    <div class="ft-controls">
+        <label class="ft-label" for="{{ $id }}">Filter</label>
+        <input
+                id="{{ $id }}"
+                class="ft-input"
+                type="search"
+                placeholder="{{ $placeholder }}"
+                autocomplete="off"
+        />
+        <div class="ft-status" aria-live="polite"></div>
+    </div>
+
+    <div class="ft-content">
+        {{ .Inner | markdownify }}
+    </div>
+</div>
