@@ -1,7 +1,7 @@
 # Basic page settings
 baseURL = "https://eclipse-edc.github.io/"
 canonifyURLs = true
-title = "EDC"
+title = "Eclipse Dataspace Technologies"
 
 # Language settings
 contentDir = "content/en"
@@ -61,7 +61,7 @@ languageName = "English"
 # Weight used for sorting.
 weight = 1
 [languages.en.params]
-title = "Eclipse Dataspace Components"
+title = "Eclipse Dataspace Technologies"
 description = "Build your own dataspace"
 
 [markup]
