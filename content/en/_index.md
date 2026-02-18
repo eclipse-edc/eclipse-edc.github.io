@@ -9,7 +9,7 @@ Learn More <i class="fas fa-arrow-alt-circle-right ms-2"></i>
 <a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/eclipse-edc">
 GitHub <i class="fab fa-github ms-2 "></i>
 </a>
-<p class="lead mt-5">Eclipse Dataspace technologies bring together a growing ecosystem of independent open source projects that enable scalable, interoperable, and trustworthy data sharing across organizations and industries. Together they provide everything needed to design, deploy, and operate modern dataspaces.</p>
+<p class="lead mt-5">EDC is an open source framework hosted by the Eclipse Foundation for building secure, globally-scalable data-sharing services. EDC provides highly customizable components for creating control planes, data planes, decentralized identity systems, and federated data catalogs. Backed by leading companies and cloud providers, EDC gives developers the tools they need to deliver innovative solutions for data exchange networks.</p>
 <p>
 Backed by leading companies and cloud providers, the ecosystem accelerates innovation while preserving openness, flexibility, and interoperability. 
 </p>

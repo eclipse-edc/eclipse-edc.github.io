@@ -1,7 +1,7 @@
 # Basic page settings
 baseURL = "https://eclipse-edc.github.io/"
 canonifyURLs = true
-title = "Eclipse Dataspace Technologies"
+title = "Eclipse Dataspace Components"
 
 # Language settings
 contentDir = "content/en"
@@ -61,7 +61,7 @@ languageName = "English"
 # Weight used for sorting.
 weight = 1
 [languages.en.params]
-title = "Eclipse Dataspace Technologies"
+title = "Eclipse Dataspace Components"
 description = "Build your own dataspace"
 
 [markup]
@@ -136,7 +136,7 @@ from_year = 2021
 #  Set to true to disable breadcrumb navigation.
 breadcrumb_disable = false
 # Set to false if you don't want to display a logo (/assets/icons/logo.svg) in the top navbar
-navbar_logo = false
+navbar_logo = true
 # Set to true if you don't want the top navbar to be translucent when over a `block/cover`, like on the homepage.
 navbar_translucent_over_cover_disable = false
 # Enable to show the side bar menu in its compact state.
