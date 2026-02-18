@@ -6,19 +6,11 @@ weight: 60
 
 The Federated Catalog (FC) provides a scalable solution for metadata discovery in decentralized dataspaces. The FC employs a set of crawlers, that periodically scrape the dataspace requesting the catalog from each participant in a list of participants and consolidates them in a local cache, which provides a unified, searchable view of available data assets across the network.
 
-
-
 Instead of requiring participants to query each other directly for catalog information, the FC uses a crawling and caching mechanism. It periodically collects catalog metadata from participant connectors and stores this information locally. By maintaining a cached copy of participant catalogs, the Federated Catalog enables faster and more reliable catalog queries while reducing network load and removing the need for real-time access to all participants during query execution. In this way, the FC effectively serves as a read-optimized replica of participant catalogs within a dataspace.
-
-
 
 Keeping a locally cached version of every participant's catalog makes catalog queries more responsive and robust, and it can cause a reduction in network load.
 
-
-
 The Federated Catalog is based on EDC components for core functionality, specifically those of the connector for extension loading, runtime bootstrap, configuration, API handling etc., while adding specific functionality using the EDC extensibility mechanism.
-
-
 
 ## Main components
 
@@ -30,7 +22,6 @@ The Federated Catalog architecture consists of two main subsystems:
 
 The main features of both subsystems are summarized in the table below.
 
-
 | Federated Catalog Node (FCN) | Federated Catalog Cache (FCC) |
 |:-----------------------------|:-------------------------------|
 | Serves a catalog to dataspace participants | Caches foreign catalog entries and their policies |
@@ -38,23 +29,6 @@ The main features of both subsystems are summarized in the table below.
 | May support multiple catalog protocols | Entries can be sent to Connector instances for retrieval |
 | Pluggable storage system | May support multiple catalog protocols |
 |  | Pluggable storage (schemeless) |
-
-
-## Important classes
-
-- **Crawler: a piece of software within the FC that periodically issues update-requests to other TCNs. Receives a WorkItem and executes the DSP catalog request.
-
-- **WorkItem**: a unit of work (= "crawl target") for the crawler
-
-- **UpdateRequest**: a DSP catalog request from the Crawler to a TCN to get that TCN's catalog
-
-- **UpdateResponse**: the response to an UpdateRequest, containing one Catalog
-
-- **ExecutionPlan**: defines how the crawlers should run, i.e. periodically, based on an event, etc. By default, FC runs on a periodic schedule.
-
-- **ExecutionManager**: this is the central component that instantiates Crawlers and schedules/distributes the work among them.
-
-- **QueryService**: a service that interprets and executes a catalog query against the cache
 
 ## Deployment considerations
 
