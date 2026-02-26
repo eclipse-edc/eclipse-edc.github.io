@@ -20,6 +20,8 @@ It remains at the committers' discretion to mark suspicious contributions as `ai
 
 ## Approach
 
+We will add a section to our contribution guidelines essentially stating the following, plus also referencing the Eclipse Foundation's [recommendation](https://www.eclipse.org/projects/handbook/#genai) on generative AI.
+
 There is no 100% reliable way to identify AI content, but there usually are certain tells. If a committer suspects a certain contribution of being largely AI-generated, they may assign the `ai` label to the contribution.
 
 Original authors are free to dispute the assessment, at which point they and the committers must come to an agreement. If none is reached, it remains at the committers' discretion to uphold the assessment or remove it.
