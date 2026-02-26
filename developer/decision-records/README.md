@@ -28,6 +28,9 @@
 - [2024-07-17 Bootstrapping SQL Databases](2024-07-17-bootstrap-sql-database/)
 - [2024-08-13 Technology Repositories Release](2024-08-13-technology-repos-release/)
 - [2024-08-24 New Release process](./2024-08-26-new-release-process/)
+- [2024-09-19 Bills of Material](./2024-09-19-bills-of-material/)
+- [2024-10-11 Dependencies Check](./2024-10-11-dependencies-check/)
+- [2026-02-25 On the usage of Artifical Intelligence](./2026-02-25-using-ai/)
 
 ## Repository-specific
 
@@ -43,4 +46,3 @@
 - [Technology Azure](../../docs/submodule/Technology-Azure/docs/developer/decision-records/)
 - [Technology GCP](../../docs/submodule/Technology-GCP/docs/developer/decision-records/)
 - [Trust Framework Adoption](../../docs/submodule/TrustFrameworkAdoption/docs/developer/decision-records/)
-
