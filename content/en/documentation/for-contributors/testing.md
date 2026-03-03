@@ -135,8 +135,7 @@ command:
 
 ### 4.5 Running them in the CI pipeline
 
-All integration tests should go into the [`verify.yaml` workflow](/.github/workflows/verify.yaml), every "technology"
-should
+All integration tests should go into the `verify.yaml` workflow, every "technology" should
 have its own job, and technology specific tests can be targeted using Junit tags with `-DincludeTags` property as
 described above in document.
 

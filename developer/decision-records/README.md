@@ -30,7 +30,8 @@
 - [2024-08-24 New Release process](./2024-08-26-new-release-process/)
 - [2024-09-19 Bills of Material](./2024-09-19-bills-of-material/)
 - [2024-10-11 Dependencies Check](./2024-10-11-dependencies-check/)
-- [2026-02-25 On the usage of Artifical Intelligence](./2026-02-25-using-ai/)
+- [2026-02-25 On the usage of Artificial Intelligence](./2026-02-25-using-ai/)
+- [2026-03-22 Catalog Crawler as Control-Plane feature](./2026-03-02-catalog-crawler/)
 
 ## Repository-specific
 
