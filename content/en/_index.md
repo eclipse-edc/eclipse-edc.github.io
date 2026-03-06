@@ -9,10 +9,9 @@ Learn More <i class="fas fa-arrow-alt-circle-right ms-2"></i>
 <a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/eclipse-edc">
 GitHub <i class="fab fa-github ms-2 "></i>
 </a>
-<p class="lead mt-5">EDC is an open source framework hosted by the Eclipse Foundation for building secure, globally-scalable data-sharing services.
-EDC provides highly customizable components for creating control planes, data planes, decentralized identity systems,
-and federated data catalogs. Backed by leading companies and cloud providers, EDC gives developers the tools they need
-to deliver innovative solutions for data exchange networks.
+<p class="lead mt-5">EDC is an open source framework hosted by the Eclipse Foundation for building secure, globally-scalable data-sharing services. EDC provides highly customizable components for creating control planes, data planes, decentralized identity systems, and federated data catalogs. Backed by leading companies and cloud providers, EDC gives developers the tools they need to deliver innovative solutions for data exchange networks.</p>
+<p>
+Backed by leading companies and cloud providers, the ecosystem accelerates innovation while preserving openness, flexibility, and interoperability. 
 </p>
 
 <img height="500px" width="600px" src="images/edc.schematic.svg">
@@ -23,14 +22,26 @@ to deliver innovative solutions for data exchange networks.
 <h2>Backed by Leading Companies</h2>
 </div>
 <div class="pt-5 logo-container">
-<div><img height="80" src="images/logos/amadeus.logo.svg"></div>
-<div><img height="60" src="images/logos/aws.logo.svg"></div>
-<div><img height="80" src="images/logos/bmw.logo.svg"></div>
-<div><img height="60" src="images/logos/fraunhofer.logo.svg"></div>
-<div><img height="60" src="images/logos/google.logo.svg"></div>
-<div><img height="60" src="images/logos/huawei.logo.svg"></div>
-<div><img height="60" src="images/logos/microsoft.logo.svg"></div>
-<div><img height="60" src="images/logos/sap.logo.svg"></div>
+    <div><img height="80" src="images/logos/amadeus.png"></div>
+    <div><img height="80" src="images/logos/aruba.png"></div>
+    <div><img height="80" src="images/logos/aws.png"></div>
+    <div><img height="80" src="images/logos/bmw.png"></div>
+    <div><img height="80" src="images/logos/cofinityx.png"></div>
+    <div><img height="80" src="images/logos/fraunhofer.png"></div>
+    <div><img height="80" src="images/logos/huawei.png"></div>
+    <div><img height="80" src="images/logos/mercedes.png"></div>
+    <div><img height="80" src="images/logos/microsoft.png"></div>
+    <div><img height="80" src="images/logos/nexyo.png"></div>
+    <div><img height="80" src="images/logos/ntt.png"></div>
+    <div><img height="80" src="images/logos/opiquad.png"></div>
+    <div><img height="80" src="images/logos/pwc.png"></div>
+    <div><img height="80" src="images/logos/sap.png"></div>
+    <div><img height="80" src="images/logos/soprasteria.png"></div>
+    <div><img height="80" src="images/logos/sovity.png"></div>
+    <div><img height="80" src="images/logos/tecnalia.png"></div>
+    <div><img height="80" src="images/logos/thinkit.png"></div>
+    <div><img height="80" src="images/logos/tsystems.png"></div>
+    <div><img height="80" src="images/logos/zf.png"></div>
 </div>
 
 {{< /blocks/section >}}

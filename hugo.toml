@@ -1,7 +1,7 @@
 # Basic page settings
 baseURL = "https://eclipse-edc.github.io/"
 canonifyURLs = true
-title = "EDC"
+title = "Eclipse Dataspace Components"
 
 # Language settings
 contentDir = "content/en"
