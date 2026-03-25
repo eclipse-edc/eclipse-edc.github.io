@@ -30,6 +30,7 @@ In addition to specific small samples we will continue to offer larger end-to-en
 MVD will need to be refactored in the following aspects:
 
 - remove Terraform/OpenTofu, use plain Kubernetes manifests instead
+- simplify participants: only one provider and one consumer, remove management domains
 - align naming with JAD
 - remove IntelliJ deployment: while this has proven to be useful in the past, it increases maintenance churn, complicates the sample and can almost entirely be replaced with in-cluster debugging.
 
