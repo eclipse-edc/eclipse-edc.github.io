@@ -32,6 +32,7 @@
 - [2024-10-11 Dependencies Check](./2024-10-11-dependencies-check/)
 - [2026-02-25 On the usage of Artificial Intelligence](./2026-02-25-using-ai/)
 - [2026-03-22 Catalog Crawler as Control-Plane feature](./2026-03-02-catalog-crawler/)
+- [2026-02-25 Introducing Dataspace Hub](./2026-03-25-dataspace-hub/)
 
 ## Repository-specific
 
