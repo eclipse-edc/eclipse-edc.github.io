@@ -174,6 +174,12 @@ For example, let's assume private key A is used to sign Credential CA and public
 
 If a private key is compromised, it must be immediately revoked. Revocation involves removing the verification method entry in the DID document and publishing the updated version. This will invalidate all resources signed with the revoked key pair.
 
+#### Using Vault's Transit Engine for signing
+
+Instead of loading private key material into application memory IdentityHub can delegate sensitive signing operations to Vault's Transit engine. In this setup, Identity Hub generates key pairs in Vault and never has access to the private key material. When a signing operation is required, Identity Hub sends the data to be signed along with the key reference to Vault, which performs the signing and returns the signature. This approach enhances security by eliminating the risk of private key exposure in application memory.
+
+Find details on how to configure Identity Hub to use Vault's Transit engine in the [Vault Transit documentation](./vault-transit.md).
+
 ### Verifiable Credentials
 
 > Support for storing verifiable credentials using the DCP issuance flow is currently in development. In the meantime, adopters must develop custom extensions for storing verifiable credential resources or create them through the Identity API.
