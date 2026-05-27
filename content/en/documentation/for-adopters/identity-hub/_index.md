@@ -178,7 +178,7 @@ If a private key is compromised, it must be immediately revoked. Revocation invo
 
 Instead of loading private key material into application memory IdentityHub can delegate sensitive signing operations to Vault's Transit engine. In this setup, Identity Hub generates key pairs in Vault and never has access to the private key material. When a signing operation is required, Identity Hub sends the data to be signed along with the key reference to Vault, which performs the signing and returns the signature. This approach enhances security by eliminating the risk of private key exposure in application memory.
 
-Find details on how to configure Identity Hub to use Vault's Transit engine in the [Vault Transit documentation]().
+Find details on how to configure Identity Hub to use Vault's Transit engine in the [Vault Transit documentation](https://github.com/eclipse-edc/IdentityHub/blob/main/docs/developer/architecture/vault-transit.md).
 
 ### Verifiable Credentials
 
