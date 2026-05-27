@@ -95,3 +95,17 @@ and updated to the new profiles at your own pace.
 
 Legacy and DPS assets can coexist for as long as needed, allowing teams to plan a gradual phase-out of the legacy ones.
 The migration is complete when all active transfers have finished and all assets have been moved to DPS profiles.
+
+## Temporary measure, not a target state
+
+Copying the EDC-DataPlane code and building a DPS shim layer on top of it is a **migration aid only**. It exists
+to give teams a bridge while transitioning away from the legacy data-plane, not as a long-term architecture.
+Maintaining a fork of the removed EDC-DataPlane code carries ongoing cost: you own all future fixes, security patches,
+and compatibility work with no upstream support.
+
+The recommended long-term approach is to adopt a data-plane built on the
+[Data Plane SDKs](https://github.com/eclipse-dataplane-core) and the DPS protocol natively — for example
+[`siglet`](https://github.com/eclipse-dataplane-core/dsdk-facet-rs/tree/main/siglet). These implementations are
+designed around the DPS specification from the ground up and are the supported path forward.
+
+Plan to retire the shim-based data-plane as soon as the migration window closes.
