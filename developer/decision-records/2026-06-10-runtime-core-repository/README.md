@@ -39,6 +39,7 @@ The migration will be carried out in the following steps:
 3. **Move runtime bootstrap modules** (`boot`, dependency injection framework, and related domain-agnostic
    infrastructure) from the `Connector` repository into `Runtime-Metamodel`.
 4. **Rename `Runtime-Metamodel`** to `Runtime-Core`.
+5. Eventually, `Connector` could be renamed to `Control-Plane`
 
 ### Versioning and Release Cycle
 
