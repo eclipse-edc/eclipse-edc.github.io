@@ -1,4 +1,9 @@
-# The Path to Version 1 for the Eclipse Dataspace Components
+---
+title: The Path to Version 1 for the Eclipse Dataspace Components
+date: 2026-03-06
+description: >
+  The Eclipse Dataspace Components (EDC) project has evolved significantly since its initial release
+---
 
 The [Eclipse Dataspace Components (EDC)](https://github.com/eclipse-edc) project has evolved significantly since its initial release. What started as an experimental reference implementation for dataspace connectors has grown into a mature, modular framework used in a variety of production-grade data sharing environments.
 
