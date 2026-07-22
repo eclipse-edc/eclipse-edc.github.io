@@ -167,10 +167,12 @@ The input JSON would look like this:
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2",
+    {
     "sw": "http://w3id.org/starwars/v0.0.1/ns/"
-  },
+    }
+  ],
   "@type": "Asset",
   "@id": "79d9c360-476b-47e8-8925-0ffbeba5aec2",
   "properties": {

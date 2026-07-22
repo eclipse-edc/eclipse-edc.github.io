@@ -25,9 +25,9 @@ Let's take one of the previous policy examples:
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "PolicyDefinition",
   "policy": {
     "@context": "http://www.w3.org/ns/odrl.jsonld",
@@ -177,14 +177,13 @@ The following values are supported for the time unit:
 | d     | days         |
 
 A duration is defined in a `ContractDefinition` using the following policy and left-hand
-operands `https://w3id.org/edc/v0.0.1/ns/inForceDate`:
+operands `inForceDate`:
 
 ```json
 {
-  "@context": {
-    "cx": "https://w3id.org/cx/v0.8/",
-    "@vocab": "http://www.w3.org/ns/odrl.jsonld"
-  },
+  "@context": [
+      "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "Offer",
   "@id": "a343fcbf-99fc-4ce8-8e9b-148c97605aab",
   "permission": [
@@ -193,20 +192,14 @@ operands `https://w3id.org/edc/v0.0.1/ns/inForceDate`:
       "constraint": {
         "and": [
           {
-            "leftOperand": "https://w3id.org/edc/v0.0.1/ns/inForceDate",
+            "leftOperand": "inForceDate",
             "operator": "gt",
-            "rightOperand": {
-              "@value": "contractAgreement",
-              "@type": "https://w3id.org/edc/v0.0.1/ns/inForceDate:dateExpression"
-            }
+            "rightOperand": "contractAgreement"
           },
           {
-            "leftOperand": "https://w3id.org/edc/v0.0.1/ns/inForceDate:inForceDate",
+            "leftOperand": "inForceDate",
             "operator": "lt",
-            "rightOperand": {
-              "@value": "contractAgreement + 100d",
-              "@type": "https://w3id.org/edc/v0.0.1/ns/inForceDate:dateExpression"
-            }
+            "rightOperand": "contractAgreement + 100d"
           }
         ]
       }
@@ -217,14 +210,13 @@ operands `https://w3id.org/edc/v0.0.1/ns/inForceDate`:
 
 ### Fixed Date
 
-Fixed dates may also be specified as follows using `https://w3id.org/edc/v0.0.1/ns/inForceDate` operands:
+Fixed dates may also be specified as follows using `inForceDate` operands:
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/inForceDate",
-    "@vocab": "http://www.w3.org/ns/odrl.jsonld"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "Offer",
   "@id": "a343fcbf-99fc-4ce8-8e9b-148c97605aab",
   "permission": [
@@ -233,20 +225,13 @@ Fixed dates may also be specified as follows using `https://w3id.org/edc/v0.0.1/
       "constraint": {
         "and": [
           {
-            "leftOperand": "https://w3id.org/edc/v0.0.1/ns/inForceDate",
+            "leftOperand": "inForceDate",
             "operator": "gt",
-            "rightOperand": {
-              "@value": "2023-01-01T00:00:01Z",
-              "@type": "xsd:datetime"
-            }
-          },
+            "rightOperand": "2023-01-01T00:00:01Z"
           {
-            "leftOperand": "https://w3id.org/edc/v0.0.1/ns/inForceDate",
+            "leftOperand": "inForceDate",
             "operator": "lt",
-            "rightOperand": {
-              "@value": "2024-01-01T00:00:01Z",
-              "@type": "xsd:datetime"
-            }
+            "rightOperand": "2024-01-01T00:00:01Z"
           }
         ]
       }
@@ -265,17 +250,16 @@ valid until its other constraints evaluate to false.
 
 ### Not Before and Until
 
-`Not Before` and `Until` semantics can be defined by specifying a single `https://w3id.org/edc/v0.0.1/ns/inForceDate`
+`Not Before` and `Until` semantics can be defined by specifying a single `inForceDate`
 fixed date constraint and an
 appropriate operand. For example, the following policy
 defines a contact is not in force before `January 1, 2023`:
 
  ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "@vocab": "http://www.w3.org/ns/odrl.jsonld"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "Offer",
   "@id": "a343fcbf-99fc-4ce8-8e9b-148c97605aab",
   "permission": [
@@ -298,6 +282,3 @@ defines a contact is not in force before `January 1, 2023`:
 
 - In-force policy with a fixed validity: [policy.inforce.fixed.json](./policy.inforce.fixed.json)
 - In-force policy with a relative validity duration: [policy.inforce.duration.json](./policy.inforce.duration.json)
-
-_Please note that the samples use the abbreviated prefix notation `"edc:inForceDate"` instead of the full namespace 
-`"https://w3id.org/edc/v0.0.1/ns/inForceDate"`._

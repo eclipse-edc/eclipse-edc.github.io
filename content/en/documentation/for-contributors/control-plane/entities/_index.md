@@ -49,9 +49,9 @@ A very simplistic `Asset` could look like this:
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@id": "79d9c360-476b-47e8-8925-0ffbeba5aec2",
   "properties": {
     "somePublicProp": "a very interesting value"
@@ -91,10 +91,12 @@ Here is an example of how an Asset with a custom property following a custom nam
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "sw": "http://w3id.org/starwars/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2",
+    {
+      "sw": "http://w3id.org/starwars/v0.0.1/ns/"
+    }
+  ],
   "@id": "79d9c360-476b-47e8-8925-0ffbeba5aec2",
   "properties": {
     "faction": "Galactic Imperium",
@@ -183,9 +185,9 @@ this:
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "PolicyDefinition",
   "policy": {
     "@context": "http://www.w3.org/ns/odrl.jsonld",
@@ -377,9 +379,9 @@ Let's revisit our headquarter policy from earlier and change it a little:
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "PolicyDefinition",
   "policy": {
     "@context": "http://www.w3.org/ns/odrl.jsonld",
@@ -434,9 +436,9 @@ Let's take this policy as example:
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "PolicyDefinition",
 	"@id": "2",
   "policy": {
@@ -460,9 +462,6 @@ Let's take this policy as example:
 }
 ```
 
-> Since we are using `@vocab`, the `leftOperand` `headquarter.location` value defaults to the `edc` namespace, i.e. will get transformed during JSON-LD expansion to `"https://w3id.org/edc/v0.0.1/ns/headquarter.location"`
-
-
 and let's assume that we didn't bind the policy to any function or scope, the output of the validation might look like this:
 
 ```json
@@ -473,11 +472,9 @@ and let's assume that we didn't bind the policy to any function or scope, the ou
     "leftOperand 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' is not bound to any scopes: Rule { Permission constraints: [Or constraint: [Constraint 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' EQ 'EU']] } ",
     "left operand 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' is not bound to any functions: Rule { Permission constraints: [Or constraint: [Constraint 'https://w3id.org/edc/v0.0.1/ns/headquarter.location' EQ 'EU']] }"
   ],
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "odrl": "http://www.w3.org/ns/odrl/2/"
-  }
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ]
 }
 ```
 
@@ -499,12 +496,12 @@ In those scenarios, the new API called the "evaluation plan API" has been introd
 By using the same policy example, we could run an evaluation plan for the `contract.negotiation` scope:
 
 ```http request
-POST https://controlplane-host:port/management/v3.1alpha/policydefinitions/2/evaluationplan
+POST https://controlplane-host:port/management/v4/policydefinitions/2/evaluationplan
 Content-Type: application/json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "policyScope": "contract.negotiation"
 }
 ```
@@ -541,11 +538,9 @@ which gives this output:
   "prohibitionSteps": [],
   "obligationSteps": [],
   "postValidators": [],
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "odrl": "http://www.w3.org/ns/odrl/2/"
-  }
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ]
 }
 ```
 
@@ -669,29 +664,29 @@ and `id3` that must contain the `"foo" : "bar"` property.
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
-  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractDefinition",
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "ContractDefinition",
   "@id": "test-id",
-  "edc:accessPolicyId": "access-policy-1234",
-  "edc:contractPolicyId": "contract-policy-5678",
-  "edc:assetsSelector": [
+  "accessPolicyId": "access-policy-1234",
+  "contractPolicyId": "contract-policy-5678",
+  "assetsSelector": [
     {
-      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
-      "edc:operandLeft": "id",
-      "edc:operator": "in",
-      "edc:operandRight": [
+      "@type": "Criterion",
+      "operandLeft": "id",
+      "operator": "in",
+      "operandRight": [
         "id1",
         "id2",
         "id3"
       ]
     },
     {
-      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
-      "edc:operandLeft": "foo",
-      "edc:operator": "=",
-      "edc:operandRight": "bar"
+      "@type": "Criterion",
+      "operandLeft": "foo",
+      "operator": "=",
+      "operandRight": "bar"
     }
   ]
 }
@@ -734,9 +729,9 @@ management API.
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "ContractRequest",
   "counterPartyAddress": "http://provider-address",
   "protocol": "dataspace-protocol-http",
@@ -953,10 +948,10 @@ API:
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
-  "@type": "https://w3id.org/edc/v0.0.1/ns/TransferRequest",
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "TransferRequest",
   "protocol": "dataspace-protocol-http",
   "counterPartyAddress": "http://provider-address",
   "contractId": "contract-id",
@@ -1149,9 +1144,9 @@ Here's an example of how a `QuerySpec` object might look like when querying for 
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "QuerySpec",
   "limit": 1,
   "offset": 1,
@@ -1201,9 +1196,9 @@ payload for filtering the datasets:
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "counterPartyAddress": "http://provider/api/dsp",
   "protocol": "dataspace-protocol-http",
   "counterPartyId": "providerId",

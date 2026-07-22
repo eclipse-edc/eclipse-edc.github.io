@@ -150,9 +150,9 @@ An `Asset` is the primary building block for data sharing. An asset represents a
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@id": "899d1ad0-532a-47e8-2245-1aa3b2a4eac6",
   "properties": {
     "somePublicProp": "a very interesting value"
@@ -183,10 +183,12 @@ The `@context` property on an asset indicates that it is a JSON-LD type. JSON-LD
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/",
-    "market-systems": "http://w3id.org/market-systems/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2",
+    {
+      "market-systems": "http://w3id.org/market-systems/v0.0.1/ns/"
+    }
+  ],
   "@id": "...",
   "properties": {
     "dataFeed": {
@@ -243,9 +245,9 @@ Policies are loaded into EDC via the Management API using a policy definition, w
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "PolicyDefinition",
   "policy": {
     "@context": "http://www.w3.org/ns/odrl.jsonld",
@@ -279,25 +281,25 @@ Now, let's examine a contract definition:
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
-  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractDefinition",
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "ContractDefinition",
   "@id": "test-id",
-  "edc:accessPolicyId": "access-policy-1234",
-  "edc:contractPolicyId": "contract-policy-5678",
-  "edc:assetsSelector": [
+  "accessPolicyId": "access-policy-1234",
+  "contractPolicyId": "contract-policy-5678",
+  "assetsSelector": [
     {
-      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
-      "edc:operandLeft": "id",
-      "edc:operator": "in",
-      "edc:operandRight": ["id1", "id2", "id3"]
+      "@type": "Criterion",
+      "operandLeft": "id",
+      "operator": "in",
+      "operandRight": ["id1", "id2", "id3"]
     },
     {
-      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
-      "edc:operandLeft": "productCategory",
-      "edc:operator": "=",
-      "edc:operandRight": "gold"
+      "@type": "Criterion",
+      "operandLeft": "productCategory",
+      "operator": "=",
+      "operandRight": "gold"
     },
   ]
 }
@@ -329,25 +331,27 @@ If a negotiation is successfully completed (termed *finalized*), a DSP contract 
 
 ```json
 {
-  "@context":  "https://w3id.org/dspace/2024/1/context.json",
-  "@type": "dspace:ContractAgreementMessage",
-  "dspace:providerPid": "urn:uuid:a343fcbf-99fc-4ce8-8e9b-148c97605aab",
-  "dspace:consumerPid": "urn:uuid:32541fe6-c580-409e-85a8-8a9a32fbe833",
-  "dspace:agreement": {
+  "@context":  [
+   "https://w3id.org/dspace/2024/1/context.json" 
+  ],
+  "@type": "ContractAgreementMessage",
+  "providerPid": "urn:uuid:a343fcbf-99fc-4ce8-8e9b-148c97605aab",
+  "consumerPid": "urn:uuid:32541fe6-c580-409e-85a8-8a9a32fbe833",
+  "agreement": {
     "@id": "urn:uuid:e8dc8655-44c2-46ef-b701-4cffdc2faa44",
-    "@type": "odrl:Agreement",
-    "odrl:target": "urn:uuid:3dd1add4-4d2d-569e-d634-8394a8836d23",
-    "dspace:timestamp": "2023-01-01T01:00:00Z",
-    "odrl:permission": [{
-      "odrl:action": "odrl:use" ,
-      "odrl:constraint": [{
-        "odrl:leftOperand": "odrl:dateTime",
-        "odrl:operand": "odrl:lteq",
-        "odrl:rightOperand": { "@value": "2023-12-31T06:00Z", "@type": "xsd:dateTime" }
+    "@type": "Agreement",
+    "target": "urn:uuid:3dd1add4-4d2d-569e-d634-8394a8836d23",
+    "timestamp": "2023-01-01T01:00:00Z",
+    "permission": [{
+      "action": "odrl:use" ,
+      "constraint": [{
+        "leftOperand": "dateTime",
+        "operand": "lteq",
+        "rightOperand": "2023-12-31T06:00Z"
       }]
     }]
   },
-  "dspace:callbackAddress": "https://example.com/callback"
+  "callbackAddress": "https://example.com/callback"
 }
 ```
 
