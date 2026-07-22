@@ -53,9 +53,9 @@ request:
 POST https://controlplane-host:port/api/control/v1/dataplanes
 Content-Type: application/json
 {
-    "@context": {
-        "edc": "https://w3id.org/edc/v0.0.1/ns/"
-    },
+    "@context": [
+        "https://w3id.org/edc/connector/management/v2"
+    ],
     "@type": "DataPlaneInstance",
     "@id": "custom_dataplane",
     "url": "http://custom-dataplane-host:3000/dataflows",
@@ -156,9 +156,9 @@ The `sourceDataAddress` is the `DataAddress` configured in the [`Asset`](../cont
 
 ```json
 {
-    "@context": {
-        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-    },
+    "@context": [
+        "https://w3id.org/edc/connector/management/v2"
+    ],
     "@id": "asset-1",
     "@type": "Asset",
     "dataAddress": {
@@ -173,9 +173,9 @@ The `destinationDataAddress` is derived from the `dataDestination` in the [`Tran
 
 ```json
 {
-    "@context": {
-        "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-    },
+    "@context": [
+        "https://w3id.org/edc/connector/management/v2"
+    ],
     "counterPartyAddress": "{{PROVIDER_DSP}}/api/dsp",
     "connectorId": "{{PROVIDER_ID}}",
     "contractId": "{{CONTRACT_ID}}",
@@ -195,9 +195,9 @@ A naive implementation may look like this:
 ```javascript
 async function handlePush(req, res) {
     res.send({
-        "@context": {
-            "edc": "https://w3id.org/edc/v0.0.1/ns/"
-        },
+        "@context": [
+            "https://w3id.org/edc/connector/management/v2"
+        ],
         "@type": "DataFlowResponseMessage"
     });
 
@@ -240,9 +240,9 @@ async function handlePull(req, res) {
     const { dataAddress } = await generateDataAddress(sourceDataAddress);
 
     const response = {
-        "@context": {
-            "edc": "https://w3id.org/edc/v0.0.1/ns/"
-        },
+        "@context": [
+            "https://w3id.org/edc/connector/management/v2"
+        ],
         "@type": "DataFlowResponseMessage",
         "dataAddress": dataAddress
     };

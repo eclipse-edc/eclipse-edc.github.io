@@ -459,12 +459,12 @@ webhooks is only possible for certain events, for example when [initiating a con
 negotiation](https://eclipse-edc.github.io/Connector/openapi/management-api/#/Contract%20Negotiation%20V3/initiateContractNegotiationV3):
 
 ```json
-// POST /v3/contractnegotiations
+// POST /v4/contractnegotiations
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
-  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractRequest",
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "ContractRequest",
   "counterPartyAddress": "http://provider-address",
   "protocol": "dataspace-protocol-http",
   "policy": {

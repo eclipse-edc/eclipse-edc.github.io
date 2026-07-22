@@ -75,7 +75,7 @@ POST https://dataplane-host:port/api/signaling/v1/dataflows
 Content-Type: application/json
 
 {
-  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
+  "@context": [ "https://w3id.org/edc/connector/management/v2" ],
   "@id": "transfer-id",
   "@type": "DataFlowStartMessage",
   "processId": "process-id",
@@ -113,7 +113,7 @@ POST https://dataplane-host:port/api/signaling/v1/dataflows
 Content-Type: application/json
 
 {
-  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
+  "@context": [ "https://w3id.org/edc/connector/management/v2" ],
   "@type": "DataFlowSuspendMessage",
   "reason": "reason"
 }
@@ -130,7 +130,7 @@ POST https://dataplane-host:port/api/signaling/v1/dataflows
 Content-Type: application/json
 
 {
-  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
+  "@context": [ "https://w3id.org/edc/connector/management/v2" ],
   "@type": "DataFlowTerminateMessage",
   "reason": "reason"
 }

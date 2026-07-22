@@ -121,23 +121,25 @@ Management domains are straightforward to configure as they mainly involve catal
 
 ```json
 {
-  "@context": "https://w3id.org/dspace/v0.8/context.json",
+  "@context": [
+    "https://w3id.org/dspace/2025/1/context.jsonld"
+  ],
   "@id": "urn:uuid:3afeadd8-ed2d-569e-d634-8394a8836d57",
-  "@type": "dcat:Catalog",
-  "dct:title": "Foo Industries Provider Root Catalog",
-  "dct:description": ["A catalog of catalogs"],
-  "dcat:catalog": {
-    "@type": "dcat:Catalog",
-    "dct:description": ["Foo Industries Sub-Catalog"],
-    "dcat:distribution": {
-      "@type": "dcat:Distribution",
-      "dcat:accessService": "urn:uuid:4aa2dcc8-4d2d-569e-d634-8394a8834d77"
+  "@type": "Catalog",
+  "title": "Foo Industries Provider Root Catalog",
+  "description": ["A catalog of catalogs"],
+  "catalog": {
+    "@type": "Catalog",
+    "description": ["Foo Industries Sub-Catalog"],
+    "distribution": {
+      "@type": "Distribution",
+      "accessService": "urn:uuid:4aa2dcc8-4d2d-569e-d634-8394a8834d77"
     },
-    "dcat:service": [
+    "service": [
       {
         "@id": "urn:uuid:4aa2dcc8-4d2d-569e-d634-8394a8834d77",
-        "@type": "dcat:DataService",
-        "dcat:endpointURL": "https://foo-industries.com/subcatalog"
+        "@type": "DataService",
+        "endpointURL": "https://foo-industries.com/subcatalog"
       }
     ]
   }
@@ -152,9 +154,9 @@ Datasets are created from assets. The same is true for linked catalogs. Adding t
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@id": "subcatalog-id",
   "@type": "CatalogAsset",
   "properties": {...},
@@ -171,19 +173,19 @@ The next step in creating a sub-catalog is to decide on access control, that is,
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
-  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractDefinition",
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "ContractDefinition",
   "@id": "test-id",
-  "edc:accessPolicyId": "access-policy-1234",
-  "edc:contractPolicyId": "contract-policy-5678",
-  "edc:assetsSelector": [
+  "accessPolicyId": "access-policy-1234",
+  "contractPolicyId": "contract-policy-5678",
+  "assetsSelector": [
     {
-      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
-      "edc:operandLeft": "id",
-      "edc:operator": "in",
-      "edc:operandRight": ["subcatalog-id"]
+      "@type": "Criterion",
+      "operandLeft": "id",
+      "operator": "in",
+      "operandRight": ["subcatalog-id"]
     }
   ]
 }
@@ -193,19 +195,19 @@ Alternatively, the following contract definition example selects a group of sub-
 
 ```json
 {
-  "@context": {
-    "edc": "https://w3id.org/edc/v0.0.1/ns/"
-  },
-  "@type": "https://w3id.org/edc/v0.0.1/ns/ContractDefinition",
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "ContractDefinition",
   "@id": "test-id",
-  "edc:accessPolicyId": "group-access-policy-1234",
-  "edc:contractPolicyId": "contract-policy-5678",
-  "edc:assetsSelector": [
+  "accessPolicyId": "group-access-policy-1234",
+  "contractPolicyId": "contract-policy-5678",
+  "assetsSelector": [
     {
-      "@type": "https://w3id.org/edc/v0.0.1/ns/Criterion",
-      "edc:operandLeft": "region",
-      "edc:operator": "=",
-      "edc:operandRight": "EU"
+      "@type": "Criterion",
+      "operandLeft": "region",
+      "operator": "=",
+      "operandRight": "EU"
     }
   ]
 }

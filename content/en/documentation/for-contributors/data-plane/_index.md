@@ -377,7 +377,7 @@ On the provider side we can create an [Asset](../control-plane/entities.md#1-ass
 
 ```json
 {
-  "@context": { "@vocab": "https://w3id.org/edc/v0.0.1/ns/" },
+  "@context": [ "https://w3id.org/edc/connector/management/v2" ],
   "@id": "file-asset",
   "properties": {
   },
@@ -416,9 +416,9 @@ Once a contract [agreement](../control-plane/entities.md#5-contract-agreements) 
 
 ```json
 {
-  "@context": {
-    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
-  },
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
   "@type": "TransferRequest",
   "dataDestination": {
     "type": "Mail",
