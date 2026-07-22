@@ -1,0 +1,14 @@
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "CelExpression",
+  "leftOperand": "https://w3id.org/example/credentials/MembershipCredential",
+  "expression": "ctx.agent.claims.vc.valid().withType('MembershipCredential').hasClaim('status', 'active')",
+  "description": "Requires a valid MembershipCredential whose subject status is active",
+  "scopes": [
+    "catalog",
+    "contract.negotiation",
+    "transfer.process"
+  ]
+}

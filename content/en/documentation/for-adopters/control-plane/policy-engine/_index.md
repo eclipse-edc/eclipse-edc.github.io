@@ -4,6 +4,7 @@ weight: 10
 ---
 
 <!-- TOC -->
+  * [CEL Policy Expressions](#cel-policy-expressions)
   * [Policy Scopes and Bindings](#policy-scopes-and-bindings)
     * [Designing for Optimal Policy Performance](#designing-for-optimal-policy-performance)
   * [In Force Policy](#in-force-policy)
@@ -94,6 +95,16 @@ public class TestPolicy implements AtomicConstraintRuleFunction<Duty, Participan
 ```
 
 Note that `PolicyContext` has its own hierarchy, that's tightly bound to the policy scope.
+
+## CEL Policy Expressions
+
+The code-first approach described above is the primary way to evaluate policies, but it requires writing and
+deploying a Java extension for each new constraint. As an experimental alternative, EDC can evaluate policy
+constraints declaratively using [Common Expression Language (CEL)](https://github.com/google/cel-spec)
+expressions that are managed as data through the Management API — no code required. This is especially handy for
+credential-based rules, which ship with a set of ready-made helper functions.
+
+See [CEL Policy Expressions](./cel/_index.md) for the details.
 
 ## Policy Scopes and Bindings
 

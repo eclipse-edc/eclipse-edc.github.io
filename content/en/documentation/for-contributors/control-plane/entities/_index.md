@@ -19,6 +19,9 @@ weight: 10
         * [2.5.3.1 Policy Evaluation Plan](#2532-policy-evaluation-plan)
     * [2.6 Bundled policy functions](#26-bundled-policy-functions)
       * [2.6.1 Contract expiration function](#261-contract-expiration-function)
+    * [2.7 Common Expression Language (CEL) policy functions](#27-common-expression-language-cel-policy-functions)
+      * [2.7.1 How CEL evaluation is wired](#271-how-cel-evaluation-is-wired)
+      * [2.7.2 Customizing functions](#272-customizing-functions)
   * [3. Contract definitions](#3-contract-definitions)
   * [4. Contract negotiations](#4-contract-negotiations)
   * [5. Contract agreements](#5-contract-agreements)
@@ -555,6 +558,85 @@ which outlines two issues that would cause the constraint to be filtered out dur
 ### 2.6 Bundled policy functions
 
 #### 2.6.1 Contract expiration function
+
+### 2.7 Common Expression Language (CEL) policy functions
+
+Writing an [evaluation function](#23-policy-evaluation-functions) and [binding it](#24-example-binding-an-evaluation-function)
+means shipping a Java extension for every new constraint. As an experimental alternative, the `cel-core`
+extension lets constraints be evaluated by [Common Expression Language (CEL)](https://github.com/google/cel-spec)
+expressions that are stored as data and managed through the Management API, so a rule can be added or changed
+without deploying code. The adopter-facing usage — the `/v5beta/celexpressions` API, scopes, and the bundled
+verifiable-credential helpers — is documented in
+[CEL Policy Expressions](../../../for-adopters/control-plane/policy-engine/cel/_index.md); this section covers the
+mechanism and how to extend it. See the
+[decision record](https://github.com/eclipse-edc/Connector/tree/main/docs/developer/decision-records/2026-01-27-adopt-cel-expressions)
+for the rationale.
+
+CEL support is opt-in and not part of the default bundles: include `cel-core` (the engine), `cel-api-v5` (the
+Management API), and optionally `cel-store-sql` (persistence).
+
+#### 2.7.1 How CEL evaluation is wired
+
+Rather than one function per constraint, `CelPolicyCoreExtension` registers a single
+`DynamicAtomicConstraintRuleFunction` — `CelExpressionFunction` — for each rule type in the transfer,
+negotiation, catalog, and policy-monitor contexts. A [dynamic function](#252-dynamic-functions) receives the
+left operand, so a single function can back any constraint. `canHandle(leftOperand)` returns `true` when a
+stored `CelExpression` matches that left operand, and `evaluate(...)` compiles and runs the expression.
+
+Scope binding is dynamic. The extension calls
+`ruleBindingRegistry.dynamicBind(engine::evaluationScopes)`, and the engine derives the scopes for a left
+operand from the `scopes` declared on the stored expressions (looked up by `leftOperand`, or by an entry in
+their `actions`). So an expression's own `scopes` field decides which policy phases it participates in.
+
+The variables available to an expression (`ctx`, `this`, `now`) are assembled by `CelContextMapper`
+implementations: `ParticipantAgentContextMapper` supplies `ctx.agent`, and `AgreementContextMapper` supplies
+`ctx.agreement`. These mappers determine the context shape for each scope.
+
+#### 2.7.2 Customizing functions
+
+Two `@ExtensionPoint` registries in `control-plane-spi` let you extend what expressions can do. Both must be
+used during extension initialization (see below).
+
+**Reshaping a claim** — `CelParticipantAgentClaimMapperRegistry` converts a raw `ParticipantAgent` claim into a
+value that is convenient to query from CEL. This is how the DCP integration turns the raw `vc` claim into the
+list-of-credential-maps exposed as `ctx.agent.claims.vc`; the reference implementation is `VcClaimMapper` in
+the `decentralized-claims-cel` module.
+
+**Adding functions** — `CelFunctionRegistry` registers custom functions. A `CelFunction` describes one overload:
+its name, a globally-unique overload id, whether it is a member (receiver-style, `a.f(b)`) or global function,
+its result type and argument types as `CelValueType` values, and the implementation. `CelValueType` is an
+EDC-neutral abstraction over the CEL type system, so extensions do not depend on the CEL library directly;
+`CelFunctionTranslator` in `cel-core` maps it onto the underlying library.
+
+```java
+public class MyCelFunctionsExtension implements ServiceExtension {
+
+    @Inject
+    private CelFunctionRegistry celFunctionRegistry;
+
+    @Override
+    public void initialize(ServiceExtensionContext context) {
+        // a member function usable as: someString.startsWith('prefix')
+        celFunctionRegistry.registerFunction(new CelFunction(
+                "startsWith",              // name used in expressions
+                "string_starts_with",      // globally unique overload id
+                true,                      // member (receiver-style) function
+                CelValueType.BOOL,         // result type
+                List.of(CelValueType.STRING, CelValueType.STRING), // receiver + argument
+                args -> ((String) args.get(0)).startsWith((String) args.get(1))));
+    }
+}
+```
+
+`VcCelFunctions` in the `decentralized-claims-cel` module is a full, real-world reference — including how to
+register several overloads of the same function name.
+
+> NB: two contracts matter when implementing functions. First, register during `initialize()`: the CEL
+> environment is built lazily from a single snapshot of the registry on first use and then **sealed**, so a
+> function registered later throws. Second, member-overload dispatch is on the receiver's runtime Java type
+> (`list`, `map`, `string`, …), so a function declared on a `list` receiver will be offered any list in the
+> context — implementations should be null- and shape-safe and return "no match" rather than throwing on
+> unexpected input.
 
 ## 3. Contract definitions
 
