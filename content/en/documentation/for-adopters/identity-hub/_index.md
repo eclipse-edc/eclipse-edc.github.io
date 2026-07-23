@@ -1,7 +1,7 @@
 ---
 title: Identity Hub
 description: >
-  Details how EDC implements decentralized identity, access control, and trust using standards such as [Decentralized Identifiers](https://www.w3.org/TR/did-core/)and [W3c Verifiable Credentials](https://www.w3.org/TR/vc-data-model/).
+  Details how EDC implements decentralized identity, access control, and trust using standards such as [Decentralized Identifiers](https://www.w3.org/TR/did-core/) and [W3c Verifiable Credentials](https://www.w3.org/TR/vc-data-model/).
 weight: 50
 ---
 
@@ -10,7 +10,7 @@ for machine-to-machine interactions and does not manage personal verifiable cred
 [Decentralized Claims Protocol (DCP)](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol) and is
 based on key decentralized identity standards, including [W3C DIDs](https://www.w3.org/TR/did-core/), the
 [W3C did:web Method](https://w3c-ccg.github.io/did-method-web/), and the
-[W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)specifications, so we recommend
+[W3C Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/) specifications, so we recommend
 familiarizing yourself with those technologies first.
 
 > One question that frequently comes up is whether Identity Hub supports [OpenID for Verifiable Credentials (OID4VC)](https://openid.net/sg/openid4vc/specifications/). The short answer is No. That's because OID4VC mandates human (end-user) interactions, while Identity Hub is designed for machine-to-machine interactions where humans are not in the loop. Identity Hub is built on many of the same decentralized identity standards as OID4VC but implements DCP, a protocol specifically designed for non-human flows.
