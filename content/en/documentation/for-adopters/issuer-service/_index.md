@@ -1,7 +1,7 @@
 ---
 title: Issuer Service
 description: >
-  Details how EDC implements decentralized identity, access control, and trust using standards such as [Decentralized Identifiers](https://www.w3.org/TR/did-core/)and [W3c Verifiable Credentials](https://www.w3.org/TR/vc-data-model/).
+  Details how EDC implements decentralized identity, access control, and trust using standards such as [Decentralized Identifiers](https://www.w3.org/TR/did-core/) and [W3c Verifiable Credentials](https://www.w3.org/TR/vc-data-model/).
 weight: 50
 ---
 
