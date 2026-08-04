@@ -1,0 +1,9 @@
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "AssociateDataspaceProfile",
+  "profiles": [
+    "aurora-2025"
+  ]
+}
