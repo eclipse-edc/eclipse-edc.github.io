@@ -1,0 +1,27 @@
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "DataspaceProfile",
+  "name": "aurora-2025",
+  "protocol": {
+    "version": "2025-1",
+    "binding": "HTTPS",
+    "namespace": "https://w3id.org/dspace/2025/1/"
+  },
+  "jsonLdContextsUrl": [
+    "https://w3id.org/dspace/2025/1/context.jsonld",
+    "https://w3id.org/edc/dspace/v0.0.1",
+    "https://w3id.org/aurora/2025/policy/context.jsonld",
+    "https://w3id.org/aurora/2025/policy/odrl.jsonld"
+  ],
+  "trustedIssuers": [
+    {
+      "@id": "did:web:issuer.aurora.example",
+      "supportedTypes": [
+        "MembershipCredential",
+        "DataProcessorCredential"
+      ]
+    }
+  ]
+}

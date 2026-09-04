@@ -1,0 +1,8 @@
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "CachedDocument",
+  "url": "https://w3id.org/aurora/2025/policy/context.jsonld",
+  "documentType": "JSON_LD"
+}
