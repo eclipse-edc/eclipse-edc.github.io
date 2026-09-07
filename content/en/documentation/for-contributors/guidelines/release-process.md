@@ -71,6 +71,16 @@ with the 2 workflows:
     to have the artifacts available. Without this job, the next repositories will fail in compiling the project because
     the upstream dependencies will be missing.
 
+### Release notes
+
+The GitHub release notes are auto-generated from the labels of the merged pull requests, structured into categories as
+defined by the `.github/release.yaml` file that is present in every repository.
+
+Security-relevant pull requests must be labeled with `security` during review/merge: they will then show up in the
+dedicated `Security` category of the release notes, so that adopters can make an educated decision on how urgent an
+upgrade is for them. Note that this does not change the backporting policy: security fixes are introduced into the main
+line only, so staying up-to-date with EDC releases remains the recommended course of action.
+
 ## 2. Nightly builds
 Every night we publish every artifact as a `-SNAPSHOT` with a date information, e.g. `0.14.0-20250801-SNAPSHOT`.
 The workflow is also stored in the `Release` repo and it's pretty similar to the `release` ones, but the version is, as
