@@ -9,6 +9,7 @@ weight: 20
   * [How CEL expressions are bound](#how-cel-expressions-are-bound)
     * [Scopes](#scopes)
     * [Binding by action](#binding-by-action)
+    * [Restricting by operator](#restricting-by-operator)
   * [Managing expressions with the Management API](#managing-expressions-with-the-management-api)
     * [Creating an expression](#creating-an-expression)
     * [Testing an expression](#testing-an-expression)
@@ -71,6 +72,49 @@ In addition to the left operand, an expression may declare a set of `actions`. A
 when the evaluated action matches one of its `actions` entries. This lets a single expression apply across
 constraints that share an action rather than a single left operand.
 
+### Restricting by operator
+
+When several expressions share a left operand, they are combined with a logical AND: all of them must evaluate to
+`true` for the constraint to be satisfied. By default, every expression is evaluated regardless of the constraint's
+`operator`. An expression may declare a set of `supportedOperators` to restrict the operators it is evaluated with:
+
+- If `supportedOperators` is empty (the default), the expression is evaluated for any operator.
+- Otherwise, the expression is evaluated only when the constraint's operator is in the set; for other operators it is
+  skipped.
+- If none of the expressions registered for a left operand supports the constraint's operator, the constraint
+  evaluates to `false` (fail closed).
+
+Operators are given as the operator names `EQ`, `NEQ`, `GT`, `GEQ`, `LT`, `LEQ`, `IS_PART_OF`, `HAS_PART`, `IS_A`,
+`IS_ALL_OF`, `IS_ANY_OF`, and `IS_NONE_OF`. The deprecated `IN` is treated as `IS_PART_OF`.
+
+This lets you register different logic per operator for the same left operand, for example an equality check for
+`EQ` and a membership check for `IS_PART_OF`:
+
+```json
+[
+  {
+    "@type": "CelExpression",
+    "leftOperand": "https://w3id.org/example/region",
+    "expression": "ctx.agent.attributes.region == this.rightOperand",
+    "description": "The counterparty must be in the given region",
+    "supportedOperators": ["EQ"]
+  },
+  {
+    "@type": "CelExpression",
+    "leftOperand": "https://w3id.org/example/region",
+    "expression": "ctx.agent.attributes.region in this.rightOperand",
+    "description": "The counterparty must be in one of the given regions",
+    "supportedOperators": ["IS_PART_OF"]
+  }
+]
+```
+
+Policy definitions are validated against `supportedOperators` too: creating or updating a policy definition fails
+if a constraint uses an operator that none of the expressions for its left operand supports.
+
+_An expression that must **always** apply to a left operand, such as a mandatory membership check, should keep
+`supportedOperators` empty. A restricted expression is skipped silently for other operators._
+
 ## Managing expressions with the Management API
 
 CEL expressions are managed through the `cel-api-v5` extension under the `/v5beta/celexpressions` path of the
@@ -91,7 +135,8 @@ The field-by-field schemas are in the
 ### Creating an expression
 
 The request body is a JSON-LD `CelExpression`. Required fields are `@context`, `@type`, `leftOperand`,
-`expression`, and `description`; `@id` (a UUID is generated if omitted), `scopes`, and `actions` are optional.
+`expression`, and `description`; `@id` (a UUID is generated if omitted), `scopes`, `actions`, and
+`supportedOperators` are optional.
 
 ```json
 {
@@ -142,15 +187,26 @@ an `error` if the expression failed to compile or evaluate):
 
 Expressions are evaluated against a set of bound variables. What is available depends on the scope:
 
-| Variable        | Shape                                                                                 | Available in                                     |
-|-----------------|---------------------------------------------------------------------------------------|--------------------------------------------------|
-| `ctx.agent`     | `{ id, attributes, claims }` — the counterparty; `claims.vc` is the credential list   | catalog, contract.negotiation, transfer.process  |
-| `ctx.agreement` | `{ id, assetId, providerId, consumerId, agreementId, contractSigningDate }`           | transfer.process, policy.monitor                 |
-| `this`          | `{ leftOperand, operator, rightOperand }` — the ODRL constraint triple being evaluated | all scopes                                        |
-| `now`           | the current timestamp                                                                 | all scopes                                        |
+| Variable        | Shape                                                                                         | Available in                                    |
+|-----------------|-----------------------------------------------------------------------------------------------|-------------------------------------------------|
+| `ctx.agent`     | `{ id, attributes, claims }` — the counterparty; `claims.vc` is the credential list           | catalog, contract.negotiation, transfer.process |
+| `ctx.agreement` | `{ id, assetId, providerId, consumerId, agreementId, contractSigningDate }`                   | transfer.process, policy.monitor                |
+| `this`          | `{ leftOperand, operator, odrlOperator, rightOperand }` — the ODRL constraint being evaluated | all scopes                                      |
+| `now`           | the current timestamp                                                                         | all scopes                                      |
 
 `this.rightOperand` is the value declared on the policy constraint, so an expression can compare against it
-rather than hard-coding a value. Note that `ctx.agent` is **not** available in the `policy.monitor` scope,
+rather than hard-coding a value.
+
+The constraint operator is available in two forms. `this.operator` holds the operator name (`EQ`, `IS_PART_OF`, …).
+`this.odrlOperator` holds the ODRL term without the namespace (`eq`, `isPartOf`, …), matching what policy authors
+write, and reports both `IN` and `IS_PART_OF` as `isPartOf`. A single expression can branch on it:
+
+```
+this.odrlOperator == 'eq' ? ctx.agent.attributes.region == this.rightOperand
+                          : ctx.agent.attributes.region in this.rightOperand
+```
+
+Alternatively, split the logic into separate expressions with [`supportedOperators`](#restricting-by-operator). Note that `ctx.agent` is **not** available in the `policy.monitor` scope,
 which only exposes `ctx.agreement`.
 
 _In CEL, reading a map key that is absent aborts evaluation with an error — it does not return `false`. Guard
