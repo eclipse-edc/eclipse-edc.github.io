@@ -5,6 +5,7 @@ weight: 10
 
 <!-- TOC -->
   * [CEL Policy Expressions](#cel-policy-expressions)
+  * [Contract Negotiation Approval](#contract-negotiation-approval)
   * [Policy Scopes and Bindings](#policy-scopes-and-bindings)
     * [Designing for Optimal Policy Performance](#designing-for-optimal-policy-performance)
   * [In Force Policy](#in-force-policy)
@@ -105,6 +106,14 @@ expressions that are managed as data through the Management API — no code requ
 credential-based rules, which ship with a set of ready-made helper functions.
 
 See [CEL Policy Expressions](./cel/_index.md) for the details.
+
+## Contract Negotiation Approval
+
+The policy engine can also decide whether a provider contract negotiation needs to be approved manually before it
+reaches an agreement. The contract policy is evaluated in the dedicated `approval.contract.negotiation` scope, and
+negotiations that do not pass it are held until they are approved or rejected through the Management API.
+
+See [Contract Negotiation Approval](./negotiation-approval/_index.md) for the details.
 
 ## Policy Scopes and Bindings
 

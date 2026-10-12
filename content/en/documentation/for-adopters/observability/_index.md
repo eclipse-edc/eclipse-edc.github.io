@@ -14,13 +14,14 @@ weight: 85
     * [3.1 Configuration reference](#31-configuration-reference)
     * [3.2 Authentication](#32-authentication)
     * [3.3 Transactional callbacks](#33-transactional-callbacks)
+  * [4. Participant callbacks](#4-participant-callbacks)
   * [Choosing the right approach](#choosing-the-right-approach)
 <!-- TOC -->
 
 ## Overview
 
 EDC processes are asynchronous. State changes — such as a contract negotiation reaching agreement or a transfer process
-starting — are communicated through an internal eventing system. There are three ways to observe these state changes
+starting — are communicated through an internal eventing system. There are four ways to observe these state changes
 from outside the runtime or from within a custom extension:
 
 | Approach | Where the consumer runs | How it is registered |
@@ -28,6 +29,7 @@ from outside the runtime or from within a custom extension:
 | In-process event subscriber | Same JVM as the EDC runtime | Custom extension, injected `EventRouter` |
 | Per-request webhooks | External HTTP endpoint | `callbackAddresses` in Management API request bodies |
 | Static callbacks | External HTTP endpoint | `edc.callback.*` configuration properties |
+| Participant callbacks | External HTTP endpoint | `edc.callbacks` participant context configuration entry |
 
 ## 1. In-process event subscribers
 
@@ -170,6 +172,11 @@ edc.callback.audit.auth.codeid=my-api-key-alias
 > `auth.codeid` is required when `auth.key` is set. Providing `auth.key` without `auth.codeid` will cause the runtime
 > to fail at startup.
 
+Static callbacks belong to the runtime, so their secrets are always resolved from the **default vault partition**,
+even for events of a specific participant context. Per-request webhooks and
+[participant callbacks](#4-participant-callbacks) resolve their secrets from the vault partition of the participant
+context that owns the event instead.
+
 ### 3.3 Transactional callbacks
 
 Setting `transactional=true` causes the callback to be dispatched synchronously, within the transaction that triggered
@@ -177,11 +184,54 @@ the event. A failure (e.g. the endpoint is unreachable) will propagate back as a
 state machine to retry the transition. Use this only when the callback endpoint is highly reliable and you need
 guaranteed delivery. For most monitoring use cases, leave `transactional=false`.
 
+## 4. Participant callbacks
+
+Participant callbacks are configured per participant context, and apply to all the matching events of that
+participant context. They are useful when the events are not triggered by a Management API request of the
+participant, so no per-request webhook can be attached: for example, a provider negotiation created by a contract
+request of a counterparty, which can be [held for manual approval](../control-plane/policy-engine/negotiation-approval/_index.md).
+
+The callbacks are read from the `edc.callbacks` entry of the participant context configuration. Its value is a JSON
+array of callback addresses, with the same fields as the per-request webhooks:
+
+```json
+[
+  {
+    "uri": "https://approvals.example.com/hook",
+    "events": [
+      "contract.negotiation.held",
+      "contract.negotiation.approved",
+      "contract.negotiation.rejected"
+    ],
+    "transactional": false,
+    "authKey": "Authorization",
+    "authCodeId": "approvals-api-key"
+  }
+]
+```
+
+| Field | Description | Required | Default |
+|---|---|---|---|
+| `uri` | The HTTP endpoint to call | yes | — |
+| `events` | Event type prefixes to subscribe to | yes | — |
+| `transactional` | Whether to invoke the callback within the processing transaction (see [Transactional callbacks](#33-transactional-callbacks)) | no | `false` |
+| `authKey` | The HTTP header name to use for authentication | no | — |
+| `authCodeId` | Alias of the secret to send in the authentication header, resolved from the participant context's vault partition | no | — |
+
+In the virtual runtime, the entry is set through the participant context configuration Management API. In the
+classic runtime, the participant context configuration is the runtime configuration, so `edc.callbacks` is set as a
+regular setting.
+
+Changes to the configuration apply immediately, as the callbacks are not stored on the processes. An invalid
+`edc.callbacks` value is logged as a warning and ignored, so it never affects event processing.
+
 ## Choosing the right approach
 
 - Use **in-process event subscribers** when you are already writing a custom EDC extension and need the lowest latency
   or transactional semantics.
 - Use **per-request webhooks** when you want to track specific operations triggered from a controller or orchestration
   layer that already constructs the Management API calls.
+- Use **participant callbacks** when each participant context needs its own sink for a class of events, including
+  processes that are not started through the Management API, such as provider contract negotiations.
 - Use **static callbacks** when you want a centralized, always-on sink for a class of events without modifying
   individual API requests or shipping code to the runtime.

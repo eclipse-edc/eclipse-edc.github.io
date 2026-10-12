@@ -355,6 +355,10 @@ If a negotiation is successfully completed (termed *finalized*), a DSP contract 
 }
 ```
 
+A provider can also hold contract negotiations for manual approval before the agreement is sent, for example for
+requests from unknown counterparties. Which negotiations need approval is decided by the contract policy, see
+[Contract Negotiation Approval](./policy-engine/negotiation-approval/_index.md).
+
 EDC implements DSP message exchanges using a reliable quality of service. That is, all message operations and state machine transitions are performed reliably in a transaction context. EDC will only commit a state machine transition if a message is successfully acknowledged by the counterparty. If a send operation fails, the associated transition will be rolled back, and the message will be resent. As with all reliable messaging systems, EDC operations are idempotent.
 
 ### Working with Asynchronous Messaging and Events

@@ -1,0 +1,12 @@
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "CelExpression",
+  "leftOperand": "https://w3id.org/example/approval/manualApproval",
+  "expression": "this.rightOperand != 'required'",
+  "description": "Holds the negotiations of the offers that declare a required manual approval",
+  "scopes": [
+    "approval.contract.negotiation"
+  ]
+}
