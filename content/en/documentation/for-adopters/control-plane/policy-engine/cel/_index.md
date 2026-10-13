@@ -55,12 +55,13 @@ used as a lookup key — but using a stable, namespaced IRI avoids collisions.
 Policy rules are only evaluated in the [scopes](../_index.md#policy-scopes-and-bindings) they are bound to. A
 `CelExpression` declares a set of `scopes`, and the engine binds the expression to exactly those policy phases:
 
-| Scope value            | Policy phase                    |
-|------------------------|---------------------------------|
-| `catalog`              | catalog request                 |
-| `contract.negotiation` | contract negotiation            |
-| `transfer.process`     | transfer process                |
-| `policy.monitor`       | policy monitor (ongoing checks) |
+| Scope value                     | Policy phase                                                       |
+|---------------------------------|--------------------------------------------------------------------|
+| `catalog`                       | catalog request                                                    |
+| `contract.negotiation`          | contract negotiation                                               |
+| `approval.contract.negotiation` | [contract negotiation approval](../negotiation-approval/_index.md) |
+| `transfer.process`              | transfer process                                                   |
+| `policy.monitor`                | policy monitor (ongoing checks)                                    |
 
 If `scopes` is left empty it defaults to `*.` (match all scopes). Restrict the scopes to the phases where the
 check is actually needed — for example, verifying a membership credential during negotiation but not again
@@ -187,12 +188,14 @@ an `error` if the expression failed to compile or evaluate):
 
 Expressions are evaluated against a set of bound variables. What is available depends on the scope:
 
-| Variable        | Shape                                                                                         | Available in                                    |
-|-----------------|-----------------------------------------------------------------------------------------------|-------------------------------------------------|
-| `ctx.agent`     | `{ id, attributes, claims }` — the counterparty; `claims.vc` is the credential list           | catalog, contract.negotiation, transfer.process |
-| `ctx.agreement` | `{ id, assetId, providerId, consumerId, agreementId, contractSigningDate }`                   | transfer.process, policy.monitor                |
-| `this`          | `{ leftOperand, operator, odrlOperator, rightOperand }` — the ODRL constraint being evaluated | all scopes                                      |
-| `now`           | the current timestamp                                                                         | all scopes                                      |
+| Variable                 | Shape                                                                                               | Available in                                                                                   |
+|--------------------------|-----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| `ctx.agent`              | `{ id, attributes, claims }` — the counterparty; `claims.vc` is the credential list                 | catalog, contract.negotiation, approval.contract.negotiation, transfer.process, policy.monitor |
+| `ctx.agreement`          | `{ id, assetId, providerId, consumerId, agreementId, contractSigningDate }`                         | transfer.process, policy.monitor                                                               |
+| `ctx.asset`              | `{ id, participantContextId, properties, privateProperties }` — the negotiated asset                | approval.contract.negotiation                                                                  |
+| `ctx.contractDefinition` | `{ id, participantContextId, accessPolicyId, contractPolicyId, privateProperties, assetsSelector }` | approval.contract.negotiation                                                                  |
+| `this`                   | `{ leftOperand, operator, odrlOperator, rightOperand }` — the ODRL constraint being evaluated       | all scopes                                                                                     |
+| `now`                    | the current timestamp                                                                               | all scopes                                                                                     |
 
 `this.rightOperand` is the value declared on the policy constraint, so an expression can compare against it
 rather than hard-coding a value.
@@ -206,8 +209,12 @@ this.odrlOperator == 'eq' ? ctx.agent.attributes.region == this.rightOperand
                           : ctx.agent.attributes.region in this.rightOperand
 ```
 
-Alternatively, split the logic into separate expressions with [`supportedOperators`](#restricting-by-operator). Note that `ctx.agent` is **not** available in the `policy.monitor` scope,
-which only exposes `ctx.agreement`.
+Alternatively, split the logic into separate expressions with [`supportedOperators`](#restricting-by-operator).
+
+In the `policy.monitor` and `approval.contract.negotiation` scopes there is no incoming request, so `ctx.agent` is
+rebuilt from the claims stored when they were received: on the contract agreement for the policy monitor (with the
+consumer as identity), and on the contract negotiation for the approval. The claims, credentials included, are not
+verified again at evaluation time.
 
 _In CEL, reading a map key that is absent aborts evaluation with an error — it does not return `false`. Guard
 raw map access with the `has()` macro, or prefer the Verifiable Credential helper functions below, which are

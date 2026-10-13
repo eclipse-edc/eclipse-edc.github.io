@@ -1,0 +1,12 @@
+{
+  "@context": [
+    "https://w3id.org/edc/connector/management/v2"
+  ],
+  "@type": "CelExpression",
+  "leftOperand": "https://w3id.org/example/approval/TrustedCounterParty",
+  "expression": "ctx.agent.id in ['did:web:partner-a.example.com', 'did:web:partner-b.example.com']",
+  "description": "Negotiations from counterparties outside the allow list need manual approval",
+  "scopes": [
+    "approval.contract.negotiation"
+  ]
+}
