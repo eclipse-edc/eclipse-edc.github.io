@@ -15,8 +15,8 @@ weight: 10
       * [2.5.1 Pre- and Post-Evaluators](#251-pre--and-post-evaluators)
       * [2.5.2 Dynamic functions](#252-dynamic-functions)
       * [2.5.3 Policy Validation and Evaluation Plan](#253-policy-validation-and-evaluation-plan)
-        * [2.5.3.1 Policy Validation](#2531-policy-validation)
-        * [2.5.3.1 Policy Evaluation Plan](#2532-policy-evaluation-plan)
+      * [2.5.3.1 Policy Validation](#2531-policy-validation)
+      * [2.5.3.2 Policy Evaluation Plan](#2532-policy-evaluation-plan)
     * [2.6 Bundled policy functions](#26-bundled-policy-functions)
       * [2.6.1 Contract expiration function](#261-contract-expiration-function)
     * [2.7 Common Expression Language (CEL) policy functions](#27-common-expression-language-cel-policy-functions)
@@ -25,6 +25,9 @@ weight: 10
   * [3. Contract definitions](#3-contract-definitions)
   * [4. Contract negotiations](#4-contract-negotiations)
   * [5. Contract agreements](#5-contract-agreements)
+    * [5.1 Retiring a contract agreement](#51-retiring-a-contract-agreement)
+    * [5.2 Un-retiring a contract agreement](#52-un-retiring-a-contract-agreement)
+    * [5.3 Retirement events](#53-retirement-events)
   * [6. Catalog](#6-catalog)
   * [7 Transfer processes](#7-transfer-processes)
     * [7.1 Transfer and data flows types](#71-transfer-and-data-flows-types)
@@ -790,9 +793,85 @@ Like contract definitions, contract agreements are entities that only exist with
 _About terminating contracts:_ once a contract negotiation has reached a [terminal
 state](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/contract-negotiation/contract.negotiation.protocol#id-1.2-state-machine)
 `TERMINATED` or `FINALIZED`, it becomes immutable. This could be compared to not being able to scratch a signature off a
-physical paper contract. Cancelling or terminating a contract is therefor handled through other channels like eventing
-systems. The semantics of cancelling a contract are highly individual to each dataspace and may even bring legal side
-effects, so EDC cannot make an assumption here.
+physical paper contract. The agreed-on policy, asset ID, parties and signing date can therefore never change.
+
+While the agreement itself stays immutable, a provider may still need to stop honoring it, for example because the
+underlying data source is decommissioned or the business relationship ends. For this EDC provides a dedicated mechanism:
+_contract agreement retirement_ (see below). Any further cancellation semantics beyond retirement are highly individual
+to each dataspace, so EDC cannot make an assumption there and leaves them to be handled through other channels like
+eventing systems.
+
+### 5.1 Retiring a contract agreement
+
+Retirement lets a **provider** invalidate a contract agreement after it has been finalized. A retired agreement:
+
+- can no longer be used to **start new transfer processes**, and
+- causes **ongoing transfer processes** that rely on it to be **terminated**.
+
+Retirement does not mutate the immutable part of the agreement. Instead, it is tracked by three dedicated fields on the
+`ContractAgreement` entity:
+
+| Field              | Type               | Meaning                                                      |
+|--------------------|--------------------|--------------------------------------------------------------|
+| `retired`          | `boolean`          | Whether the agreement is retired. Defaults to `false`.       |
+| `retirementReason` | `String`           | The reason supplied when retiring, or `null` if not retired. |
+| `retirementDate`   | `long` (epoch sec) | When the agreement was retired, or `0` if not retired.       |
+
+**How retirement is enforced.** Enforcement is implemented as a [policy](#2-policies) pre-validator,
+`AgreementRetirementValidator`, which is registered for both the `transfer.process` scope and the
+[`policy.monitor`](../policy-monitor.md) scope. The validator simply fails policy evaluation whenever
+`contractAgreement().isRetired()` is `true`:
+
+- In the `transfer.process` scope this makes any attempt to start a transfer against a retired agreement fail.
+- In the `policy.monitor` scope the [Policy Monitor](../policy-monitor.md) re-evaluates the policy of running transfers
+  and terminates those whose agreement has become retired.
+
+> Termination of in-flight transfers depends on the Policy Monitor extension being enabled on the provider. Without it,
+> already-running transfers are not swept, though new transfers are still refused.
+
+**API.** Retirement is triggered via the Management API by issuing a `POST` to the agreement's `retire` sub-resource.
+The endpoint is available on both API versions:
+
+- v4: `POST /v4/contractagreements/{id}/retire`
+- v5: `POST /v5/participants/{participantContextId}/contractagreements/{id}/retire`
+
+The request body is a JSON-LD document of type `RetireAgreement` carrying a mandatory `reason`:
+
+```json
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "@type": "RetireAgreement",
+  "reason": "The underlying data source has been decommissioned"
+}
+```
+
+The call returns `404 Not Found` if no agreement with the given ID exists, and `409 Conflict` if the agreement is
+already retired.
+
+### 5.2 Un-retiring a contract agreement
+
+A retired agreement can be brought back into service. Un-retiring resets the retirement fields (`retired=false`,
+`retirementReason=null`, `retirementDate=0`), after which the agreement can again be used to start transfers.
+
+Because un-retiring is a plain action with no extra information to supply, it takes **no request body**:
+
+- v4: `POST /v4/contractagreements/{id}/unretire`
+- v5: `POST /v5/participants/{participantContextId}/contractagreements/{id}/unretire`
+
+The call returns `404 Not Found` if no agreement with the given ID exists, and `409 Conflict` if the agreement is **not**
+currently retired.
+
+### 5.3 Retirement events
+
+Both operations emit [events](../../runtime/service-layers.md#6-events-and-callbacks) through the `EventRouter`, so
+extensions and external systems can react to them:
+
+| Event                        | Event name                     | Payload                                                 |
+|------------------------------|--------------------------------|---------------------------------------------------------|
+| `ContractAgreementRetired`   | `contract.agreement.retired`   | `contractAgreementId`, `participantContextId`, `reason` |
+| `ContractAgreementUnretired` | `contract.agreement.unretired` | `contractAgreementId`, `participantContextId`           |
 
 ## 6. Catalog
 
