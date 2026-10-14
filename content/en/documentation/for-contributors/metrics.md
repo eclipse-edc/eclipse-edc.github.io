@@ -14,14 +14,14 @@ weight: 250
 
 EDC provides extensions for instrumentation with the [Micrometer](https://micrometer.io/) metrics library to automatically collect metrics from the host system, JVM, and frameworks and libraries used in EDC (including OkHttp, Jetty, Jersey and ExecutorService).
 
-See [sample 04.3](https://github.com/eclipse-edc/Samples/tree/main/transfer/transfer-04-event-consumer/README.md) for an example of an instrumented EDC consumer.
+See [the event consumer sample](https://github.com/eclipse-edc/Samples/tree/main/basic/basic-04-event-consumer/README.md) for an example of an instrumented EDC consumer.
 
 ## Micrometer Extension
 
 This extension provides support for instrumentation for some core EDC components:
 
 - JVM metrics
-- [OkHttp](https://square.github.io/okhttp/) client metrics
+- [OkHttp](https://github.com/square/okhttp) client metrics
 - [ExecutorService](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/ExecutorService.html) metrics
 
 ## Jetty Micrometer Extension

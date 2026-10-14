@@ -90,7 +90,7 @@ public class AuditingEventHandler implements EventSubscriber {
 ```
 
 For a full explanation of the eventing model, including how to emit custom events, see the
-[Service Layers documentation](/documentation/for-contributors/runtime/service-layers/#6-events-and-callbacks).
+[Service Layers documentation](../../for-contributors/runtime/service-layers.md#6-events-and-callbacks).
 
 ## 2. Webhooks (per-request callbacks)
 

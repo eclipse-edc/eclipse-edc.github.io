@@ -150,7 +150,7 @@ chapter](#32-public-api-access-control) for details).
 > Note that the EDC does not provide an implementation of a Public API, this would need to be implemented by the adopters
 > or by a third party, it could be made using EDC or also by extending a full-fledged proxy application.
 > More details on how to write a custom implementation in the
-> [Samples repository](https://github.com/eclipse-edc/Samples/tree/main/transfer/transfer-03-consumer-pull)
+> [Samples repository](https://github.com/eclipse-edc/Samples)
 
 ### 3.1 Endpoints and endpoint resolution
 

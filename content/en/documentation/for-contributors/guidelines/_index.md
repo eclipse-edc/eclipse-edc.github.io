@@ -163,8 +163,4 @@ If you have questions or suggestions, do not hesitate to contact the project dev
 the [project's "dev" list](https://dev.eclipse.org/mailman/listinfo/edc-dev). You may also want to join
 our [Discord server](https://discord.gg/n4sD9qtjMQ).
 
-The project holds a biweekly meeting on fridays 2-3 p.m. (CET) to give community members the
-opportunity to get in touch with the committer team. We meet in the "general" voice channel.
-Schedule details are [on GitHub](https://github.com/eclipse-edc/Connector/discussions/1303).
-
 _If you have a "contributor" or "committer" status, you will also have access to private channels._
