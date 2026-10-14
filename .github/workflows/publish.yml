@@ -46,6 +46,13 @@ jobs:
           key: ${{ runner.os }}-hugo-${{ hashFiles('**/go.mod', '**/go.sum') }}
           restore-keys: ${{ runner.os }}-hugo-
 
+      # Docsy >= 0.18 pulls Bootstrap/Font Awesome from npm and needs Dart Sass
+      # (sass-embedded). Install them and put the sass binary on PATH.
+      - name: Install Node dependencies
+        run: |
+          npm install
+          echo "$GITHUB_WORKSPACE/node_modules/.bin" >> "$GITHUB_PATH"
+
       - name: Build site
         env:
           HUGO_BASEURL: ${{ steps.pages.outputs.base_url }}
