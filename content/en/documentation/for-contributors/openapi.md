@@ -78,7 +78,7 @@ _Note: currently we have categories for `control-api` and `management-api`_
 
 This feature does **neither** expose the generated files through a REST endpoint providing any sort of live try-out
 feature, **nor** does it generate any sort of client code. A visual documentation page for our APIs is served
-through [SwaggerHub](https://app.swaggerhub.com/home?type=API).
+through [SwaggerHub](https://swagger.io/tools/swaggerhub/).
 
 However, there is Gradle plugin capable of generating client code.
 Please refer to the [official documentation](https://github.com/int128/gradle-swagger-generator-plugin).  

@@ -72,11 +72,11 @@ The [Dataspace protocol](https://docs.internationaldataspaces.org/ids-knowledgeb
 
 It extends the `RemoteMessageDispatcher` with the interface `DspHttpRemoteMessageDispatcher` (`dsp-spi`), which adds an additional method for registering message [handlers](#21-remotemessage-handlers).
 
-The implementation of the three [DSP](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol) specifications:
+The implementation of the three [DSP](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/) specifications:
 
-- [Catalog](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/catalog/catalog.protocol)
-- [Contract Negotiation](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/contract-negotiation/contract.negotiation.protocol)
-- [Transfer Process](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol)
+- [Catalog](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/)
+- [Contract Negotiation](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/)
+- [Transfer Process](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/)
 
 is separated in multiple extension modules grouped by specification.
 
@@ -84,7 +84,7 @@ is separated in multiple extension modules grouped by specification.
 
 Each specification implementation defines [handlers](#21-remotemessage-handlers), [transformers](#22-remotemessage-transformers) for `RemoteMessage`s and exposes [HTTP endpoints](#22-http-endpoints).
 
-> The `dsp` implementation also provide [HTTP endpoints](#22-http-endpoints) for the DSP [common functionalities](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/common-functionalities/common.protocol).
+> The `dsp` implementation also provide [HTTP endpoints](#22-http-endpoints) for the DSP [common functionalities](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/).
 
 ### 2.1 `RemoteMessage` handlers
 

@@ -29,7 +29,7 @@ weight: 90
     * [Documenting Extensions](#documenting-extensions)
 <!-- TOC -->
 
-This chapter covers adding custom features and capabilities to an EDC runtime by creating extensions.  Features can be wide-ranging, from a specific data validation or policy function to integration with an identity system.  We will focus on common extension use cases, for example, implementing specific dataspace requirements. For more complex features and in-depth treatment, refer to the [Contributor documentation]().
+This chapter covers adding custom features and capabilities to an EDC runtime by creating extensions.  Features can be wide-ranging, from a specific data validation or policy function to integration with an identity system.  We will focus on common extension use cases, for example, implementing specific dataspace requirements. For more complex features and in-depth treatment, refer to the [Contributor documentation](../../for-contributors/_index.md).
 
 > This chapter requires a thorough knowledge of Java and modern build systems such as [Gradle](https://gradle.org/) and [Maven](https://maven.apache.org). As you read through this chapter, it will be helpful to consult the extensions contained in the [EDC Samples repository](https://github.com/eclipse-edc/Samples).
 ## The EDC Module System
@@ -486,7 +486,7 @@ If an extension is required to work with `Json-Ld`, use the `JsonLd` service, wh
 
 ### HTTP Dispatching
 
-Extensions should use the `EdcHttpClient` to make remote `HTTP/S` calls. The client is based on the [OkHttp library](https://square.github.io/okhttp/) and includes retry logic, which can be obtained through injection.
+Extensions should use the `EdcHttpClient` to make remote `HTTP/S` calls. The client is based on the [OkHttp library](https://github.com/square/okhttp) and includes retry logic, which can be obtained through injection.
 
 ### Secrets Handling and the Vault
 

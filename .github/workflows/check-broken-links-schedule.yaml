@@ -42,6 +42,8 @@ jobs:
             --exclude-path "node_modules"
             --exclude-path "themes"
             --exclude-path "static/lib"
+            --exclude-path "developer/decision-records"
+            --exclude-path "layouts"
             --scheme "https"
             --scheme "http"
             --max-retries 6

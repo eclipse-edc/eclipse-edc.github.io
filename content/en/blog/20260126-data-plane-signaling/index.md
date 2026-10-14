@@ -32,8 +32,8 @@ for removal from the codebase. If you are an EDC adopter, we recommend to start 
 following the current specification. The dataplane-signaling team is already providing SDKs library in different
 languages ([Go](https://github.com/eclipse-dataplane-core/dataplane-sdk-go),
 [Rust](https://github.com/eclipse-dataplane-core/dataplane-sdk-rust),
-[Java](https://github.com/[eclipse-dataplane-core/dataplane-sdk-java](https://github.com/eclipse-dataplane-core/dataplane-sdk-java)),
-[.NET](https://github.com/[eclipse-dataplane-core/dataplane-sdk-net](https://github.com/eclipse-dataplane-core/dataplane-sdk-net)))
+[Java](https://github.com/eclipse-dataplane-core/dataplane-sdk-java),
+[.NET](https://github.com/eclipse-dataplane-core/dataplane-sdk-net))
 to help with this transition.
 
 Let's see from the technical point of view what are the advantages brought by this approach.

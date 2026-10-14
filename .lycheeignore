@@ -78,4 +78,19 @@ file://.*?/content/.*
 ^https?://connector\.[^/]+/
 ^https?://api\.[^/]+/
 
+# Sites with anti-scraping / bot protection that reject automated CI requests (403)
+^https?://(en\.)?cppreference\.com
+^https?://search\.maven\.org
+^https?://(www\.)?npmjs\.com
+
+# GitHub project boards require authentication and are not anonymously reachable (400/404)
+^https?://github\.com/orgs/[^/]+/projects/
+^https?://github\.com/[^/]+/[^/]+/projects/?$
+
+# Files in the eclipse-edc/.github repo intermittently return 503 to anonymous blob requests
+^https?://github\.com/eclipse-edc/\.github/blob/
+
+# Fraunhofer GitLab instance is not reliably reachable from CI (request times out)
+^https?://gitlab\.fit\.fraunhofer\.de/
+
 # Add project-specific URL patterns to exclude here 
