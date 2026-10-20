@@ -85,9 +85,11 @@ The provisioning of the NATS streams and consumers, the task store and the retry
   command is retried with the usual delay: on redelivery, the entity has either moved on, and the task is skipped, or
   the remote call is made again. These retries do not count toward the retry limit. Such leases are held only for the
   duration of the message or command, so collisions are rare and short.
-- **Head-of-line blocking.** A replica processes the tasks of an entity type with one subscriber thread, one message
-  at a time, and tasks are not scoped by participant: a slow counter-party delays the tasks behind it on that replica.
-  To be addressed by processing the batch with a pool of workers.
+- **Head-of-line blocking.** A replica handles the tasks of an entity type with a pool of workers (one by default),
+  and a worker is blocked for the duration of the remote call of a task: once all the workers wait for slow
+  counter-parties, the tasks behind them wait too on that replica. Tasks are not scoped by participant, so a
+  participant context with many slow tasks can take all the workers. Raise the number of workers (see
+  [Tuning](../../tuning/_index.md#task-based-state-machine-nats)).
 - **Stale tasks.** A task carries only the entity id and its state. A task waiting for a retry delay while its entity
   leaves the state and enters it again is processed for the new visit, which has its own task: at worst, a remote
   call is made twice. The entity version cannot tell them apart, since every save changes it, including the one of a
