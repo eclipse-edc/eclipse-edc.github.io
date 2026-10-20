@@ -4,6 +4,7 @@ weight: 10
 ---
 
 <!-- TOC -->
+  * [Right Operand Values](#right-operand-values)
   * [CEL Policy Expressions](#cel-policy-expressions)
   * [Contract Negotiation Approval](#contract-negotiation-approval)
   * [Policy Scopes and Bindings](#policy-scopes-and-bindings)
@@ -96,6 +97,41 @@ public class TestPolicy implements AtomicConstraintRuleFunction<Duty, Participan
 ```
 
 Note that `PolicyContext` has its own hierarchy, that's tightly bound to the policy scope.
+
+## Right Operand Values
+
+The right operand of a constraint is a literal value: a string, a number, a boolean, a typed literal, or an array of
+these. EDC applies no IRI semantics to it: the policy model is a plain object model, and JSON-LD is only used for
+namespace handling. Policy functions receive the value and compare it as given. If a policy profile needs the right
+operand to be an identifier, it states so and uses a plain string.
+
+Concretely, a right operand expressed as a node reference (`{"@id": ...}`):
+
+- is rejected by the Management API with a `400 Bad Request`;
+- is read as the plain string it contains when received over the Dataspace Protocol;
+- is never emitted by EDC.
+
+This constraint is accepted:
+
+```json
+{
+  "leftOperand": "membership",
+  "operator": "eq",
+  "rightOperand": "https://example.com/memberships/gold"
+}
+```
+
+This one is rejected by the Management API:
+
+```json
+{
+  "leftOperand": "membership",
+  "operator": "eq",
+  "rightOperand": {
+    "@id": "https://example.com/memberships/gold"
+  }
+}
+```
 
 ## CEL Policy Expressions
 

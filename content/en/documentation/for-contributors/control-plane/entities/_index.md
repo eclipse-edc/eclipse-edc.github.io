@@ -215,9 +215,10 @@ MUST (`duty`), MAY (`permission`) or MUST NOT (`prohibition`) relation. The `act
 which the rule is intended. Acceptable values for `action` are defined [here](https://www.w3.org/TR/odrl-model/#action),
 but in EDC you'll exclusively encounter `"use"`.
 
-The `constraint` object expresses logical relationship of a key (`leftOperand`), the value (`righOperand`) and the
+The `constraint` object expresses logical relationship of a key (`leftOperand`), the value (`rightOperand`) and the
 `operator`. Multiple constraints can be linked with logical operators, see [advanced policy
-concepts](#25-advanced-policy-concepts). The `leftOperand` and `rightOperand` are completely arbitrary, only the
+concepts](#25-advanced-policy-concepts). The `leftOperand` is arbitrary, and the `rightOperand` is a literal value (see
+[Right Operand Values](../../../for-adopters/control-plane/policy-engine/_index.md#right-operand-values)). The
 `operator` is limited to the following possible values: `eq`, `neq`, `gt`, `geq`, `lt`, `leq`, `in`, `hasPart`, `isA`,
 `isAllOf`, `isAnyOf`, `isNoneOf`.
 
