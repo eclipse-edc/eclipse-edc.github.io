@@ -8,6 +8,10 @@ weight: 80
   * [State Machines](#state-machines)
     * [Settings](#settings)
     * [How to tune them](#how-to-tune-them)
+    * [State machine nuances](#state-machine-nuances)
+    * [Lease duration](#lease-duration)
+    * [Task-based state machine (NATS)](#task-based-state-machine-nats)
+    * [Known limitations](#known-limitations)
 <!-- TOC -->
 
 Out of the box the EDC provides a set of default configurations that aim to find a good balance for performances.
@@ -100,3 +104,42 @@ this state machine manages the data-flows so based on how many data flows are ex
 _tuning suggestion:_ \
 `state-machine.iteration-wait`: in the order of 100/1000 milliseconds for many PUSH transfers, consider 1/10 seconds for few PULL transfers. \
 `state-machine.batch-size` in the order of 10/100 \
+
+### Lease duration
+
+When several connector replicas share the same database, an entity is leased by the replica that processes it. If the
+processing lasts longer than the lease, the lease expires and the entity is processed again, by another replica or by
+the same one. The lease must then last longer than the slowest processing step, including the HTTP timeouts and the
+retries of a protocol message.
+
+| Setting                                        | Default |
+|------------------------------------------------|---------|
+| `edc.transfer.state-machine.lease-duration`    | `PT60S` |
+| `edc.negotiation.state-machine.lease-duration` | `PT60S` |
+| `edc.policy.monitor.lease-duration`            | `PT60S` |
+
+### Task-based state machine (NATS)
+
+Instead of polling the store, the transfer processes and the contract negotiations can be driven by tasks published to
+NATS JetStream for every state change. The settings above about iterations and batches don't apply to it; the
+following ones do:
+
+- **Retries:** a retryable failure is delivered again after `edc.transfer.send.retry.base-delay.ms` /
+  `edc.negotiation.send.retry.base-delay.ms` (default 1000), doubled at every delivery, up to
+  `edc.transfer.send.retry.limit` / `edc.negotiation.send.retry.limit` (default 7), as on the poll-based state
+  machine. There is no maximum delay: a high limit leads to very long delays.
+- **Streams and consumers:** the ones created by the subscribers (`edc.nats.tp.subscriber.autocreate`,
+  `edc.nats.cn.subscriber.autocreate`) are meant for testing: memory storage, limits retention and the server
+  defaults. In production, provision them with persistent storage and the following settings:
+  - `MaxAckPending`: size it for the tasks that can wait at the same time. A task waiting for a retry delay counts
+    toward it, and the limit is shared by all the replicas, which use the same durable consumer. When it is reached,
+    new tasks are not delivered until some delays expire.
+  - Ack wait: the subscriber marks the messages it holds as in progress at a third of the ack wait, so the ack wait
+    does not need to cover the processing time.
+- **Task store:** the default in-memory task store does not work with several replicas: use the SQL task store
+  (`task-store-sql`).
+
+### Known limitations
+
+The accepted limitations of both state machines, their impact and how to mitigate them are listed in
+[State Machines Known Limitations](../control-plane/state-machines/_index.md).
