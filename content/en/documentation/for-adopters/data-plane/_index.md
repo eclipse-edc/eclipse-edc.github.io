@@ -52,6 +52,23 @@ is a consumer-pull type where data is accessed by the consumer, the response wil
 additional signals, such as SUSPEND and RESUME, or TERMINATE, in response to events. For example, the control plane
 policy monitor could send a SUSPEND or TERMINATE message if a policy violation is encountered.
 
+### Securing the Signaling API
+
+The data plane notifies the control plane of the progress of a transfer (prepared, started, completed, errored) by
+calling the Signaling API of the control plane, which is served on its own port and path (`web.http.signaling.port`,
+default `8182`, and `web.http.signaling.path`, default `/api/signaling`). How these calls are authenticated depends
+on the authorization profile a data plane provides when it registers:
+
+- **With an authorization profile** (e.g. `oauth2_client_credentials` or `oauth2_token_exchange`), the control plane
+  authenticates every call and checks that it comes from the data plane that handles the transfer.
+- **Without an authorization profile**, the calls are not authenticated: any client that can reach the Signaling API
+  and knows the id of a transfer process can change its state. This fits a deployment in which the control plane and
+  its data planes run in the same trusted network. The control plane logs a warning when such a data plane registers.
+
+Expose the Signaling API only on the internal network. Register the data planes with an authorization profile when the
+Signaling API can be reached from outside that network, or when the data planes of several participant contexts share
+it, as in a multi-tenant deployment.
+
 ## The Data Plane Framework (DPF)
 
 EDC includes a framework for building custom data planes called the DPF. DPF supports end-to-end streaming transfers
