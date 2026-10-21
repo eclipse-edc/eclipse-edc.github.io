@@ -8,6 +8,6 @@
     "bootstrap": "5.3.8"
   },
   "devDependencies": {
-    "sass-embedded": "1.105.0"
+    "sass-embedded": "1.105.2"
   }
 }
