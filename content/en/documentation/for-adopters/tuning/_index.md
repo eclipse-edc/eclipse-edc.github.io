@@ -124,6 +124,16 @@ Instead of polling the store, the transfer processes and the contract negotiatio
 NATS JetStream for every state change. The settings above about iterations and batches don't apply to it; the
 following ones do:
 
+- **Workers:** a subscriber handles the messages it fetches with `edc.nats.tp.subscriber.workers` /
+  `edc.nats.cn.subscriber.workers` workers (default 1), i.e. the number of messages handled concurrently. With a single
+  worker, a slow counter-party delays all the tasks behind it on that replica.
+- **Prefetch:** a subscriber holds at most `workers + prefetch` messages, with `edc.nats.tp.subscriber.prefetch` /
+  `edc.nats.cn.subscriber.prefetch` (default 10), and fetches again once half of them are completed, up to
+  `edc.nats.tp.subscriber.batch-size` / `edc.nats.cn.subscriber.batch-size` messages per fetch (default 100). The
+  messages held by a replica can't be taken by another one, so keep the prefetch small.
+- **Database connections:** a worker holds a database connection while it makes the remote call of a task. Size the
+  datasource pool for the workers of both subscribers (transfer processes and contract negotiations), on top of the
+  API traffic.
 - **Retries:** a retryable failure is delivered again after `edc.transfer.send.retry.base-delay.ms` /
   `edc.negotiation.send.retry.base-delay.ms` (default 1000), doubled at every delivery, up to
   `edc.transfer.send.retry.limit` / `edc.negotiation.send.retry.limit` (default 7), as on the poll-based state
@@ -133,7 +143,8 @@ following ones do:
   defaults. In production, provision them with persistent storage and the following settings:
   - `MaxAckPending`: size it for the tasks that can wait at the same time. A task waiting for a retry delay counts
     toward it, and the limit is shared by all the replicas, which use the same durable consumer. When it is reached,
-    new tasks are not delivered until some delays expire.
+    new tasks are not delivered until some delays expire. It must also cover the `workers + prefetch` messages held by
+    every replica.
   - Ack wait: the subscriber marks the messages it holds as in progress at a third of the ack wait, so the ack wait
     does not need to cover the processing time.
 - **Task store:** the default in-memory task store does not work with several replicas: use the SQL task store
