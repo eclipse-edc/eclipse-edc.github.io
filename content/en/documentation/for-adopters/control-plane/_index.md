@@ -269,6 +269,8 @@ Policies are loaded into EDC via the Management API using a policy definition, w
 
 A policy definition allows the policy to be referenced by its `@id` when specifying the usage requirements for a set of assets or access control. Decoupling policies in this way allows for a great deal of flexibility. For example, specialists can create a set of corporate policies that are reused across an organization.
 
+The Management API accepts a constraint's `rightOperand` only as a literal value: a plain string, a value object carrying a `@value`, or an array of these. A node reference such as `{"@id": "https://example.com/memberships/gold"}` is rejected with a `400 Bad Request`. When the value is an identifier, pass it as a plain string: `"rightOperand": "https://example.com/memberships/gold"`.
+
 ### Contract Definitions
 
 Contract definitions link assets and policies by declaring which policies apply to a set of assets. Contract definitions contain two types of policy:

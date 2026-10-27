@@ -214,8 +214,7 @@ but in EDC you'll exclusively encounter `"use"`.
 
 The `constraint` object expresses logical relationship of a key (`leftOperand`), the value (`rightOperand`) and the
 `operator`. Multiple constraints can be linked with logical operators, see [advanced policy
-concepts](#25-advanced-policy-concepts). The `leftOperand` is arbitrary, and the `rightOperand` is a literal value (see
-[Right Operand Values](../../../for-adopters/control-plane/policy-engine/_index.md#right-operand-values)). The
+concepts](#25-advanced-policy-concepts). The `leftOperand` and `rightOperand` are completely arbitrary, only the
 `operator` is limited to the following possible values: `eq`, `neq`, `gt`, `geq`, `lt`, `leq`, `in`, `hasPart`, `isA`,
 `isAllOf`, `isAnyOf`, `isNoneOf`.
 
