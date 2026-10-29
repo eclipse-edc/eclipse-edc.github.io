@@ -11,7 +11,7 @@ Checkstyle is a [tool](https://checkstyle.sourceforge.io/) that statically analy
 rules formulated in an XML document. Checkstyle rules are included in all EDC code repositories. Many modern IDEs have a
 plugin that runs Checkstyle analysis in the background.
 
-Our checkstyle config is based on the [Google Style](https://checkstyle.sourceforge.io/google_style.html) with a few
+Our checkstyle config is based on the [Google Style](https://checkstyle.sourceforge.io/google-style.html) with a few
 additional rules such as the naming of constants and Types.
 
 _Note: currently we do **not** enforce the generation of Javadoc comments, even though documenting code is **highly**
