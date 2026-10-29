@@ -12,6 +12,10 @@ weight: 80
     * [Lease duration](#lease-duration)
     * [Task-based state machine (NATS)](#task-based-state-machine-nats)
     * [Known limitations](#known-limitations)
+  * [Concurrent protocol requests](#concurrent-protocol-requests)
+    * [Outgoing requests](#outgoing-requests)
+    * [Database connections](#database-connections)
+    * [Finding the limit](#finding-the-limit)
 <!-- TOC -->
 
 Out of the box the EDC provides a set of default configurations that aim to find a good balance for performances.
@@ -154,3 +158,70 @@ following ones do:
 
 The accepted limitations of both state machines, their impact and how to mitigate them are listed in
 [State Machines Known Limitations](../control-plane/state-machines/_index.md).
+
+## Concurrent protocol requests
+
+Two limits decide how many protocol requests (catalog, negotiation and transfer messages) a runtime handles at the same
+time: how many requests it can send to a counter-party, and how many database connections it can use while answering
+them. Their defaults suit a runtime that hosts one participant. A runtime that hosts many participants, or that talks
+to a few counter-parties that each host many, usually needs higher values.
+
+### Outgoing requests
+
+Protocol messages are sent asynchronously through a shared HTTP client, which limits the requests running at the same
+time. Further requests wait in a queue until a running one completes.
+
+| Setting                                 | Default | Description                                                     |
+|-----------------------------------------|---------|-----------------------------------------------------------------|
+| `edc.http.client.max.requests`          | `64`    | asynchronous requests running at the same time, to all hosts    |
+| `edc.http.client.max.requests.per.host` | `5`     | asynchronous requests running at the same time, to the same host |
+
+The host is the counter-party's protocol endpoint, not the participant. All the participants hosted by the same
+counter-party runtime share one host. Likewise, a runtime that hosts many participants sends the requests of all of
+them through the same limits. With the default, at most 5 protocol requests go from one runtime to another at a time,
+whatever the number of participants on either side.
+
+_tuning suggestion:_ raise `edc.http.client.max.requests.per.host` when many requests go to the same counter-party
+runtime, e.g. catalog requests from many consumer participants, or negotiations and transfers driven by the state
+machines in parallel. Keep `edc.http.client.max.requests` at or above it. A higher limit moves the load to the
+counter-party: it must have the CPU and the database connections to answer that many requests at once.
+
+Synchronous calls, e.g. to the Secure Token Service or to resolve DIDs, are not affected by these limits.
+
+### Database connections
+
+Each data source has its own connection pool, configured with `edc.datasource.<name>.pool.*` (e.g.
+`edc.datasource.default.pool.connections.max-total`):
+
+| Setting                         | Default | Description                              |
+|---------------------------------|---------|------------------------------------------|
+| `pool.connections.max-total`    | `8`     | connections open at the same time        |
+| `pool.connections.max-idle`     | `4`     | idle connections kept open               |
+| `pool.connections.min-idle`     | `1`     | idle connections opened in advance       |
+
+A connection is held for the whole transaction, and handling an incoming protocol request runs in one transaction.
+For a catalog request, that includes validating the counter-party's token and evaluating the policies of the offers,
+so `max-total` also caps the incoming protocol requests handled at the same time. Other requests wait for a free
+connection.
+
+_tuning suggestion:_ size `max-total` for the concurrent requests you expect, plus the state machines' batches, and
+check that the database's own connection limit (e.g. PostgreSQL's `max_connections`) covers `max-total` times the
+number of replicas, for every data source that points at it.
+
+{{% alert title="Note" color="primary" %}}
+Settings are also read from environment variables, which are lowercased with `_` replaced by `.`. A key that contains
+`-`, such as `pool.connections.max-total`, cannot be written that way: set it in the configuration file, or pass it
+under its original name, e.g. through a Kubernetes `ConfigMap` used with `envFrom`.
+{{% /alert %}}
+
+### Finding the limit
+
+When throughput stops growing with the load while the CPU still has room, one of these limits is usually the cause:
+
+- **Outgoing requests:** a thread dump shows as many `OkHttp <counter-party URL>` threads as
+  `edc.http.client.max.requests.per.host`, each waiting for a response.
+- **Database connections:** the database shows `max-total` connections from the runtime, most of them
+  `idle in transaction` in PostgreSQL's `pg_stat_activity`.
+
+If the CPU is used up instead, add replicas.
+
