@@ -15,7 +15,10 @@ weight: 80
   * [Concurrent protocol requests](#concurrent-protocol-requests)
     * [Outgoing requests](#outgoing-requests)
     * [Database connections](#database-connections)
+    * [DID resolution](#did-resolution)
     * [Finding the limit](#finding-the-limit)
+  * [Policy evaluation](#policy-evaluation)
+  * [JVM memory](#jvm-memory)
 <!-- TOC -->
 
 Out of the box the EDC provides a set of default configurations that aim to find a good balance for performances.
@@ -199,12 +202,19 @@ Each data source has its own connection pool, configured with `edc.datasource.<n
 | `pool.connections.max-idle`     | `4`     | idle connections kept open               |
 | `pool.connections.min-idle`     | `1`     | idle connections opened in advance       |
 
-A connection is held for the whole transaction, and handling an incoming protocol request runs in one transaction.
-For a catalog request, that includes validating the counter-party's token and evaluating the policies of the offers,
-so `max-total` also caps the incoming protocol requests handled at the same time. Other requests wait for a free
+A connection is held for the whole transaction:
+
+- **Negotiation and transfer messages:** handling an incoming message runs in one transaction. That includes validating
+  the counter-party's token, which makes remote calls (DID resolution, the presentation request to the counter-party's
+  credential service), so the connection is held during those calls too.
+- **Catalog requests:** the token is validated first, and the connection is held only while the datasets are queried
+  and their policies evaluated.
+
+So `max-total` also caps the incoming protocol requests handled at the same time. Other requests wait for a free
 connection.
 
-_tuning suggestion:_ size `max-total` for the concurrent requests you expect, plus the state machines' batches, and
+_tuning suggestion:_ size `max-total` for the concurrent requests you expect, plus the state machines' batches or the
+NATS subscribers' workers (see [Task-based state machine (NATS)](#task-based-state-machine-nats)), and
 check that the database's own connection limit (e.g. PostgreSQL's `max_connections`) covers `max-total` times the
 number of replicas, for every data source that points at it.
 
@@ -214,6 +224,26 @@ Settings are also read from environment variables, which are lowercased with `_`
 under its original name, e.g. through a Kubernetes `ConfigMap` used with `envFrom`.
 {{% /alert %}}
 
+### DID resolution
+
+Validating a counter-party's token needs its DID document, and validating its credentials needs the issuers' ones. The
+resolved documents are kept in a cache:
+
+| Setting                         | Default  | Description                                                                    |
+|---------------------------------|----------|--------------------------------------------------------------------------------|
+| `edc.did.resolver.cache.size`   | `50`     | DID documents kept, least recently used evicted first; `0` disables the cache |
+| `edc.did.resolver.cache.expiry` | `300000` | how long (in milliseconds) a resolved document is kept                        |
+
+All the participants hosted by a runtime share the cache. A miss resolves the document over HTTP, synchronously, on the
+thread that handles the protocol request. When the runtime's participants talk to more counter-parties than the cache
+holds, documents are evicted before they are used again and nearly every request resolves a DID. In a load test with 99
+counter-parties at 40 negotiations per second, the default cache raised the median negotiation time from about 1 s to
+11 s, and a cache of 1000 entries brought it back.
+
+_tuning suggestion:_ size `edc.did.resolver.cache.size` above the number of DIDs (counter-parties and credential
+issuers) the hosted participants talk to. The expiry bounds how long a changed DID document, e.g. after a key rotation,
+goes unnoticed.
+
 ### Finding the limit
 
 When throughput stops growing with the load while the CPU still has room, one of these limits is usually the cause:
@@ -222,6 +252,44 @@ When throughput stops growing with the load while the CPU still has room, one of
   `edc.http.client.max.requests.per.host`, each waiting for a response.
 - **Database connections:** the database shows `max-total` connections from the runtime, most of them
   `idle in transaction` in PostgreSQL's `pg_stat_activity`.
+- **NATS workers:** a thread dump shows all the `NatsSubscriber` worker threads of a subscriber busy, most of them
+  waiting for a remote call (a protocol message to the counter-party, a data plane signaling call). Raise
+  `edc.nats.*.subscriber.workers`, and the datasource pool with it.
+- **DID resolution:** a thread dump shows request threads in `WebDidResolver.resolve`, called from
+  `DidResolverRegistryImpl.resolveCachedDocument`: the DID cache is too small.
 
 If the CPU is used up instead, add replicas.
+
+## Policy evaluation
+
+Policies can use CEL expressions, which are registered in a store. A runtime keeps the registered expressions in memory
+and compiles each one once:
+
+| Setting                                   | Default | Description                                                          |
+|-------------------------------------------|---------|----------------------------------------------------------------------|
+| `edc.policy.cel.expressions.cache.ttl.ms` | `5000`  | how long the registered expressions are kept before being read again |
+
+Expressions created, updated or deleted through the same runtime apply immediately; changes made through another
+replica apply within the TTL. `0` reads the expressions from the store on every policy evaluation, which is costly for
+a catalog with many offers: every offer's policy is evaluated.
+
+_tuning suggestion:_ keep the default, or raise it when expressions rarely change and every policy evaluation counts.
+Lower it only if the other replicas must see changes sooner.
+
+## JVM memory
+
+In a container, the JVM sizes its maximum heap at 25% of the container's memory limit by default. Raise it with
+`-XX:MaxRAMPercentage` (e.g. `JDK_JAVA_OPTIONS=-XX:MaxRAMPercentage=50`), and leave room for the memory outside the
+heap: metaspace, threads, direct buffers.
+
+Check that the JVM sees the container's limit, with the same image:
+
+- `java -XshowSettings:system -version` prints the memory limit the JVM detected;
+- `java -XX:+PrintFlagsFinal -version | grep MaxHeapSize` prints the heap it would use.
+
+{{% alert title="Warning" color="warning" %}}
+Some JDK builds don't detect the container's limit on hosts whose kernel has no cgroup v1 memory support: they report
+"System not containerized" and size the heap from the host's memory, so the container ends up OOM-killed under load.
+This was observed with Temurin 24.0.2; Temurin 25 detects the limit.
+{{% /alert %}}
 
