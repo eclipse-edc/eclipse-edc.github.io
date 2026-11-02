@@ -16,6 +16,7 @@ weight: 80
     * [Outgoing requests](#outgoing-requests)
     * [Database connections](#database-connections)
     * [DID resolution](#did-resolution)
+    * [Credential service](#credential-service)
     * [Finding the limit](#finding-the-limit)
   * [Policy evaluation](#policy-evaluation)
   * [JVM memory](#jvm-memory)
@@ -218,6 +219,10 @@ NATS subscribers' workers (see [Task-based state machine (NATS)](#task-based-sta
 check that the database's own connection limit (e.g. PostgreSQL's `max_connections`) covers `max-total` times the
 number of replicas, for every data source that points at it.
 
+Keep `max-idle` close to `max-total`. With the default of 4, the pool closes the connections beyond 4 whenever the
+load dips and opens new ones at the next burst; opening a PostgreSQL connection costs CPU on both sides. In a load
+test at 60 negotiations per second, setting `max-idle` to `max-total` saved PostgreSQL about a third of its CPU.
+
 {{% alert title="Note" color="primary" %}}
 Settings are also read from environment variables, which are lowercased with `_` replaced by `.`. A key that contains
 `-`, such as `pool.connections.max-total`, cannot be written that way: set it in the configuration file, or pass it
@@ -244,6 +249,17 @@ _tuning suggestion:_ size `edc.did.resolver.cache.size` above the number of DIDs
 issuers) the hosted participants talk to. The expiry bounds how long a changed DID document, e.g. after a key rotation,
 goes unnoticed.
 
+### Credential service
+
+With DCP, every incoming protocol message, on the provider and on the consumer side, is verified with a presentation
+query to the credential service of the counter-party. A credential service such as the IdentityHub therefore serves
+the protocol traffic of all the participants it hosts, and its own limits cap the connectors that talk to them: with
+its default pool of 8 database connections, an IdentityHub hosting the participants of a busy connector became the
+limit of the whole platform in a load test.
+
+_tuning suggestion:_ size the credential service's database pool (`edc.datasource.default.pool.connections.*` of the
+IdentityHub) like the connector's, and scale it with the connector's protocol traffic.
+
 ### Finding the limit
 
 When throughput stops growing with the load while the CPU still has room, one of these limits is usually the cause:
@@ -257,8 +273,19 @@ When throughput stops growing with the load while the CPU still has room, one of
   `edc.nats.*.subscriber.workers`, and the datasource pool with it.
 - **DID resolution:** a thread dump shows request threads in `WebDidResolver.resolve`, called from
   `DidResolverRegistryImpl.resolveCachedDocument`: the DID cache is too small.
+- **Credential service:** a thread dump of the connector shows request threads waiting in
+  `DefaultCredentialServiceClient.sendRequest`; the cause is on the credential service, e.g. its request threads
+  waiting in `CommonsConnectionPool.getConnection` (pool too small) or in `DriverManagerConnectionFactory.create`
+  (connections reopened, `max-idle` too low).
 
-If the CPU is used up instead, add replicas.
+If the CPU is used up instead, add replicas, each with CPU of its own: replicas that share the same cores with each
+other and with the database only add threads competing for them.
+
+{{% alert title="Note" color="primary" %}}
+Tracing has a cost under load: exporting the spans of every request, and storing them in the tracing backend, took
+several cores in a load test, and latencies under overload were 3 to 5 times higher with tracing enabled. Measure
+throughput with tracing disabled, or sampled, and account for its cost when sizing.
+{{% /alert %}}
 
 ## Policy evaluation
 
