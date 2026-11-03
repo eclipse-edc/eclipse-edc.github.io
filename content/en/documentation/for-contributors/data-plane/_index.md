@@ -22,4 +22,4 @@ This section covers:
 
 Up to version 0.18, EDC contained the *Data Plane Framework* (`DataPlaneManager`, `PipelineService`, `DataSource` and
 `DataSink`) and a data plane built on it. Both were removed in favour of DPS; the
-[migration guide](/blog/2026/05/19/data-plane-migration/) describes how to move to DPS data planes.
+[migration guide](../../../blog/20260519-data-plane-migration/index.md) describes how to move to DPS data planes.
