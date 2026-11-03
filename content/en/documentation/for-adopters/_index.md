@@ -25,9 +25,9 @@ section provides a quick overview of the key EDC components.
 ### The Connector
 
 The Connector is a pair of components that _control_ data sharing and _execute_ data transfer. These components are the
-**_Control Plane_** and **_Data Plane,_** respectively. In keeping with EDC's modular design philosophy, connector
-components may be deployed in a single monolith (for simple use cases) or provisioned as clusters of individual
-services. It is recommended to separate the Control Plane and Data Plane so they can be individually managed and scaled.
+**_Control Plane_** and **_Data Plane,_** respectively. The Control Plane is an EDC runtime, the Data Planes are separate
+applications that it directs through the Data Plane Signaling protocol, so that both can be individually managed and
+scaled.
 
 ![Control and Data Planes](control-and-data-planes.svg)
 
@@ -44,10 +44,11 @@ conditions. For example, if a contract agreement expires.
 #### The Data Plane
 
 The Data Plane is responsible for executing data transfers, which are managed by the Control Plane. A Data Plane sends
-data using specialized technology such as a messaging system or data integration platform. EDC includes the *Data Plane
-Framework (DPF)* for building custom Data Planes. Alternatively, a Data Plane can be built using other languages or
-technologies and integrated with the EDC Control Plane by implementing
-the [Data Plane Signaling API](../for-contributors/data-plane/data-plane-signaling/_index.md).
+data using specialized technology such as a messaging system or data integration platform. EDC doesn't include a Data
+Plane: any application that implements
+the [Data Plane Signaling (DPS)](https://eclipse-dataplane-signaling.github.io/dataplane-signaling) protocol can be one,
+for example one built with the [Data Plane SDKs](https://github.com/eclipse-dataplane-core). See
+the [Data Plane](./data-plane/_index.md) section for details.
 
 ### Federated Catalog
 

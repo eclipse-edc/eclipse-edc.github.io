@@ -161,7 +161,7 @@ Implementors that need additional `@context` and `namespaces` to be supported in
 extension that registers the required `@context` and `namespace`.
 
 For example let's say we want to support a custom namespace `http://w3id.org/starwars/v0.0.1/ns/` in the extensible
-properties of an [Asset](./entities.md#1-assets).
+properties of an [Asset](../control-plane/entities/_index.md#1-assets).
 
 The input JSON would look like this:
 
@@ -190,7 +190,7 @@ The input JSON would look like this:
 ```
 
 Even if we don't register any additional `@context` or `namespace` prefix in the EDC runtime,
-the [Asset](./entities.md#1-assets) will still be persisted correctly since the JSON-LD gets expanded correctly and
+the [Asset](../control-plane/entities/_index.md#1-assets) will still be persisted correctly since the JSON-LD gets expanded correctly and
 stored in the expanded form.
 
 But in the `egress` the JSON-LD document gets always compacted, and without additional configuration, it will look like
@@ -383,7 +383,7 @@ public class FooValidator {
 }
 ```
 
-and can be registered with the [@Injectable](../control-plane/dependency-injection.md#2-injecting-a-service)
+and can be registered with the [@Injectable](./dependency-injection.md#2-injecting-a-service)
 `JsonObjectValidatorRegistry`:
 
 ```java

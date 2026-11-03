@@ -134,9 +134,9 @@ contract negotiations and provisioning of resources. To understand how scopes wo
 In the above scenario, the provider EDC's policy engine should verify a partner credential when a request is made to
 initiate a contract negotiation. The business partner rule must be bound to the *contract negotiation scope* since
 policy rules are only evaluated for each scope they are bound to. However, validating a business partner credential
-may not be needed when data is provisioned if it has already been checked when starting a transfer process. To avoid an
-unnecessary check, do not bind the business partner rule to the *provision scope*. This will result in the rule being
-filtered and ignored during policy evaluation for that scope.
+may not be needed when a transfer process is requested if it has already been checked during the contract negotiation.
+To avoid an unnecessary check, do not bind the business partner rule to the *transfer process scope*. This will result
+in the rule being filtered and ignored during policy evaluation for that scope.
 
 The relationship between scopes, rules, and functions is shown in the following diagram:
 

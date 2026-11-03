@@ -40,6 +40,6 @@ Used to describe details of the normal flow that are not interesting for a produ
 
 ## What should be not logged
 
-- secrets and any other potentially sensitive data, like the payload that is passed through the `data-plane`
+- secrets and any other potentially sensitive data, like the payload that is passed through a data plane
 - an exception that will be thrown in the same block
 - not strictly necessary information, like "entering method X", "leaving block Y", "returning HTTP 200"

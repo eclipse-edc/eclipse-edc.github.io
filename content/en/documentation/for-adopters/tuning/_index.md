@@ -94,24 +94,6 @@ also minutes as delay in evaluating them shouldn't be an issue (if it is in your
 `state-machine.iteration-wait`: in the order of 30/60 minutes (translated in ms) \
 `state-machine.batch-size` in the order of 10/100 \
 
-- `data.plane.selector`: checks registered data planes availability
-
-this state machine checks registered data planes and verifies if they are available or not. If the data-planes in your
-environment are not supposed to change often the wait time can be keep high to avoid unnecessary database interaction:
-
-_tuning suggestion:_ \
-`state-machine.iteration-wait`: in the order of 1/10 minutes (translated in ms) \
-`state-machine.batch-size` in the order of 10/100 \
-
-#### Data-plane
-
-- `dataplane`: handles the data flows
-this state machine manages the data-flows so based on how many data flows are executed it can be tuned accordingly.
-  
-_tuning suggestion:_ \
-`state-machine.iteration-wait`: in the order of 100/1000 milliseconds for many PUSH transfers, consider 1/10 seconds for few PULL transfers. \
-`state-machine.batch-size` in the order of 10/100 \
-
 ### Lease duration
 
 When several connector replicas share the same database, an entity is leased by the replica that processes it. If the

@@ -1,276 +1,94 @@
 ---
-title: Custom Data Plane
+title: Building a data plane
 weight: 30
 ---
 
 <!-- TOC -->
-  * [1. The Registration Phase](#1-the-registration-phase)
-  * [2. Handling DPS messages](#2-handling-dps-messages)
-    * [2.1 `START`](#21-start)
-    * [2.1.1 `PUSH`](#211-push)
-    * [2.1.2 `PULL`](#212-pull)
-    * [2.2 `SUSPEND` and `TERMINATE`](#22-suspend-and-terminate)
+  * [1. Where to start](#1-where-to-start)
+  * [2. What a data plane implements](#2-what-a-data-plane-implements)
+    * [2.1 Registration](#21-registration)
+    * [2.2 The DPS endpoints](#22-the-dps-endpoints)
+    * [2.3 Data addresses and credentials](#23-data-addresses-and-credentials)
+    * [2.4 Notifications](#24-notifications)
+  * [3. Testing against the EDC control plane](#3-testing-against-the-edc-control-plane)
 <!-- TOC -->
 
-When the data-plane is not embedded, EDC uses the Data Plane Signaling protocol ([DPS](./data-plane-signaling/_index.md))
-for the communication between control plane and data plane. In this chapter we will see how to leverage on [DPS](./data-plane-signaling/_index.md)
-for writing a custom data plane from scratch.
-
-For example purposes, this chapter contains JS snippets that use `express` as web framework.
-
-> Since it's only for educational purposes, the code is not intended to be complete, as proper error handling and JSON-LD
-> processing are not implemented
-
-Our simple data plane setup looks like this:
-
-```javascript
-const express = require('express')
-const app = express()
-const port = 3000
-
-app.use(express.json());
-
-app.use((req, res, next) => {
-    console.log(req.method, req.hostname, req.path, new Date(Date.now()).toString());
-    next();
-})
-
-app.listen(port, () => {
-    console.log(`Data plane listening on port ${port}`)
-})
-```
-
-It's a basic `express` application that listens on port `3000` and logs every request with a basic middleware.
-
-## 1. The Registration Phase
-
-First we need to register our custom data plane in the EDC control plane.
-
-By using the internal `Dataplane Selector` API available under the `control` context of EDC, we could send a registration
-request:
-
-```http request
-POST https://controlplane-host:port/api/control/v1/dataplanes
-Content-Type: application/json
-{
-    "@context": [
-        "https://w3id.org/edc/connector/management/v2"
-    ],
-    "@type": "DataPlaneInstance",
-    "@id": "custom_dataplane",
-    "url": "http://custom-dataplane-host:3000/dataflows",
-    "allowedSourceTypes": [
-        "HttpData"
-    ],
-    "allowedTransferTypes": [
-        "HttpData-PULL",
-        "HttpData-PUSH"
-    ]
-}
-```
-
-> It's up to the implementors to decide when the data plane gets registered. This may be a manual operation as well as
-> automated in a process routine.
-
-- The `@id` is the data plane's `component ID`, which identify a [logical](./data-plane-signaling/_index.md#5-data-plane-selection) 
-  data plane component.
-- The `url` is the location on which the data plane will be receiving protocol [messages](#2-handling-dps-messages).
-- The `allowedSourceTypes` is an array of source type supported, in this case only `HttpData`.
-- The `allowedTransferTypes` is an array of supported transfer types. When using the [DPS](./data-plane-signaling/data-plane-signaling.md) the transfer type is by
-  convention a string with format `<label>-{PULL,PUSH}`, which carries the type of the flow `push` or `pull`. By default,
-  in EDC the `label` always corresponds to a source/sync type (e.g `HttpData`), but it can be customized for data plane
-  implementation.
-
-With this configuration we declare that our data plane is able to transfer data using HTTP protocol in `push` and `pull` mode.
-
-The lifecycle of a data plane instance is managed by the `DataPlaneSelectorManager` component implemented as
-[state machine](../runtime/programming-primitives.md#1-state-machines). A data plane instance is in the `REGISTERED`
-state when created/updated. Then for each data plane a periodic heartbeat is sent for checking if it is still running.
-
-If the data plane response is successful, the state transits to `AVAILABLE`. As soon as the data plane does not respond
-or returns a not successful response, the state transits to `UNAVAILABLE`.
-
-Let's implement a route method for `GET /dataflows/check` in our custom data plane:
-
-```javascript
-app.get('/dataflows/check', (req, res) => {
-    res.send('{}')
-})
-```
-
-> Only the response code matters, the response body is ignored on the EDC side.
-
-Once the data plane is started and registered we should see these entries in the logs:
-
-```
-GET localhost /dataflows/check Fri Aug 30 2024 18:01:56 GMT+0200 (Central European Summer Time)
-```
-
-And the status of our the data plane is `AVAILABLE`.
-
-
-## 2. Handling DPS messages
-
-When a transfer process is ready to be started by the [Control Plane](../_index.md#2-the-control-plane), the `DataPlaneSignalingFlowController`
-is engaged for handling the transfer request. The `DPS` flow controller uses the `DataPlaneSelectorService` for selecting
-the right data plane instance based on it's capabilities and once selected it sends a [DataFlowStartMessage](#21-start)
-that our custom data plane should be able to process.
-
-> The `AVAILABLE` state is a prerequisite to candidate the data plane instance in the selection process.
-
-The `ID` of the selected data plane is stored in the transfer process entity for delivering subsequent messages that may
-be necessary in the lifecycle of a transfer process. (e.g. [SUSPEND and TERMINATE](#22-suspend-and-terminate))
-
-### 2.1 `START`
-
-If our data plane fulfills the data plane selection criteria, it should be ready to handle `DataFlowStartMessage` at the
-endpoint `/dataflows`:
-
-```javascript
-app.post('/dataflows', async (req, res) => {
-    let { flowType } = req.body;
-    if (flowType === 'PUSH') {
-        await handlePush(req,res);
-    } else if (flowType === 'PULL') {
-        await handlePull(req,res);
-    } else {
-        res.status(400);
-        res.send(`Flow type ${flowType} not supported`)
-    }
-});
-```
-
-We split the handling of the transfer request in `handlePush` and `handlePull` functions that handle [PUSH](#211-push)
-and [PULL](#212-pull) flow types.
-
-The format of the `sourceDataAddress` and `destinationDataAddress` is aligned with the
-[DSP](./data-plane-signaling/_index.md#323-access-token-generation) specification.
-
-### 2.1.1 `PUSH`
-
-Our custom data plane should be able to transfer data (`PUSH`) from an `HttpData` source (`sourceDataAddress`) to an
-`HttpData` sink (`destinationDataAddress`).
-
-The `sourceDataAddress` is the `DataAddress` configured in the [`Asset`](../control-plane/entities.md#1-assets) and may look like this in our case:
-
-
-```json
-{
-    "@context": [
-        "https://w3id.org/edc/connector/management/v2"
-    ],
-    "@id": "asset-1",
-    "@type": "Asset",
-    "dataAddress": {
-        "@type": "DataAddress",
-        "type": "HttpData",
-        "baseUrl": "https://jsonplaceholder.typicode.com/todos"
-    }
-}
-```
-
-The `destinationDataAddress` is derived from the `dataDestination` in the [`TransferRequest`](../control-plane/entities.md#7-transfer-processes) and may look like this:
-
-```json
-{
-    "@context": [
-        "https://w3id.org/edc/connector/management/v2"
-    ],
-    "counterPartyAddress": "{{PROVIDER_DSP}}/api/dsp",
-    "connectorId": "{{PROVIDER_ID}}",
-    "contractId": "{{CONTRACT_ID}}",
-    "dataDestination": {
-        "type": "HttpData",
-        "baseUrl": "{{RECEIVER_URL}}"
-    },
-    "protocol": "dataspace-protocol-http",
-    "transferType": "HttpData-PUSH"
-}
-```
-
-The simplest `handlePush` function would need to fetch data from the source `baseUrl` and send the result to the sink `baseUrl`.
-
-A naive implementation may look like this:
-
-```javascript
-async function handlePush(req, res) {
-    res.send({
-        "@context": [
-            "https://w3id.org/edc/connector/management/v2"
-        ],
-        "@type": "DataFlowResponseMessage"
-    });
-
-    const { sourceDataAddress, destinationDataAddress } = req.body;
-
-    const sourceUrl = getBaseUrl(sourceDataAddress);
-    const destinationUrl = getBaseUrl(destinationDataAddress);
-
-    const response = await fetch(sourceUrl);
-
-    await fetch(destinationUrl, {
-        "method": "POST",
-        body : await response.text()
-    });
-}
-```
-
-First we acknowledge the [Control Plane](../contributor-handbook.md#2-the-control-plane) by sending a `DataFlowResponseMessage` as response.
-
-Then we transfer the data from `sourceUrl` to `destinationUrl`.
-
-> The `getBaseUrl` is a utility function that extracts the `baseUrl` from the `DataAddress`.
-
-Implementors should keep track of `DataFlowStartMessage`s in some persistent storage system in order to fulfill subsequent
-`DPS` messages on the same transfer id ([e.g. SUSPEND and TERMINATE](#22-suspend-and-terminate)).
-
-For example in the streaming case, implementors may track the opened streaming channels, which could be terminated
-on-demand or by the [policy monitor](../control-plane/policy-monitor.md).
-
-
-### 2.1.2 `PULL`
-
-When receiving a `DataFlowStartMessage` in a `PULL` scenario there is no direct transfer to be handled by the data plane.
-Based on the `sourceDataAddress` in the `DataFlowStartMessage` a custom data plane implementation should create another
-`DataAddress` containing all the information required for the data transfer:
-
-```javascript
-async function handlePull(req, res) {
-    const { sourceDataAddress } = req.body;
-    const { dataAddress } = await generateDataAddress(sourceDataAddress);
-
-    const response = {
-        "@context": [
-            "https://w3id.org/edc/connector/management/v2"
-        ],
-        "@type": "DataFlowResponseMessage",
-        "dataAddress": dataAddress
-    };
-    res.send(response);
-}
-```
-
-We will not implement the `generateDataAddress` function, as it may vary depending on the use case. But at the high level
-a `generateDataAddress` should generate a `DataAddress` in DSP format that contains useful information for the consumer
-for fetching the data: `endpoint`, `endpointType` and custom extensible properties `endpointProperties`.
-
-For example the default [EDC](./data-plane-signaling/_index.md#323-access-token-generation) generates a `DataAddress`
-that contains also authorization information like the auth token to be used when request data using a Data Plane
-[public API](./data-plane-signaling/_index.md#3-data-plane-public-api) and the token type (e.g. bearer).
-
-Implementors may also want to track `PULL` requests in a persistent storage, which can be useful in scenario like token
-revocation or transfer process termination.
-
-How the actual data requests is handled depends on the implementation of the custom data plane. It could be done in the
-same way as it's done in the EDC data plane, which exposes an endpoint that validates the authorization and it proxies
-the request to the `sourceDataAddress`.
-
-The [DPS](./data-plane-signaling/_index.md) gives enough flexibility for implementing different strategy for different use cases.
-
-### 2.2 `SUSPEND` and `TERMINATE`
-
-A [DPS](./data-plane-signaling/data-plane-signaling.md) compliant data plane implementation should also support [SUSPEND](./data-plane-signaling/_index.md#22-suspend)
-and [TERMINATE](./data-plane-signaling/_index.md#23-terminate) messages.
-
-If implementors are keeping track of the transfers (`STARTED`), those message are useful for closing the data channels
-and cleaning-up I/O resources.
+A data plane is any application that implements the
+[Data Plane Signaling (DPS)](https://eclipse-dataplane-signaling.github.io/dataplane-signaling) protocol and registers
+with the control plane. It can be written in any language and run anywhere the control plane can reach it. This page
+describes what the EDC control plane expects of it; the protocol itself is defined by the specification.
+
+## 1. Where to start
+
+- **Use an existing data plane.** [`siglet`](https://github.com/eclipse-dataplane-core/dsdk-facet-rs/tree/main/siglet),
+  from the Data Plane Core project, is driven by DPS and issues, verifies and renews the access tokens of the data flows,
+  so that existing APIs and data infrastructure can serve the data.
+- **Build one with a Data Plane SDK.** The [Data Plane SDKs](https://github.com/eclipse-dataplane-core) implement the
+  DPS endpoints, the data flow state machine and its persistence, and leave the transfer itself to your code:
+  [Java](https://github.com/eclipse-dataplane-core/dataplane-sdk-java),
+  [Go](https://github.com/eclipse-dataplane-core/dataplane-sdk-go),
+  [Rust](https://github.com/eclipse-dataplane-core/dataplane-sdk-rust).
+- **Implement the specification directly**, if no SDK fits.
+
+The transfer types a data plane supports are DPS profiles; the common ones are listed in the
+[DPS profiles](https://eclipse-dataplane-signaling.github.io/profiles). A data plane can also define profiles of its own,
+as long as the participants of a dataspace agree on them.
+
+## 2. What a data plane implements
+
+### 2.1 Registration
+
+At startup, the data plane registers with the control plane, with its id, its DPS endpoint, the transfer types it
+supports, its labels and its authorization profile. Registration is idempotent, so the data plane can register on every
+start; it deregisters only when it is removed for good. The API and the payload are described in
+[Data plane registration](./data-plane-signaling/_index.md#2-data-plane-registration).
+
+All the replicas of a data plane register with the same id and endpoint: the control plane sends the signals of a data
+flow to that endpoint, and any replica must be able to handle them, so the data flows are kept in a store shared by the
+replicas.
+
+### 2.2 The DPS endpoints
+
+The control plane calls the endpoints defined by the specification, relative to the registered endpoint (see
+[Signals sent to the data plane](./data-plane-signaling/_index.md#41-signals-sent-to-the-data-plane)):
+
+- `prepare` (consumer side) and `start` (provider side) create the data flow, whose id is the id of the transfer
+  process. They receive the `profile` (the transfer type), the agreement and dataset ids, the participants, and the
+  `labels` and `metadata` of the asset or transfer request; the `metadata` carries what the data plane needs to find the
+  data, e.g. the URL of the backend of an HTTP asset.
+- `{flowId}/started` (consumer side) hands over the provider's data address of a pull transfer.
+- `{flowId}/suspend`, `{flowId}/resume`, `{flowId}/terminate` and `{flowId}/completed` change the state of the data flow.
+
+Every call can be repeated: the control plane retries a signal whose response it didn't receive, so a data plane answers
+a repeated call with the current state of the data flow instead of an error.
+
+A data plane can answer `prepare`, `start` and `resume` synchronously, with the final state, or asynchronously, with a
+pending state, and notify the control plane later (see [2.4 Notifications](#24-notifications)). An asynchronous answer
+fits work that takes time, e.g. provisioning a bucket or a queue for the transfer.
+
+### 2.3 Data addresses and credentials
+
+The data plane creates the data address of a transfer and the credentials in it, and validates them when the
+counter-party uses them; the control plane only passes them on:
+
+- **pull:** the provider data plane returns, in its `start` answer, the endpoint and the token at which the consumer
+  fetches the data, and accepts requests with that token until the data flow is suspended, terminated or completed.
+- **push:** the consumer data plane returns, in its `prepare` answer, the destination the provider pushes the data to; the
+  provider data plane receives it in the `start` message.
+
+### 2.4 Notifications
+
+The data plane reports the progress of a data flow to the control plane's Signaling API: `prepared` and `started` after an
+asynchronous answer, `completed` when a finite transfer is done, `errored` when it failed (see
+[Notifications from the data plane](./data-plane-signaling/_index.md#42-notifications-from-the-data-plane)). The URL of the
+Signaling API is part of the data plane's configuration. With an authorization profile, the data plane authenticates
+these calls, and validates the control plane's signals, as the profile defines (see
+[Authorization profiles](./data-plane-signaling/_index.md#5-authorization-profiles)).
+
+## 3. Testing against the EDC control plane
+
+The Connector's end-to-end transfer tests use a data plane built with the Java SDK
+(`system-tests/e2e-transfer-test/signaling-data-plane` in the
+[Connector repository](https://github.com/eclipse-edc/Connector)): it shows a registration, the handling of the
+signals, and pull and push transfers between two control planes, and can serve as a starting point for tests of your own
+data plane.

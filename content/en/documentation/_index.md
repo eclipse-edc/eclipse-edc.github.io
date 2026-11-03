@@ -22,8 +22,9 @@ dataspaces using the following building blocks:
 - **Catalog service** for publishing and securing assets that can be shared with other organizations.
 - **Control plane services** for the automated creation and processing of data usage agreements that grant access to
   data.
-- **Data plane and monitoring services** for initiating and managing data transfers using off-the-shelf protocols such
-  as `HTTP`, `Kafka`, cloud object storage, or virtually any other technology.
+- **Data plane integration and monitoring services** for initiating and managing data transfers through data planes that
+  implement the [Data Plane Signaling](https://eclipse-dataplane-signaling.github.io/dataplane-signaling) protocol, using
+  off-the-shelf protocols such as `HTTP`, `Kafka`, cloud object storage, or virtually any other technology.
 
 EDC is designed to serve a range of use cases, including large AI data sets, API access, supply-chain data processing,
 and research data sharing.

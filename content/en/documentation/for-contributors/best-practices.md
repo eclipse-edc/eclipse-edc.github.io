@@ -51,8 +51,8 @@ This only means that API endpoints should not be _directly_ facing the internet,
 infrastructure](#23-use-appropriate-network-infrastructure) in place.
 
 It also means that we advise **extreme caution** when making APIs accessible via the internet - by default only the DSP
-API and the data plane's public API should be accessible via the internet, the others (management API, signaling
-API,...) are intended _only for local network access_, e.g. within a Kubernetes cluster.
+API and the data planes' endpoints that serve data to the counter-party should be accessible via the internet, the
+others (management API, signaling API,...) are intended _only for local network access_, e.g. within a Kubernetes cluster.
 
 Corporate security policies might require that only HTTPS/TLS connections be used, even between pods in a Kubernetes
 cluster. While the EDC project makes no argument pro or contra, that is certainly an idea worth considering in high

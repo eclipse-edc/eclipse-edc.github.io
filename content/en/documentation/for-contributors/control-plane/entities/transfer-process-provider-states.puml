@@ -37,16 +37,7 @@ state "COMPLETING" as COMPLETING_provider {
 }
 state "COMPLETED" as COMPLETED_provider {
 }
-state "provision" as provision_provider {
-  state "PROVISIONING" as PROVISIONING_provider {
-  }
-  state "PROVISIONED_REQUESTED" as PROVISIONED_REQUESTED_provider {
-  }
-  state "PROVISIONED" as PROVISIONED_provider {
-  }
-  PROVISIONING_provider --> PROVISIONED_REQUESTED_provider : async provisioning
-  PROVISIONED_REQUESTED_provider --> PROVISIONED_provider
-  PROVISIONING_provider --> PROVISIONED_provider
+state "STARTUP_REQUESTED" as STARTUP_REQUESTED_provider {
 }
 state "TERMINATING" as TERMINATING_provider {
 }
@@ -101,29 +92,18 @@ state CONSUMER ##[dotted] {
   TERMINATING_provider -right[dashed]-> TERMINATED_consumer : sends\n**TransferTerminationMessage**\nmessage
 }
 
-INITIAL_provider --> PROVISIONING_provider
-PROVISIONED_provider --> STARTING_provider
+INITIAL_provider --> STARTING_provider : data plane started
+INITIAL_provider --> STARTUP_REQUESTED_provider : async start
+STARTUP_REQUESTED_provider --> STARTING_provider : data plane notifies **started**
 STARTING_provider --> STARTED_provider
 
 STARTED_provider --> COMPLETING_provider
 COMPLETING_provider --> COMPLETED_provider
 
-COMPLETED_provider --> DEPROVISIONING
 
 STARTED_provider -[hidden]-> TERMINATING_provider : used for layout
 TERMINATING_provider --> TERMINATED_provider
-TERMINATED_provider --> DEPROVISIONING
 
 
-
-state deprovision {
-    state DEPROVISIONING {
-    }
-    state DEPROVISIONED {
-    }
-    DEPROVISIONING --> DEPROVISIONED_REQUESTED : async provisioning
-    DEPROVISIONED_REQUESTED --> DEPROVISIONED
-    DEPROVISIONING --> DEPROVISIONED
-}
 
 @enduml
