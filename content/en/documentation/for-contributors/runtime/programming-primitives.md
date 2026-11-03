@@ -83,10 +83,11 @@ two replicas attempt to load the same entity at the same time, which - without l
 data inconsistencies, duplicated DSP messages and other problems.
 
 To avoid this, EDC employs pessimistic exclusive locks on the database level for stateful entities, which are called
-`Lease`. These are entries in a database that indicate whether an entity is currently leased, whether the lease is
-expired and which replica leased the entity. Attempting to acquire a lease for an already-leased entity is only possible
-if the
-lease holder is the same.
+`Lease`. A lease is recorded on the entity's own row (`leased_by`, `leased_at`, `lease_duration`): which replica leased
+the entity, and until when. Attempting to acquire a lease for an already-leased entity is only possible if the lease
+holder is the same, or the lease is expired. The lease duration is configurable
+(`edc.transfer.state-machine.lease-duration`, `edc.negotiation.state-machine.lease-duration`,
+`edc.policy.monitor.lease-duration`, see [Tuning](../../for-adopters/tuning/_index.md#lease-duration)).
 
 > Note that the value of the `edc.runtime.id` property is used to record the holder of a `Lease`. It is _recommended not
 > to configure_ this property in clustered environments so that randomized runtime IDs (= default) are used.
@@ -100,6 +101,15 @@ Generally the process is as follows:
 
 That way, each replica of the control plane holds an exclusive lock for a particular entity while it is trying to
 process and advance its state.
+
+In addition, stateful entities carry a `version`, incremented on every save (optimistic locking): saving a copy that
+was read before another save fails with a `CONFLICT` store result, which the Management API answers with `409`. This
+protects the entities from concurrent changes outside the state machine, e.g. an API call and a protocol message, and
+from a replica that kept processing after its lease expired.
+
+The poll-based state machine described here is one of two implementations; multi-participant runtimes can use
+task-based state machines driven by NATS instead, see
+[State Machines Known Limitations](../../for-adopters/control-plane/state-machines/_index.md).
 
 ## 2. Transformers
 

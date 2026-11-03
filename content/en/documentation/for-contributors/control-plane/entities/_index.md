@@ -269,11 +269,11 @@ scopes is not possible. Currently, the following scopes are defined:
   agreement](#5-contract-agreements) is fulfilled. One example would be contract expiry.
 - `catalog`: evaluated when the catalog for a particular participant agent is generated. Decides whether the participant
   has the asset in their catalog.
-- `request.contract.negotiation`: evaluated on every request during contract negotiation between two control plane
-  runtimes. Not relevant for end users.
-- `request.transfer.process`: evaluated on every request during transfer establishment between two control plane
-  runtimes. Not relevant for end users.
-- `request.catalog`: evaluated upon an incoming catalog request. Not relevant for end users.
+- `approval.contract.negotiation`: evaluated by the provider on a contract request, when
+  [negotiation approval](../../../for-adopters/control-plane/policy-engine/negotiation-approval/_index.md) is enabled.
+  Decides whether the negotiation is held for a manual approval.
+- `policy.monitor`: evaluated periodically by the [policy monitor](../policy-monitor.md) for the running transfer
+  processes. Terminates a transfer process whose agreement policy is not fulfilled anymore.
 
 A policy scope is a string that is used for two purposes:
 
@@ -430,7 +430,8 @@ By default, ODRL policies are validated only in their structure (e.g. fields mis
 version of EDC an additional layer of validation has been introduced which leverages the `PolicyEngine` configuration in the `runtime` as described [above](#22-policy-scopes-and-bindings)
 in order to have a more domain-specific validation. 
 
-Two APIs were added currently under `v3.1alpha`: 
+Two Management API endpoints expose it (`/v4/policydefinitions/{id}/…` and
+`/v5/participants/{participantContextId}/policydefinitions/{id}/…`):
 
 - Validate
 - Evaluation Plan
@@ -491,7 +492,7 @@ and let's assume that we didn't bind the policy to any function or scope, the ou
 
 Since the `leftOperand` is not bound to a scope and there is no function associated to it within any scope, we can deduce that the constraint will be filtered during evaluation.
 
-The kind validation can be called using the `/v3.1alpha/policydefinitions/{id}/validate` or can be
+The kind validation can be called using `POST …/policydefinitions/{id}/validate` or can be
 enabled by default on policy definition creation.
 
 > The setting is `edc.policy.validation.enabled` and is set to `false` by default
@@ -564,6 +565,12 @@ which outlines two issues that would cause the constraint to be filtered out dur
 ### 2.6 Bundled policy functions
 
 #### 2.6.1 Contract expiration function
+
+The `ContractExpiryCheckFunction` evaluates the `inForceDate` constraint (`https://w3id.org/edc/v0.0.1/ns/inForceDate`)
+in the `transfer.process` and `policy.monitor` scopes: a transfer process can only be started while the contract
+agreement is in force, and the [policy monitor](../policy-monitor.md) terminates it once the agreement expires. The
+supported forms of the constraint (duration, fixed date, start and end) are described in the
+[adopters manual](../../../for-adopters/control-plane/policy-engine/_index.md#in-force-policy).
 
 ### 2.7 Common Expression Language (CEL) policy functions
 

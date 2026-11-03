@@ -8,8 +8,13 @@ weight: 70
 
 In the Maven/Gradle world, _bills-of-material_ are meta-modules with the sole purpose of declaring dependencies onto other modules. This greatly reduces the number of dependencies a developer needs to declare. By simply referencing the BOM module, all transitive dependencies are also referenced. The Eclipse Dataspace Components project [declares several BOMs](https://search.maven.org/search?q=g:org.eclipse.edc%20AND%20bom). The most important ones are listed here:
 
-- `controlplane-base-bom`: base BOM for an EDC control plane without an `IdentityService` implementation. Attempting to run this directly will result in an exception
+- `controlplane-base-bom`: base BOM for a single participant ("classic") EDC control plane without an `IdentityService` implementation. Attempting to run this directly will result in an exception
 - `controlplane-dcp-bom`: controlplane that uses [DCP](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol) as identity system
+- `controlplane-virtual-base-bom`: base BOM for a multi-participant ("virtual") control plane, with the v5 Management API, [participant contexts](../control-plane/participant-contexts/_index.md), dataspace profiles, CEL and partners, and task-based state machines
+- `controlplane-virtual-poll-base-bom`: the same, with the poll-based state machines instead of the task-based ones
+- `controlplane-virtual-feature-sql-bom`, `controlplane-virtual-feature-dcp-bom`, `controlplane-virtual-feature-nats-bom`: SQL persistence, DCP, and the NATS publishers and subscribers of the task-based state machines for the multi-participant control plane
+
+The single participant and the multi-participant BOMs can't be combined in one runtime.
 
 **FederatedCatalog:**
 
@@ -19,8 +24,9 @@ In the Maven/Gradle world, _bills-of-material_ are meta-modules with the sole pu
 **IdentityHub:**
 
 - `identityhub-base-bom`: base BOM for IdentityHub. No DCP modules included
-- `identityhub-bom`: default IdentityHub runtime image including DCP. Does not include/embed the SecureTokenService (STS).
-- `identityhub-with-sts-bom`: IdentityHub runtime that has a SecureTokenService (STS) embedded.
+- `identityhub-bom`: default IdentityHub runtime including DCP and the embedded SecureTokenService (STS)
+- `identityhub-oauth2-bom`: IdentityHub whose Identity API is secured with OAuth2 tokens instead of API keys
+- `issuerservice-base-bom`, `issuerservice-bom`, `issuerservice-oauth2-bom`: the same for the IssuerService
 
 In addition, most components also provide a `*-feature-sql-bom` BOM, which simply adds SQL persistence for all related entities, for example Assets, ContractDefinitions, etc. in the control plane BOM.
 
@@ -158,15 +164,13 @@ Datasets are created from assets. The same is true for linked catalogs. Adding t
   ],
   "@id": "subcatalog-id",
   "@type": "CatalogAsset",
-  "properties": {...},
-  "dataAddress": {
-    "type": "HttpData",
-    "baseUrl": "https://foo-industries.com/subcatalog"
+  "properties": {
+    "http://www.w3.org/ns/dcat#endpointURL": "https://foo-industries.com/subcatalog"
   }
 }
 ```
 
-There are two things to note. First, the `@type` is set to CatalogAsset (which Json-Ld expands to `https://w3id.org/edc/v0.0.1/ns/CatalogAsset`). Second, the `baseUrl` of the data address is set to the sub-catalog's **_publicly accessible_** URL.
+There are two things to note. First, the `@type` is set to CatalogAsset (which Json-Ld expands to `https://w3id.org/edc/v0.0.1/ns/CatalogAsset`). Second, the `dcat:endpointURL` property is set to the sub-catalog's **_publicly accessible_** URL. (Older versions read it from the `baseUrl` of the asset's `dataAddress`, which still works but is deprecated.)
 
 The next step in creating a sub-catalog is to decide on access control, that is, which clients can see the sub-catalog. Recall that this is done with a contract definition. A contract definition can have an empty policy ("allow all") or require specific credentials. It can also apply to (select) all sub-catalogs, sub-catalogs containing a specified property value, or a specific sub-catalog. The following contract definition applies an access policy and selects the previous sub-catalog:
 
