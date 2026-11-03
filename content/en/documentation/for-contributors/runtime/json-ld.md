@@ -182,9 +182,8 @@ The input JSON would look like this:
       "sw:webpage": "https://death.star"
     }
   },
-  "dataAddress": {
-    "@type": "DataAddress",
-    "type": "myType"
+  "dataplaneMetadata": {
+    "profiles": [ "myType" ]
   }
 }
 ```
@@ -208,9 +207,8 @@ this:
     },
     "id": "79d9c360-476b-47e8-8925-0ffbeba5aec2"
   },
-  "dataAddress": {
-    "@type": "DataAddress",
-    "type": "myType"
+  "dataplaneMetadata": {
+    "profiles": [ "myType" ]
   },
   "@context": {
     "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
@@ -259,9 +257,8 @@ JSON-LD:
     },
     "id": "79d9c360-476b-47e8-8925-0ffbeba5aec2"
   },
-  "dataAddress": {
-    "@type": "DataAddress",
-    "type": "myType"
+  "dataplaneMetadata": {
+    "profiles": [ "myType" ]
   },
   "@context": {
     "@vocab": "https://w3id.org/edc/v0.0.1/ns/",
@@ -325,9 +322,8 @@ the remote context `http://w3id.org/starwars/context.jsonld`:
     },
     "id": "79d9c360-476b-47e8-8925-0ffbeba5aec2"
   },
-  "dataAddress": {
-    "@type": "DataAddress",
-    "type": "myType"
+  "dataplaneMetadata": {
+    "profiles": [ "myType" ]
   },
   "@context": [
     "http://w3id.org/starwars/context.jsonld",

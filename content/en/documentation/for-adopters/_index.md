@@ -83,13 +83,14 @@ specific instances termed `Management Domains`.
 EDC was designed with the philosophy that one size does not fit all. Before deploying an EDC-powered data sharing
 ecosystem, you'll need to build customizations and bundle them into one or more distributions. Specifically:
 
-- **Policies** - Create a set of policies for data access and usage control. EDC adopts a code-first approach, which
-  involves writing *policy functions*.
+- **Policies** - Create a set of policies for data access and usage control. Constraints are evaluated by *policy
+  functions*, written in Java, or by [CEL expressions](./control-plane/policy-engine/cel/_index.md) managed through the
+  Management API.
 - **Verifiable Credentials** - Define a set of W3C Verifiable Credentials for your use cases that your policy functions
   can process. For example, a credential that identifies a particular partner type.
-- **Data transfer types** - Define a set of data transfer technologies or types that must be supported. For example,
-  choose out-of-the-box support for HTTP, S3-based transfers, or Kafka. Alternatively, you can select your preferred
-  wire protocol and implement a custom data plane.
+- **Data transfer types** - Define a set of data transfer technologies or types that must be supported, e.g. HTTP,
+  S3-based transfers or Kafka, and the [data planes](./data-plane/_index.md) that implement them, existing ones or
+  built with the Data Plane SDKs.
 - **Backend connectivity** - You may need to integrate EDC components with back-office systems. This is done by writing
   custom extensions.
 

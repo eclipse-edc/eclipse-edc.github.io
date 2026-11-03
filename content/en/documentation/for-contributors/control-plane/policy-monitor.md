@@ -17,8 +17,10 @@ The data plane also gets notified through the [data plane signaling](../data-pla
 
 Implementors that want a [Policy function](./entities.md#23-policy-evaluation-functions) to be evaluated at the policy monitor layer need to bind such function to the `policy.monitor` scope.
 
-Note that because the policy evaluation happens in the background, the `PolicyContext` does not contain `ParticipantAgent` as context data. This means that the Policy Monitor cannot evaluate policies that involve VerifiableCredentials.
+The policy evaluation happens in the background, without a request of the consumer. The `PolicyMonitorContext` available for functions in the `policy.monitor` scope contains:
 
-Currently, the only information published in the `PolicyContext` available for functions in the `policy.monitor` scope are the [`ContractAgreement`](./entities.md#5-contract-agreements), and the `Instant` at the time of the evaluation.
+- the [`ContractAgreement`](./entities.md#5-contract-agreements) and the `Instant` at the time of the evaluation;
+- a `ParticipantAgent` rebuilt from the agreement: its identity is the consumer's, and its claims are the ones of the consumer's verified credentials stored with the agreement when it was reached. Functions that check credentials therefore evaluate the credentials the consumer presented at that time; they are not requested again;
+- the participant context the transfer belongs to, so that [CEL expressions](../../for-adopters/control-plane/policy-engine/cel/_index.md) can use `ctx.agent` and `ctx.partners` in this scope too.
 
 A bundled example of a [Policy function](./entities.md#23-policy-evaluation-functions) that runs in the `policy.monitor` scope is the `ContractExpiryCheckFunction` which checks if the [contract agreement](./entities.md#5-contract-agreements) is not expired.

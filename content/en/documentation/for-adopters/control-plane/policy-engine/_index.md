@@ -149,7 +149,7 @@ and denoted with a `DOT` notation. A rule bound to a parent context will be eval
 
 ### Designing for Optimal Policy Performance
 
-Be careful when implementing policy functions, particularly those bound to the catalog request scope (`request.catalog`),
+Be careful when implementing policy functions, particularly those bound to the catalog scope (`catalog`),
 which may involve evaluating a large set of policies in the course of a synchronous request. Policy functions should be
 efficient and avoid unnecessary remote communication. When a policy function makes a database call or invokes a
 back-office system (e.g., for a security check), consider introducing a caching layer to improve performance if testing

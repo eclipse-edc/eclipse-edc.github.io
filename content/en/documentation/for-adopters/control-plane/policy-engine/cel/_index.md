@@ -19,6 +19,7 @@ weight: 20
     * [Available functions](#available-functions)
   * [End-to-end example](#end-to-end-example)
   * [Configuration](#configuration)
+  * [Partners](#partners)
   * [Extending with custom functions](#extending-with-custom-functions)
 <!-- TOC -->
 
@@ -349,6 +350,12 @@ CEL adds a single configuration setting, and only when the SQL store is used:
 | Setting                          | Default   | Description                                    |
 |----------------------------------|-----------|------------------------------------------------|
 | `edc.sql.store.cel.datasource`   | `default` | The datasource used by the SQL expression store |
+
+## Partners
+
+In multi-participant runtimes, `ctx.partners` gives expressions access to the partners and partner groups of the
+participant context, e.g. `ctx.partners.byIdentity(ctx.agent.id).inGroup('gold')`, see
+[Partners and Partner Groups](../partners/_index.md).
 
 ## Extending with custom functions
 

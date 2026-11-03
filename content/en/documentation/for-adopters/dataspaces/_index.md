@@ -16,7 +16,7 @@ After reading this document, we recommend consulting the DSP and DCP specificati
 
 One of the most important things to understand is how identities work in a dataspace and EDC. A participant has a single identity, which is a URI. EDC supports multiple identity systems, including OAuth2 and the [Decentralized Claims Protocol (DCP).](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol) If DCP is used, the identity will be a Web DID.
 
-An EDC component, such as a control plane, acts as a *participant agent*; in other words, it is a system that runs on behalf of a participant. Therefore, each component will use a single identity. This concept is important and nuanced. Let's consider several scenarios.
+An EDC component, such as a control plane, acts as a *participant agent*; in other words, it is a system that runs on behalf of a participant. Therefore, each participant served by a component uses a single identity: a single participant runtime has one identity, and a multi-participant runtime hosts several [participant contexts](../control-plane/participant-contexts/_index.md), each with its own identity. This concept is important and nuanced. Let's consider several scenarios.
 
 #### Simple Scenarios
 ##### Single Deployment

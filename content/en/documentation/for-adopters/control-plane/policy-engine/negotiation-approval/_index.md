@@ -192,8 +192,8 @@ The contract policy then references the same left operand ([policy.approval.json
 
 A request from `did:web:partner-a.example.com` is agreed automatically, any other counterparty is held.
 
-If partners and partner groups are available in the runtime, the same rule can be expressed without hard-coding
-identities:
+If [partners and partner groups](../partners/_index.md) are available in the runtime, the same rule can be expressed
+without hard-coding identities:
 
 ```
 ctx.partners.byIdentity(ctx.agent.id).inGroup('trusted')

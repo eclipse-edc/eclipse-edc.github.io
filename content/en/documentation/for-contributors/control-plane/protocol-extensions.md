@@ -68,7 +68,12 @@ which handle respectively `Catalog`, `ContractNegotiation` and `TransferProcess`
 
 ## 2. DSP protocol implementation
 
-The [Dataspace protocol](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol) implementation is available under the `data-protocol/dsp` subfolder in the [Connector](https://github.com/eclipse-edc/Connector) repository and it is identified by the key `dataspace-protocol-http`.
+The [Dataspace protocol](https://eclipse-dataspace-protocol-base.github.io/DataspaceProtocol/) implementation is available under the `data-protocols/dsp` subfolder in the [Connector](https://github.com/eclipse-edc/Connector) repository. EDC 1.0 implements DSP `2025-1` only (the versions `08` and `2024/1` were removed), identified by the protocol key `dataspace-protocol-http:2025-1`:
+
+- `dsp-2025`: the endpoints of a single participant runtime, under `/2025-1/catalog`, `/2025-1/negotiations` and `/2025-1/transfers`;
+- `dsp-virtual`: the endpoints of a multi-participant runtime, under `/{participantContextId}/{profileId}/…`, where the [dataspace profile](../../for-adopters/control-plane/dataspace-profiles/_index.md) determines the protocol version, binding and JSON-LD namespace of the exchange;
+- `dsp-version`: the version metadata, `/.well-known/dspace-version` (`/{participantContextId}/.well-known/dspace-version` in a multi-participant runtime);
+- `dsp-core`, `dsp-lib`, `dsp-spi`, `dsp-http-spi`: the shared dispatcher, transformers and SPIs.
 
 It extends the `RemoteMessageDispatcher` with the interface `DspHttpRemoteMessageDispatcher` (`dsp-spi`), which adds an additional method for registering message [handlers](#21-remotemessage-handlers).
 
@@ -97,4 +102,4 @@ Each `dsp-*-http-api` module exposes its own [API Controllers](../runtime/servic
 
 ### 2.2 `RemoteMessage` transformers
 
-Each `dsp-*-transform` module registers in the DSP API context [`Transformers`](./programming-primitives.md#2-transformers) for mapping JSON-LD objects from and to `RemoteMessage`s.
+Each `dsp-*-transform` module registers in the DSP API context [`Transformers`](../runtime/programming-primitives.md#2-transformers) for mapping JSON-LD objects from and to `RemoteMessage`s.

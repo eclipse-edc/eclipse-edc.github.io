@@ -15,6 +15,7 @@ weight: 30
   * [Catalog Generation](#catalog-generation)
     * [Designing for Optimal Catalog Performance](#designing-for-optimal-catalog-performance)
   * [Contract Negotiations](#contract-negotiations)
+    * [Retiring Contract Agreements](#retiring-contract-agreements)
     * [Working with Asynchronous Messaging and Events](#working-with-asynchronous-messaging-and-events)
     * [Reliable Messaging](#reliable-messaging)
   * [Transfer Processes](#transfer-processes)
@@ -41,8 +42,10 @@ EDC is designed to handle all general forms of data. It's important to note that
 
 The Management API is a RESTful interface for client applications to interact with the control plane. All client
 operations described in this section use the Management API. We won't cover the API in detail here since there is an
-OpenAPI definition. The API can be secured using an authentication key or third-party OAuth2 identity provider, but it
-is important to note that it should never be exposed over the Internet or other non-trusted networks.
+OpenAPI definition. The API is secured with an API key (v4, single participant runtimes) or with OAuth2 tokens and
+scopes (v5, multi-participant runtimes), see [Management API](./management-api/_index.md), but it is important to note
+that it should never be exposed over the Internet or other non-trusted networks. A runtime can host several
+participants, see [Participant Contexts](./participant-contexts/_index.md).
 
 The openapi documentation is available following this link:
 https://eclipse-edc.github.io/Connector/openapi/management-api/
@@ -363,6 +366,15 @@ requests from unknown counterparties. Which negotiations need approval is decide
 [Contract Negotiation Approval](./policy-engine/negotiation-approval/_index.md).
 
 EDC implements DSP message exchanges using a reliable quality of service. That is, all message operations and state machine transitions are performed reliably in a transaction context. EDC will only commit a state machine transition if a message is successfully acknowledged by the counterparty. If a send operation fails, the associated transition will be rolled back, and the message will be resent. As with all reliable messaging systems, EDC operations are idempotent.
+
+### Retiring Contract Agreements
+
+A provider can *retire* a contract agreement it no longer wants to honour, e.g. when the business relationship ends,
+with `POST /v4/contractagreements/{id}/retire` (or `POST /v5/participants/{participantContextId}/contractagreements/{id}/retire`)
+and a reason. A retired agreement can't be used to start new transfer processes, and the
+[policy monitor](#policy-monitor) terminates the running ones. Retirement can be undone with `…/unretire`, and emits the
+events `contract.agreement.retired` and `contract.agreement.unretired`. See the
+[contributors manual](../../for-contributors/control-plane/entities/_index.md#51-retiring-a-contract-agreement) for details.
 
 ### Working with Asynchronous Messaging and Events
 
