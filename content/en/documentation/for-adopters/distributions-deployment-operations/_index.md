@@ -10,7 +10,6 @@ In the Maven/Gradle world, _bills-of-material_ are meta-modules with the sole pu
 
 - `controlplane-base-bom`: base BOM for an EDC control plane without an `IdentityService` implementation. Attempting to run this directly will result in an exception
 - `controlplane-dcp-bom`: controlplane that uses [DCP](https://github.com/eclipse-dataspace-dcp/decentralized-claims-protocol) as identity system
-- `dataplane-base-bom`: runnable data plane image that contains HTTP transfer pipelines
 
 **FederatedCatalog:**
 
@@ -29,7 +28,7 @@ In addition, most components also provide a `*-feature-sql-bom` BOM, which simpl
 
 The [Modules, Runtimes, and Components](../modules-runtimes-components/_index.md) chapter explained how EDC is built on a module system. Runtimes are assembled to create a _component_ such as a control plane, a data plane, or an identity hub. EDC itself does not ship runtime distributions since it is the job of downstream projects to bundle features and capabilities that address the specific requirements of a dataspace or organization. However, EDC provides the [Basic Template Repository](https://github.com/eclipse-edc/Template-Basic) to facilitate creating extensions and runtime distributions.
 
-The EDC Basic Template Repository can be forked and used as a starting point for building an EDC distribution. You will need to be familiar with Maven Repositories and [Gradle](https://gradle.org/). Once the repository is forked, custom extensions can be added and included in a runtime. The template is configured to create two runtime Docker images: a control plane and data plane. These images are designed to be deployed as separate processes, such as two Kubernetes `Replicasets`.
+The EDC Basic Template Repository can be forked and used as a starting point for building an EDC distribution. You will need to be familiar with Maven Repositories and [Gradle](https://gradle.org/). Once the repository is forked, custom extensions can be added and included in a runtime. The template is configured to create runtime Docker images, which are designed to be deployed as separate processes, such as Kubernetes `Replicasets`. EDC doesn't provide a data plane: data planes are separate applications that implement the [Data Plane Signaling](https://eclipse-dataplane-signaling.github.io/dataplane-signaling) protocol (see [Data Plane](../data-plane/_index.md)).
 
 > EDC distributions can be created using other build systems if they support Maven dependencies since EDC modules are released to Maven Central. Using Gradle as the build system for your distribution has several advantages. One is that the distribution project can incorporate [EDC Gradle Plugins](https://github.com/eclipse-edc/GradlePlugins) such as the Autodoc and Build plugins to automate and remove boilerplate tasks.
 

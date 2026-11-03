@@ -1,8 +1,8 @@
 ---
 title: Data Plane
 description: >
-  Describes how the EDC integrates with off-the-shelf protocols such as `HTTP`, `Kafka`, cloud object storage, and other
-  technologies to transfer data between parties.
+  Describes how the EDC control plane works with data planes, which transfer the data between parties using protocols
+  such as `HTTP`, `Kafka` or cloud object storage.
 weight: 40
 ---
 
@@ -13,44 +13,65 @@ the data consumer. This section provides an overview of how data planes work and
 
 ## Separation of Concerns
 
-Although a data plane can be collocated in the same process as a control plane, this is not a recommended setup. Typically,
-a data plane component is deployed as a separate set of instances to an independent environment such as a Kubernetes cluster.
-This allows the data plane to be operated and scaled independently of the control plane. At runtime, a data plane must
-register with a control plane, which in turn directs the data plane using the *Data Plane Signaling API*. EDC does not
-ship with an out-of-the-box data plane. Rather, it provides the *Data Plane Framework (DPF)*, a platform for building
-custom data planes. You can choose to start with the DPF or build your own data plane using your programming language
-of choice. In either case, understanding the data plane registration process and Signaling API are the first steps.
+A data plane is a separate component from the control plane, deployed and scaled on its own, e.g. as a separate set of
+instances in a Kubernetes cluster. The two talk to each other through the
+[Data Plane Signaling (DPS)](https://eclipse-dataplane-signaling.github.io/dataplane-signaling) protocol: at runtime, a data
+plane registers with a control plane, which in turn directs the data plane through DPS.
+
+EDC doesn't include a data plane. Any application that implements DPS can be one:
+
+- an existing data plane that speaks DPS, such as
+  [`siglet`](https://github.com/eclipse-dataplane-core/dsdk-facet-rs/tree/main/siglet);
+- a data plane of your own, built with one of the [Data Plane SDKs](https://github.com/eclipse-dataplane-core)
+  ([Java](https://github.com/eclipse-dataplane-core/dataplane-sdk-java),
+  [Go](https://github.com/eclipse-dataplane-core/dataplane-sdk-go),
+  [Rust](https://github.com/eclipse-dataplane-core/dataplane-sdk-rust)), or directly on the specification.
+
+In either case, understanding the data plane registration process and the signaling flow are the first steps.
 
 ## Data Plane Registration
 
 In the EDC model, control planes and data planes are dynamically associated. At startup, a data plane registers itself
-with a control plane using its component ID. Registration is idempotent and persistent and made available to all
-clustered control plane runtimes via persistent storage. After a data plane is registered, the control plane
-periodically sends a heartbeat and culls the registration if the data plane is unavailable.
+with the control plane through the Management API (`PUT /v4/dataplanes`, or
+`PUT /v5/participants/{participantContextId}/dataplanes` for a participant context). Registration is idempotent and
+persistent, and made available to all clustered control plane runtimes via persistent storage. A data plane that shuts
+down for good deregisters itself (`DELETE`). The control plane doesn't check whether a registered data plane is
+available: making data planes available, e.g. by running several replicas behind a load balancer, is the job of the
+infrastructure.
 
-The data plane registration includes metadata about its capabilities, including:
-- The supported wire protocols and supported transfer types. For example, "HTTP-based consumer pull"  or "S3-based provider push"
-- The supported data source types.
+The registration includes the data plane's:
+- endpoint, at which the control plane sends it signals;
+- supported transfer types, i.e. the DPS profiles it implements, for example `HttpData-PULL`;
+- labels, which assets can require of the data plane that transfers them;
+- authorization profile, see [Securing the Signaling API](#securing-the-signaling-api).
 
-The control plane uses data plane metadata for two purposes. First, it is used to determine which data transfer types
-are available for an asset when generating a catalog. Second, the metadata is used to select a data plane when a
-transfer process is requested.
+The control plane uses this metadata for two purposes. First, it is used to determine which transfer types are available
+for an asset when generating a catalog: those of the registered data planes or, if the asset lists profiles in its
+`dataplaneMetadata`, those of the data planes that support one of them. Second, it is used to select a data plane when
+a transfer process is requested: one that supports the transfer type and has all the labels the asset requires.
 
 ## Data Plane Signaling
 
-A control plane communicates with a data plane through a RESTful interface called the Data Plane Signaling API. Custom
-data planes can be written that integrate with the EDC control plane by implementing the registration protocol and the
-signaling API.
+A control plane communicates with a data plane through the RESTful interfaces defined by DPS: the control plane sends
+signals to the data plane, and the data plane notifies the control plane of the progress of a transfer. Any data plane
+that implements DPS and registers with the control plane can be used.
 
 The Data Plane Signaling flow is shown below:
 
 ![data-plane-signaling](data-plane-signaling.png)
 
-When a transfer process is started, and a data plane is selected, a start message will be sent. If the transfer process
-is a consumer-pull type where data is accessed by the consumer, the response will contain an Endpoint Data Reference
-(EDR) that contains the coordinates to the data and an access token if one is required. The control plane may send
-additional signals, such as SUSPEND and RESUME, or TERMINATE, in response to events. For example, the control plane
-policy monitor could send a SUSPEND or TERMINATE message if a policy violation is encountered.
+When a transfer process is requested, the consumer control plane selects a data plane and sends it a prepare message.
+The provider control plane, once it accepts the request, selects a data plane and sends it a start message. A data plane
+answers with the *data address* of the transfer when there is one: for a pull transfer, the provider data plane returns
+the endpoint (and the credentials, if needed) at which the consumer gets the data; for a push transfer, the consumer data
+plane returns the destination the provider pushes the data to. The control planes don't create or interpret data
+addresses, they pass them to the counter-party through the Dataspace Protocol, and the consumer control plane hands the
+provider's data address to its data plane with a started message.
+
+A data plane can also answer asynchronously, and report the outcome later through the control plane's Signaling API
+(prepared, started). The control plane may send additional signals, such as SUSPEND and RESUME, or TERMINATE, in
+response to events. For example, the control plane policy monitor could send a TERMINATE message if a policy violation
+is encountered.
 
 ### Securing the Signaling API
 
@@ -68,12 +89,3 @@ on the authorization profile a data plane provides when it registers:
 Expose the Signaling API only on the internal network. Register the data planes with an authorization profile when the
 Signaling API can be reached from outside that network, or when the data planes of several participant contexts share
 it, as in a multi-tenant deployment.
-
-## The Data Plane Framework (DPF)
-
-EDC includes a framework for building custom data planes called the DPF. DPF supports end-to-end streaming transfers
-(i.e., data content is streamed rather than materialized in memory) for scalability and both pull- and push- style
-transfers. The framework has extensibility points for supporting different data sources and sinks (e.g., S3, HTTP,
-Kafka) and can perform direct streaming between different source and sink types.
-
-The [EDC samples](https://github.com/eclipse-edc/Samples) contain examples of how to use and customize the DPF.

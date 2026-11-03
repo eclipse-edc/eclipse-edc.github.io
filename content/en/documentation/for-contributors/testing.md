@@ -240,15 +240,14 @@ class YourEndToEndTest {
             // all modules to be put on the runtime classpath
             ":core:common:connector-core",
             ":core:control-plane:control-plane-core",
-            ":core:data-plane-selector:data-plane-selector-core",
-            ":extensions:control-plane:transfer:transfer-data-plane-signaling",
+            ":data-protocols:data-plane-signaling:data-plane-signaling-core",
             ":extensions:common:iam:iam-mock",
             ":extensions:common:http",
-            ":extensions:common:api:control-api-configuration")
+            ":extensions:common:api:management-api-configuration")
             // the runtime configuration is passed through a lazy provider
             .configurationProvider(() -> ConfigFactory.fromMap(Map.of(
-                    "web.http.control.port", String.valueOf(getFreePort()),
-                    "web.http.control.path", "/control"))
+                    "web.http.management.port", String.valueOf(getFreePort()),
+                    "web.http.management.path", "/management"))
             )
     );
     

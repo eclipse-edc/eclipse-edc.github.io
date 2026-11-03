@@ -42,16 +42,9 @@
   }
   state "COMPLETED" as COMPLETED_consumer {
   }
-  state "provision" as provision_consumer {
-      state "PROVISIONING" as PROVISIONING_consumer {
-      }
-      state "PROVISIONED_REQUESTED" as PROVISIONED_REQUESTED_consumer {
-      }
-      state "PROVISIONED" as PROVISIONED_consumer {
-      }
-      PROVISIONING_consumer --> PROVISIONED_REQUESTED_consumer : async provisioning
-      PROVISIONED_REQUESTED_consumer --> PROVISIONED_consumer
-      PROVISIONING_consumer --> PROVISIONED_consumer
+  state "PREPARATION_REQUESTED" as PREPARATION_REQUESTED_consumer {
+  }
+  state "STARTUP_REQUESTED" as STARTUP_REQUESTED_consumer {
   }
   state "TERMINATING" as TERMINATING_consumer {
   }
@@ -104,31 +97,22 @@
   }
 
   [*] --> INITIAL_consumer
-  INITIAL_consumer --> PROVISIONING_consumer
-  PROVISIONED_consumer --> REQUESTING
+  INITIAL_consumer --> REQUESTING : data plane prepared
+  INITIAL_consumer --> PREPARATION_REQUESTED_consumer : async prepare
+  PREPARATION_REQUESTED_consumer --> REQUESTING : data plane notifies **prepared**
   REQUESTING --> REQUESTED
   REQUESTING -[dashed]-> INITIAL_provider : sends\n**TransferRequestMessage**\nmessage
 
+  REQUESTED --> STARTUP_REQUESTED_consumer : receives\n**TransferStartMessage**
+  STARTUP_REQUESTED_consumer --> STARTED_consumer : data plane notified **started**
   REQUESTED -[hidden]-> STARTING_consumer : used for layout
   STARTING_consumer --> STARTED_consumer
 
   STARTED_consumer --> COMPLETING_consumer
 
   COMPLETING_consumer --> COMPLETED_consumer
-  COMPLETED_consumer --> DEPROVISIONING
 
   TERMINATING_consumer --> TERMINATED_consumer
   TERMINATING_consumer -[dashed]-> TERMINATED_provider : sends\n**TransferTerminationMessage**\nmessage
-  TERMINATED_consumer --> DEPROVISIONING
-
-state deprovision {
-    state DEPROVISIONING {
-    }
-    state DEPROVISIONED {
-    }
-    DEPROVISIONING --> DEPROVISIONED_REQUESTED : async provisioning
-    DEPROVISIONED_REQUESTED --> DEPROVISIONED
-    DEPROVISIONING --> DEPROVISIONED
-}
 
 @enduml

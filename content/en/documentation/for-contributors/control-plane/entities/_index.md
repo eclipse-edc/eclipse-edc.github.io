@@ -33,11 +33,10 @@ weight: 10
     * [7.1 Transfer and data flows types](#71-transfer-and-data-flows-types)
       * [7.1.1 Consumer Pull](#711-consumer-pull)
       * [7.1.2 Provider Push](#712-provider-push)
-      * [7.1.2 Finite and Non-Finite Data](#712-finite-and-non-finite-data)
-    * [7.2 About Data Destinations](#72-about-data-destinations)
+      * [7.1.3 Finite and Non-Finite Data](#713-finite-and-non-finite-data)
+    * [7.2 About data addresses](#72-about-data-addresses)
     * [7.3 Transfer process callbacks](#73-transfer-process-callbacks)
-  * [8 Endpoint Data References](#8-endpoint-data-references)
-  * [9 Querying with `QuerySpec` and `Criterion`](#9-querying-with-queryspec-and-criterion)
+  * [8 Querying with `QuerySpec` and `Criterion`](#8-querying-with-queryspec-and-criterion)
 <!-- TOC -->
 
 ## 1. Assets
@@ -62,28 +61,39 @@ A very simplistic `Asset` could look like this:
   "privateProperties": {
     "secretKey": "this is secret information, never tell it to the dataspace!"
   },
-  "dataAddress": {
-    "type": "HttpData",
-    "baseUrl": "http://localhost:8080/test"
+  "dataplaneMetadata": {
+    "profiles": [ "HttpData-PULL" ],
+    "labels": [ "eu" ],
+    "properties": {
+      "baseUrl": "http://localhost:8080/test"
+    }
   }
 }
 ```
 
-The `Asset` also contains a `DataAddress` object, which can be understood as a "pointer into the physical world". It
-contains information about where the asset is physically located. This could be an HTTP URL, or a complex object. In the
-S3 example, that `DataAddress` might contain the bucket name, region and potentially other information. Notice that the
-_schema_ of the `DataAddress` will depend on where the data is physically located, for instance a `HttpDataAddress` has
-different properties from an S3 `DataAddress`. More precisely, Assets and DataAddresses are _schemaless_, so there is no
-schema enforcement beyond a very basic validation. Read [this document](./service-layers.md) to learn about plugging in
-custom validators.
+The `Asset` also contains a `dataplaneMetadata` object, which tells the control plane which data planes can transfer it
+and tells the data plane where the data is:
+
+- `profiles`: the transfer types the asset is offered with (see [Catalog](#6-catalog)). Without profiles, the asset is
+  offered with the transfer types of all the registered data planes.
+- `labels`: labels the data plane that transfers the asset must have (see
+  [Data plane selection](../../data-plane/data-plane-signaling/_index.md#3-data-plane-selection)).
+- `properties`: a "pointer into the physical world", passed as `metadata` to the data plane when a transfer starts. It
+  could contain an HTTP URL, or for an S3 object the bucket name, region and potentially other information. The control
+  plane doesn't interpret it: its schema is defined by the data plane.
+
+Assets and their `dataplaneMetadata` are _schemaless_, so there is no schema enforcement beyond a very basic validation.
+Read [this document](../../runtime/service-layers.md) to learn about plugging in custom validators.
+
+> The `dataAddress` of an `Asset` is deprecated since 0.18.0: DPS data planes receive the `dataplaneMetadata` instead.
 
 A few things must be noted. First, while there isn't a _strict requirement_ for the `@id` to be a UUID, we highly
 recommend using the JDK `UUID` implementation.
 
-Second, _never_ store access credentials such as passwords, tokens, keys etc. in the `dataAddress` or even the
+Second, _never_ store access credentials such as passwords, tokens, keys etc. in the `dataplaneMetadata` or even the
 `privateProperties` object. While the latter does not get serialized over DSP, both properties are persisted in the
-database. Always use an HSM to store the credential, and hold a reference to the secret in the DataAddress. Checkout
-[the best practices](../contributor-handbook.md#4-development-best-practices) for details.
+database. Always use an HSM to store the credential, and hold a reference to the secret in the `dataplaneMetadata`.
+Checkout [the best practices](../../best-practices.md#27-store-sensitive-data-in-a-vault) for details.
 
 By design, Assets are extensible, so users can store any metadata they want in it. For example, the `properties` object
 could contain a simple string value, or it could be a complex object, following some custom schema. Be aware, that
@@ -264,8 +274,6 @@ scopes is not possible. Currently, the following scopes are defined:
 - `request.transfer.process`: evaluated on every request during transfer establishment between two control plane
   runtimes. Not relevant for end users.
 - `request.catalog`: evaluated upon an incoming catalog request. Not relevant for end users.
-- `provision.manifest.verify`: evaluated during the precondition check for resource provisioning. Only relevant in
-  advanced use cases.
 
 A policy scope is a string that is used for two purposes:
 
@@ -330,7 +338,7 @@ The same policy can be evaluated by different evaluation functions, if they are 
 As we've learned, for a policy to be evaluated at certain [points](#22-policy-scopes-and-bindings), we need to create
 a policy (duh!), bind the policy to a scope, create a [policy evaluation function](#23-policy-evaluation-functions),
 and we need to bind the function to the same scope. The standard way of registering and binding policies is done in an
-[extension](./extension-model.md). For example, here we configure our `HeadquarterFunction` so that it evaluates our
+[extension](../../runtime/extension-model.md). For example, here we configure our `HeadquarterFunction` so that it evaluates our
 `headquarter_location` function whenever someone tries to negotiate a contract:
 
 ```java
@@ -660,7 +668,7 @@ included in the definition, like an SQL `SELECT` statement. With that it is poss
 conditions (= access policy and contract policy) for a multitude of assets.
 
 Please note that creating an `assetSelector` may require knowledge about the shape of an Asset and can get complex
-fairly quickly, so be sure to read the chapter about [querying](#9-querying-with-queryspec-and-criterion).
+fairly quickly, so be sure to read the chapter about [querying](#8-querying-with-queryspec-and-criterion).
 
 Here is an example of a contract definition, that defines an access policy and a contract policy for assets `id1`, `id2`
 and `id3` that must contain the `"foo" : "bar"` property.
@@ -763,7 +771,7 @@ management API.
 ```
 
 The `counterPartyAddress` is the address where to send the `ContractRequestMessage` via the specified `protocol` (
-currently [`dataspace-protocol-http`](../contributor-handbook.md#28-protocol-extensions-dsp))
+currently [`dataspace-protocol-http`](../protocol-extensions.md))
 
 The `policy` should hold the same policy associated to the data offering chosen from the [catalog](#6-catalog), plus
 two additional properties:
@@ -773,7 +781,7 @@ two additional properties:
 
 In addition, the (optional) `callbackAddresses` array can be used to get notified about state changes of the
 negotiation. Read more on callbacks in the section
-about [events and callbacks](./service-layers.md#6-events-and-callbacks).
+about [events and callbacks](../../runtime/service-layers.md#6-events-and-callbacks).
 
 > Note: if the `policy` sent by the consumer differs from the one expressed by the provider, the contract negotiation
 > will fail and transition to a `TERMINATED` state.
@@ -984,9 +992,9 @@ participant filtering out those where the participant does not satisfy the acces
 therein.
 
 In order to determine how an asset can be _distributed_, the resolver requires knowledge about the data planes that are
-available. It uses the [Dataplane Signaling Protocol](../contributor-handbook.md#210-data-plane-signaling) to query them
-and construct the list of
-`Distributions` for an asset.
+available: the transfer types of the
+[registered data planes](../../data-plane/data-plane-signaling/_index.md#31-building-the-catalog), matched against the
+`profiles` of the asset's `dataplaneMetadata`, make up the list of `Distributions` for an asset.
 
 > For details about the FederatedCatalog, please refer to
 > its [documentation](https://github.com/eclipse-edc/FederatedCatalog/).
@@ -998,16 +1006,14 @@ through the system, they transition through several
 states ([`TransferProcessStates`](../../runtime/programming-primitives.md#1-state-machines)).
 
 Once a contract is [negotiated](#4-contract-negotiations) and an [agreement](#5-contract-agreements) is reached, the
-consumer connector may send a transfer initiate request to start the transfer. In the course of doing that, both parties
-may provision additional resources, for example deploying a
-temporary object store, where the provider should put the data. Similarly, the provider may need to take some
-preparatory steps, e.g. anonymizing the data before sending it out.
+consumer connector may send a transfer initiate request to start the transfer. The consumer control plane first asks
+its data plane to _prepare_ the data flow, and the provider control plane asks its data plane to _start_ it, both through
+[Data Plane Signaling](../../data-plane/data-plane-signaling/_index.md). A data plane may need to take some preparatory
+steps, for example deploying a temporary object store where the provider should put the data, or anonymizing the data
+before sending it out: it does so on its own, and may answer asynchronously, in which case the transfer process waits in
+`PREPARATION_REQUESTED` or `STARTUP_REQUESTED`.
 
-This is sometimes referred to as the _provisioning phase_. If no additional provisioning is needed, the transfer process
-simply transitions through the state with a NOOP.
-
-Once that is done, the transfer begins in earnest. Data is transmitted according to the `dataDestination`, that was
-passed in the initiate-request.
+Once that is done, the transfer begins in earnest, between the data planes, according to the transfer type.
 
 Once the transmission has completed, the transfer process will transition to the `COMPLETED` state, or - if an error
 occurred - to the `TERMINATED` state.
@@ -1035,8 +1041,11 @@ API:
   "counterPartyAddress": "http://provider-address",
   "contractId": "contract-id",
   "transferType": "transferType",
-  "dataDestination": {
-    "type": "data-destination-type"
+  "dataplaneMetadata": {
+    "labels": [ "eu" ],
+    "properties": {
+      "key": "value"
+    }
   },
   "privateProperties": {
     "private-key": "private-value"
@@ -1059,11 +1068,12 @@ API:
 where:
 
 - `counterPartyAddress`: the address where to send the `TransferRequestMessage` via the specified `protocol` (
-  currently [`dataspace-protocol-http`](../contributor-handbook.md#28-protocol-extensions-dsp))
+  currently [`dataspace-protocol-http`](../protocol-extensions.md))
 - `contractId`: the ID of a previously negotiated [contract agreement](#5-contract-agreements) which is a result of
   the [contract negotiation](#4-contract-negotiations) process.
-- [`transferType`](#71-transfer-and-data-flows-types) and the [`dataDestination`](#72-about-data-destinations)define
-  how and where the data transfer should happen.
+- [`transferType`](#71-transfer-and-data-flows-types) defines how the data transfer should happen.
+- `dataplaneMetadata`: the `labels` the consumer's data plane must have, and `properties` passed to it as `metadata`,
+  e.g. where a push transfer should put the data (see [About data addresses](#72-about-data-addresses)).
 - [`callbackAddresses`](#73-transfer-process-callbacks) custom hooks in order bo be notified about state transition of
   the transfer process.
 - `privateProperties`: custom properties not shared with the counter-party.
@@ -1071,68 +1081,51 @@ where:
 ### 7.1 Transfer and data flows types
 
 The transfer type defines the channel (Distribution) for the data transfer and it depends on the capabilities of
-the [data plane](../contributor-handbook.md#3-the-data-plane) if it can be fulfilled. The `transferType` available for a
+the [data planes](../../data-plane/_index.md) if it can be fulfilled. The `transferType` available for a
 data offering is available in the `dct:format` of the `Distribution` when inspecting the [catalog](#6-catalog) response.
 
 Each transfer type also characterizes the type of the flow, which can be either [pull](#711-consumer-pull)
-or [push](#712-provider-push) and it's data can be either [finite](#712-finite-and-non-finite-data)
-or [non-finite](#712-finite-and-non-finite-data)
+or [push](#712-provider-push) and it's data can be either [finite](#713-finite-and-non-finite-data)
+or [non-finite](#713-finite-and-non-finite-data)
 
 #### 7.1.1 Consumer Pull
 
-A pull transfer is when the consumer receives information (in the form of a `DataAddress`) on how to retrieve data from
-the Provider.
-Then it's up to the consumer to use this information for pulling the data.
+A pull transfer is when the consumer receives information (in the form of a data address) on how to retrieve data from
+the Provider. Then it's up to the consumer data plane to use this information for pulling the data.
 
-![Consumer Pull](transfer-data-plane-consumer-pull.png)
+![Consumer Pull](transfer-dps-consumer-pull.png)
 
 **Provider and consumer agree to a contract (not displayed in the diagram)**
 
-1. Consumer initiates the transfer process by sending a [
-   `TransferRequestMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#21-transfer-request-message)
-2. The Provider Control Plane retrieves the `DataAddress` of the actual data source and creates a`DataFlowStartMessage`.
-3. The Provider Control Plane asks the selector which Data Plane instance can be used for this data transfer
-4. The Selector returns an eligible Data Plane instance (if any)
-5. Provider Control Plane sends the `DataFlowStartMessage` to the selected Data Plane instance
-   through [data plane signaling](../contributor-handbook.md#210-data-plane-signaling) protocol.
-6. The Provider `DataPlaneManager` validates the incoming request and delegates to the `DataPlaneAuthorizationService`
-   the generation of `DataAddress`, containing the information on location and authorization for fetching the data
-7. The Provider Data Plane acknowledges the Provider control plane and attach the `DataAddress` generated.
-8. The Provider Control Plane notifies the start of the transfer attaching the `DataAddress` in the [
-   `TransferStartMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#22-transfer-start-message).
-9. The Consumer Control plane receives the `DataAddress` and dispatch it accordingly to the configured runtime. Consumer
-   can either decide to receive the `DataAddress` using the eventing
-   system [callbacks](#73-transfer-process-callbacks) using the `transfer.process.started` type, or use
-   the [EDRs](#8-endpoint-data-references) extensions for automatically store it on consumer control plane side.
-10. With the information in the `DataAddress` such as the `endpointUrl` and the `Authorization` data can be fetched.
-11. The Provider Data plane validates and authenticates the incoming request and retrieves the source `DataAddress`.
-12. The provider data plane proxies the validated request to the configured backend in the source `DataAddress`.
+1. The consumer initiates the transfer process through the Management API. The consumer control plane selects a data
+   plane and sends it a `prepare` message (not displayed in the diagram), then sends a `TransferRequestMessage` to the
+   provider.
+2. The provider control plane selects a data plane and sends it a `start` message through
+   [Data Plane Signaling](../../data-plane/data-plane-signaling/_index.md), with the `dataplaneMetadata` of the asset.
+3. The provider data plane creates the data address, i.e. the endpoint and the credentials with which the consumer
+   fetches the data, and returns it (in its answer, or later with a `started` notification). The provider control plane
+   sends it to the consumer in the `TransferStartMessage`.
+4. The consumer control plane hands the data address to its data plane with a `started` message. Applications can also
+   receive it through the [callbacks](#73-transfer-process-callbacks) of the `transfer.process.started` event.
+5. The consumer data plane fetches the data from the provider data plane, which validates the credentials it issued.
 
 #### 7.1.2 Provider Push
 
 A push transfer is when the Provider data plane initiates sending data to the destination specified by the consumer.
 
-![Provider Push](transfer-data-plane-provider-push.png)
+![Provider Push](transfer-dps-provider-push.png)
 
 **Provider and consumer agree to a contract (not displayed in the diagram)**
 
-1. The Consumer initiates the transfer process, i.e. sends [
-   `TransferRequestMessage`](https://docs.internationaldataspaces.org/ids-knowledgebase/v/dataspace-protocol/transfer-process/transfer.process.protocol#21-transfer-request-message)
-   with a destination [DataAddress](#72-about-data-destinations)
-2. The Provider Control Plane retrieves the `DataAddress` of the actual data source and creates a `DataFlowStartMessage`
-   with both source and destination `DataAddress`.
-3. The Provider Control Plane asks the selector which Data Plane instance can be used for this data transfer
-4. The Selector returns an eligible Data Plane instance (if any)
-5. The Provider Control Plane sends the `DataFlowStartMessage` to the selected Data Plane instance
-   through [data plane signaling](../contributor-handbook.md#210-data-plane-signaling) protocol.
-6. The Provider Data Plane validates the incoming request
-7. If request is valid, the Provider Data Plane returns acknowledgement
-8. The `DataPlaneManager` of the Provider Data Plane processes the request: it creates a `DataSource`/`DataSink`pair
-   based on the source/destination data addresses
-9. The Provider Data Plane fetches data from the actual data source (see `DataSource`)
-10. The Provider Data Plane pushes data to the consumer services (see `DataSink`)
+1. The consumer initiates the transfer process through the Management API. The consumer control plane selects a data
+   plane and sends it a `prepare` message.
+2. The consumer data plane returns the destination as data address (in its answer, or later with a `prepared`
+   notification). The consumer control plane sends it to the provider in the `TransferRequestMessage`.
+3. The provider control plane selects a data plane and sends it a `start` message with the `dataplaneMetadata` of the
+   asset and the consumer's data address.
+4. The provider data plane pushes the data to the destination.
 
-#### 7.1.2 Finite and Non-Finite Data
+#### 7.1.3 Finite and Non-Finite Data
 
 The characterization of the data applies to either `push` and `pull` transfers. Finite data transfers cause the transfer
 process to transition to the state `COMPLETED`, once the transmission has finished. For example a transfer of a single
@@ -1143,29 +1136,21 @@ in the `STARTED` state until it gets terminated by the consumer or the provider.
 or API endpoints.
 
 On the provider side transfer processes can also be terminated by
-the [policy monitor](../contributor-handbook.md#27-policy-monitor) that
+the [policy monitor](../policy-monitor.md) that
 periodically watches over the ongoing transfer and checks if the
 associated [contract agreement](#5-contract-agreements) still fulfills the contract [policy](#2-policies).
 
-### 7.2 About Data Destinations
+### 7.2 About data addresses
 
-A data destination is a description of where the consumer expects to find the data after the transfer completes. In a "
-provider-push" scenario this could be an object storage container, a directory on a file system, etc. In a
-"consumer-pull" scenario this would be a placeholder, that does not contain any information about the destination, as
-the provider "decides" which endpoint he makes the data available on.
+A data address describes where the data of a transfer is: in a "provider-push" scenario, the destination the consumer
+data plane provides, e.g. an object storage container or a directory on a file system; in a "consumer-pull" scenario,
+the endpoint and the credentials the provider data plane provides.
 
-A data address is a schemaless object, and the provider and the consumer need to have a common understanding of the
-required fields. For example, if the provider is supposed to put the data into a file share, the `DataAddress` object
-representing the data destination will likely contain the host URL, a path and possibly a file name. So both connectors
-need to be "aware" of that.
-
-The actual data transfer is handled by a [data plane](../contributor-handbook.md#3-the-data-plane) through extensions (
-called "sources" and "
-sinks"). Thus, the way to establish that "understanding" is to make sure that both parties have matching sources and
-sinks. That means, if a consumer asks to put the data in a file share, the provider must have the appropriate data plane
-extensions to be able to perform that transfer.
-
-If the provider connector does _not_ have the appropriate extensions loaded at runtime, the transfer process will fail.
+A data address is created and used only by the data planes. It is a schemaless object, and the provider and the consumer
+data planes need to have a common understanding of the required fields: if the provider is supposed to put the data into
+a file share, the data address will likely contain the host URL, a path and possibly a file name. The transfer type
+(the DPS profile) is the way to establish that "understanding": the provider offers an asset only with the transfer types
+its data planes support, and the consumer picks one of them in the transfer request.
 
 ### 7.3 Transfer process callbacks
 
@@ -1197,24 +1182,22 @@ Callbacks must be specified when requesting to initiate the transfer:
 
 Currently, we support the following events:
 
-- `transfer.process.deprovisioned`
-- `transfer.process.completed`
-- `transfer.process.deprovisioningRequested`
 - `transfer.process.initiated`
-- `transfer.process.provisioned`
-- `transfer.process.provisioning`
+- `transfer.process.preparationRequested`
+- `transfer.process.prepared`
 - `transfer.process.requested`
 - `transfer.process.started`
+- `transfer.process.suspended`
+- `transfer.process.resuming`
+- `transfer.process.completed`
 - `transfer.process.terminated`
 
 The connector's event dispatcher will send invoke the webhook specified in the `uri` field passing the event
 payload as JSON object.
 
-More info about events and callbacks can be found [here](./service-layers.md#6-events-and-callbacks).
+More info about events and callbacks can be found [here](../../runtime/service-layers.md#6-events-and-callbacks).
 
-## 8 Endpoint Data References
-
-## 9 Querying with `QuerySpec` and `Criterion`
+## 8 Querying with `QuerySpec` and `Criterion`
 
 Most of the entities can be queried with the `QuerySpec` object, which is a generic way of expressing limit, offset,
 sort and filters when querying a collection of objects managed by the EDC stores.
@@ -1245,7 +1228,7 @@ which filters by the `description` custom property being equals to `This asset`.
 with limit and p set to 1. Additionally a sorting strategy is in place by `createdAt` property in `descending` order (
 the default is `ASC`)
 
-> Note: Since custom properties are persisted in their [expanded form](./json-ld.md), we have to use
+> Note: Since custom properties are persisted in their [expanded form](../../runtime/json-ld.md), we have to use
 > the expanded form also when querying.
 
 The `filterExpression` property is a list of `Criterion`, which expresses a single filtering condition based on:
@@ -1293,7 +1276,7 @@ payload for filtering the datasets:
 }
 ```
 
-Entities are backed by [stores](./service-layers.md#51-in-memory-stores) for doing CRUD operations. For each entity
+Entities are backed by [stores](../../runtime/service-layers.md#51-in-memory-stores) for doing CRUD operations. For each entity
 there is an associated store interface (SPI). Most of the stores SPI have a `query` like method which takes a
 `QuerySpec` type as input and returns the matched entities in a collection. Individual implementations are then
 responsible for translating the `QuerySpec` to a proper fetching strategy.
@@ -1301,8 +1284,8 @@ responsible for translating the `QuerySpec` to a proper fetching strategy.
 The description on how the translation and mapping works will be explained in each implementation. Currently EDC support
 out of the box:
 
-- [In-memory stores](./service-layers.md#51-in-memory-stores) (default implementation).
-- [SQL stores](../contributor-handbook.md#29-postgre-sql-persistence) provided as extensions for each store, mostly
+- [In-memory stores](../../runtime/service-layers.md#51-in-memory-stores) (default implementation).
+- [SQL stores](../../postgres-persistence.md) provided as extensions for each store, mostly
   tailored for and tested with
   PostgreSQL.
 

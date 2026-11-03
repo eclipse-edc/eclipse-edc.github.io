@@ -8,9 +8,11 @@ autonumber
 participant "Control Plane" as CP
 participant "Data Plane" as DP
 
-CP -> DP: START
-CP <- DP: START Response w/ EDR 
+CP -> DP: PREPARE (consumer) / START (provider)
+CP <- DP: Response w/ data address
+CP -> DP: STARTED w/ counter-party data address (consumer)
 CP -> DP: SUSPEND
 CP -> DP: RESUME
 CP -> DP: TERMINATE
+CP <- DP: Callback: COMPLETED / ERRORED
 @enduml

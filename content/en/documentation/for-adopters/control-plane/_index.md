@@ -21,7 +21,6 @@ weight: 30
     * [Flow Types](#flow-types)
       * [Consumer Pull](#consumer-pull)
       * [Provider Push](#provider-push)
-      * [The Role of the Data Plane](#the-role-of-the-data-plane)
     * [Transfer Process States](#transfer-process-states)
     * [Policy Monitor](#policy-monitor)
 <!-- TOC -->
@@ -160,9 +159,11 @@ An `Asset` is the primary building block for data sharing. An asset represents a
   "privateProperties": {
     "secretKey": "..."
   },
-  "dataAddress": {
-    "type": "HttpData",
-    "baseUrl": "http://localhost:8080/test"
+  "dataplaneMetadata": {
+    "profiles": [ "HttpData-PULL" ],
+    "properties": {
+      "baseUrl": "http://localhost:8080/test"
+    }
   }
 }
 ```
@@ -174,7 +175,7 @@ In contrast, the `privateProperties` attribute contains properties that are not 
 
 > Why is the term `Asset` used and not `Dataset`? This is mostly for historical reasons since the EDC was originally designed before the writing of the DSP specification. However, it was decided to keep the two distinct since it provides a level of decoupling between the DSP and internal layers of EDC.
 
-Remember that assets are just descriptors - they do not contain actual data. How does EDC know where the actual data is stored? The `dataAddress` object acts as a pointer to where the actual data resides. The DataAddress type is open-ended. It could point to an HTTP address (HttpDataAddress), S3 bucket (S3DataAddress), messaging topic, or some other form of storage. EDC supports a defined set of storage types. These can be extended to include support for virtually any custom storage.  While data addresses can contain custom data, it's important not to include secrets since data addresses are persisted.  Instead, use a secure store for secrets and include a reference to it in the DataAddress.
+Remember that assets are just descriptors - they do not contain actual data. How does EDC know where the actual data is stored? It doesn't need to: the `properties` of the `dataplaneMetadata` object act as a pointer to where the actual data resides, and are passed to the data plane that transfers the asset. Their content is open-ended and defined by the data plane: it could be an HTTP address, an S3 bucket, a messaging topic, or some other form of storage. The `profiles` list the transfer types the asset is offered with (all those of the registered data planes, if empty), and the optional `labels` restrict which data planes may transfer it. It's important not to include secrets in the `dataplaneMetadata` since it is persisted. Instead, use a secure store for secrets and include a reference to it. The `dataAddress` of an asset is deprecated since 0.18.0.
 
 #### Understanding Expanded Assets
 
@@ -395,19 +396,19 @@ We'll explain how to open a Transfer Process in the next section. First, it is i
 
 It requires the consumer to initiate the data flow operation. A common example of this is when a consumer makes an HTTP request to an endpoint and receives a response or pulls a message off a queue:
 
-![consumer-pull](consumer-pull.png)
+![consumer-pull](transfer-dps-consumer-pull.png)
 
-The EDR (Endpoint Data Reference) contains all the coordinates to reach the provider public endpoint where the data can be fetched. In the basic case, it is an HTTP endpoint, but it could be a message broker, an object storage and so on.
+The provider data plane creates a data address that contains all the coordinates to reach the endpoint where the data can be fetched, and the credentials if needed. The provider control plane sends it to the consumer, whose control plane hands it to the consumer data plane. In the basic case, it is an HTTP endpoint, but it could be a message broker, an object storage and so on.
 
 #### Provider Push
 
 It requires the provider to actively push data to the consumer.
 
-![provider-push](provider-push.png)
+![provider-push](transfer-dps-provider-push.png)
 
 Note that, on the consumer side, the data plane role is to prepare the destination endpoint. \
 An example of provider push is when a consumer wishes to receive a dataset at an object storage endpoint that it controls. \
-Since the provider may need time to prepare the data, the consumer sends an access token when initiating a Transfer Process. The provider uses this token to push the data once it is ready.
+The consumer data plane returns the destination, with an access token if needed, as data address when the transfer process is initiated, and the consumer control plane sends it to the provider. The provider data plane uses it to push the data once it is ready.
 
 ### Transfer Process States
 
@@ -424,10 +425,10 @@ The following are the most important transfer process states:
 
 There are a number of internal states that the consumer or provider can transition into without notifying the other party. The two most important are:
 
-- PROVISIONED - When a data transfer request is made through the Management API on the consumer, its state machine will first transition to the PROVISIONED state to perform any required setup. After this is completed, the consumer control plane will dispatch a request to the provider and transition to the REQUESTED state. The state machine on the provider will transition to the PROVISIONED state after receiving a request and asynchronously completing any required data pre-processing.
-- DEPROVISIONED - After a transfer has completed, the provider state machine will transition to the deprovisioned state to clean up any remaining resources.
+- PREPARATION_REQUESTED - When a data transfer request is made through the Management API on the consumer, the consumer control plane first asks its data plane to prepare the transfer. If the data plane needs time for the setup, e.g. to create a destination for a push transfer, the transfer process waits in this state until the data plane reports that it is prepared. The consumer control plane then dispatches the request to the provider and transitions to the REQUESTED state.
+- STARTUP_REQUESTED - The provider control plane asks its data plane to start the transfer after receiving a request. If the data plane needs time, e.g. to pre-process the data, the transfer process waits in this state until the data plane reports that it is started. On the consumer, the transfer process passes through this state while the control plane hands the provider's data address to its data plane.
 
-As with the contract negotiation state machine, custom code can react to transition events using the `EventRouter`. There are also two further options for executing operations during the provisioning step on the consumer or provider. First, a  `Provisioner` extension can be used to perform a task. EDC also includes the `HttpProviderProvisioner`, which invokes a configured HTTP endpoint when a provider control plane enters the provisioning step. The endpoint can front code that performs a task and asynchronously invoke a callback on the control plane when it is finished.
+Any resources a transfer needs, and their clean-up, are handled by the data planes. As with the contract negotiation state machine, custom code can react to transition events using the `EventRouter`.
 
 ### Policy Monitor
 

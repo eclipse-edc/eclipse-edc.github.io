@@ -154,8 +154,8 @@ public void initialize(ServiceExtensionContext context) {
 
 One might encounter situations, where different serialization formats are required for the same entity, for example
 `DataAddress` objects are serialized differently on
-the [Signaling API](../contributor-handbook.md#210-data-plane-signaling) and
-the [DSP API](../contributor-handbook.md#28-protocol-extensions-dsp).
+the [Signaling API](../data-plane/data-plane-signaling/_index.md) and
+the [DSP API](../control-plane/protocol-extensions.md).
 
 If we would simply register both transformers with the transformer registry, the second registration would overwrite the
 first, because both transformers have the same input and output types:
@@ -226,7 +226,7 @@ should be performed by [validators](service-layers.md#2-validators).
 ## 3. Token generation and decorators
 
 A token is a datastructure that consists of a header and claims and that is signed with a private key. While EDC
-is able to create any type of tokens through [extensions](../control-plane/extension-model.md), in most use cases JSON Web Tokens (JWT)
+is able to create any type of tokens through [extensions](./extension-model.md), in most use cases JSON Web Tokens (JWT)
 are a good option.
 
 The `TokenGenerationService` offers a way to generate such a token by passing in a reference to a private key and a set
@@ -246,7 +246,7 @@ be opinionated with respect to the token technology.
 
 When receiving a token, EDC makes use of the `TokenValidationService` facility to verify and validate the incoming
 token. Out-of-the-box JWTs are supported, but other token types could be supported through
-[extensions](../control-plane/extension-model.md). This section will be limited to validating JWT tokens.
+[extensions](./extension-model.md). This section will be limited to validating JWT tokens.
 
 Every JWT that is validated by EDC _must_ have a `kid` header indicating the ID of the public key with which the token
 can be verified. In addition, a `PublicKeyResolver` implementation is required to download the public key.

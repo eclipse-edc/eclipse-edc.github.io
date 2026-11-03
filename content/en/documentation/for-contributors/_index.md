@@ -15,9 +15,8 @@ weight: 30
     * [2.3 Protocol extensions (DSP)](#23-protocol-extensions-dsp)
     * [3. (Postgre-)SQL persistence](#3-postgre-sql-persistence)
   * [4. The data plane](#4-the-data-plane)
-    * [4.1 Data plane signaling](#41-data-plane-signaling)
-    * [4.2 Writing a custom data plane extension (sink/source)](#42-writing-a-custom-data-plane-extension-sinksource)
-    * [4.3 Writing a custom data plane (using only DPS)](#43-writing-a-custom-data-plane-using-only-dps)
+    * [4.1 Data plane integration](#41-data-plane-integration)
+    * [4.2 Building a data plane](#42-building-a-data-plane)
   * [5. Runtime](#5-runtime)
     * [5.1 Serialization via JSON-LD](#51-serialization-via-json-ld)
     * [5.2 Programming Primitives](#52-programming-primitives)
@@ -77,7 +76,8 @@ combination of OS, tool and tool version.
   etc.
 - launcher: a runnable Java module, that pulls in other modules to form a distribution. "Launcher" and "distribution"
   are sometimes used synonymously
-- connector: a control plane runtime and 1...N data plane runtimes. Sometimes used interchangeably with "distribution".
+- connector: a control plane runtime and the 1...N data planes it directs through Data Plane Signaling. Sometimes used
+  interchangeably with "distribution".
 - consumer: a dataspace participant who wants to ingest data under the access rules imposed by the provider
 - provider: a dataspace participant who offers data assets under a set of access rules
 
@@ -91,10 +91,9 @@ implemented all dataspace components. These include:
   persistent way. For example starting a contract negotiation through the API will only return the negotiation's ID, and
   the control plane will cyclically advance the negotiation's state.
 - **single-thread processing**: the control plane is designed around a set of sequential [state
-  machines](./control-plane/programming-primitives.md#1-state-machines), that employ pessimistic locking to guard
+  machines](./runtime/programming-primitives.md#1-state-machines), that employ pessimistic locking to guard
   against race conditions and other problems.
-- **idempotency**: requests, that do not trigger a mutation, are idempotent. The same is true when provisioning external
-  resources.
+- **idempotency**: requests, that do not trigger a mutation, are idempotent.
 - **error-tolerance**: the design goal of the control plane was to favor correctness and reliability over (low) latency.
   That means, even if a communication partner may not be reachable due to a transient error, it is designed to cope with
   that error and attempt to overcome it.
@@ -105,8 +104,7 @@ applications around them.
 There are other, less technical principles of EDC such as simplicity and self-contained-ness. We are extremely careful
 when adding third-party libraries or technologies to maintain a simple, fast and un-opinionated platform.
 
-Take a look at our [coding principles](../../contributing/coding-principles.md) and our
-[styleguide](../../contributing/styleguide.md).
+Take a look at our [styleguide](./guidelines/styleguide/_index.md).
 
 ## 2. The control plane
 
@@ -156,27 +154,20 @@ Detailed documentation about EDCs PostgreSQL implementations can be found [here]
 
 ## 4. The data plane
 
-### 4.1 Data plane signaling
+EDC doesn't contain a data plane: data planes are separate applications that the control plane directs through the
+[Data Plane Signaling (DPS)](https://eclipse-dataplane-signaling.github.io/dataplane-signaling) protocol. The EDC Data
+Plane Framework of earlier versions was removed in favour of DPS.
 
-Data Plane Signaling (DPS) is the communication protocol that is used between control planes and data planes. Detailed
-information about it and other topics such as data plane self-registration and public API authentication can be found
-[here](./data-plane/data-plane-signaling/_index.md).
+### 4.1 Data plane integration
 
-### 4.2 Writing a custom data plane extension (sink/source)
+How the control plane registers and selects data planes, sends them signals and receives their notifications is
+described [here](./data-plane/data-plane-signaling/_index.md).
 
-The EDC Data Plane is build on top of the *Data Plane Framework (DPF)*, which can be used for building custom data planes.
- The framework has extensibility points for supporting different data sources and sinks (e.g., S3, HTTP, Kafka) and can 
-perform direct streaming between different source and sink types.
+### 4.2 Building a data plane
 
-Detailed documentation about writing a custom data plane extension can be found [here](./data-plane/_index.md#2-the-data-plane-framework).
-
-
-### 4.3 Writing a custom data plane (using only DPS)
-
-Since the communication between control plane and data plane is well-defined in the [DPS](#41-data-plane-signaling) protocol, it's possible 
-to write a data plane from scratch (without using EDC and [DPF](./data-plane/_index.md#2-the-data-plane-framework)) and make it work with the EDC control plane.
-
-Detailed documentation about writing a custom data plane be found [here](./data-plane/custom-data-plane.md).
+Any application that implements DPS can be a data plane, e.g. one built with the
+[Data Plane SDKs](https://github.com/eclipse-dataplane-core). What a data plane implements, and where to start, is
+described [here](./data-plane/custom-data-plane.md).
 
 ## 5. Runtime
 

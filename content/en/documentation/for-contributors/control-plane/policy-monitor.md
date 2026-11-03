@@ -11,7 +11,7 @@ The policy monitor (`PolicyMonitorManager`) is a component that watches over ong
 Once a transfer process transition to the `STARTED` state on the provider side, the policy monitor gets notified through the [eventing system](../runtime/service-layers.md#6-events-and-callbacks) of EDC and start tracking transfer process. For each monitored transfer process in the `STARTED` state the policy monitor retrieves the policy associated (through [contract agreement](./entities.md#5-contract-agreements)) and runs the [Policy Engine](./entities.md#22-policy-scopes-and-bindings) using the `policy.monitor` as scope.
 If the policy is no longer valid, the policy monitor marks the transfer process for termination (`TERMINATING`) and stops tracking it.
 
-The data plane also gets notified through the [data plane signaling](../contributor-handbook.md#210-data-plane-signaling) protocol about the termination of the transfer process, and if accepted by the data plane, the data transfer terminates as well.
+The data plane also gets notified through the [data plane signaling](../data-plane/data-plane-signaling/_index.md) protocol about the termination of the transfer process, and if accepted by the data plane, the data transfer terminates as well.
 
 ## Note for implementors
 
