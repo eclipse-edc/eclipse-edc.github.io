@@ -38,4 +38,54 @@ The amount of crawlers is one variable that can have great influence on the perf
 
 Another way to tweak the performance is to change the ExecutionPlan to the needs of the dataspace. Out of the box, FC supports a periodic execution, but in some dataspace there might be additional triggers such as dataspace events or even manual triggers through a web API.
 
+## Running the Federated Catalog
+
+The Federated Catalog is assembled from `federatedcatalog-base-bom` (crawler, query API, Management API context),
+`federatedcatalog-dcp-bom` (with DCP, to authenticate to the crawled connectors) and `federatedcatalog-feature-sql-bom`
+(PostgreSQL storage of the cache and of the crawl targets). The single participant control plane BOMs
+(`controlplane-base-bom`, `controlplane-feature-sql-bom`) contain it too, so a connector can also act as a Federated
+Catalog.
+
+The crawler requests the catalogs as a single participant, the one configured with `edc.participant.id` (see
+[Participant Contexts](../control-plane/participant-contexts/_index.md)): the Federated Catalog is not available in
+multi-participant runtimes.
+
+### Crawl targets
+
+The connectors to crawl are the _target nodes_ of the `TargetNodeDirectory`, each with a `name`, an `id` (the
+participant id of the connector), a `url` (its DSP endpoint) and its `supportedProtocols`
+(`dataspace-protocol-http:2025-1`). The default directory is in memory and empty; with
+`federatedcatalog-feature-sql-bom`, the targets are read from the `edc_target_node_directory` table. There is no API to
+register targets: insert them into that table, or provide a `TargetNodeDirectory` of your own in an extension, e.g. one
+that reads the participants of the dataspace from a registry. The node whose `name` is the runtime id is skipped.
+
+### Crawling
+
+Every `edc.catalog.cache.execution.period.seconds`, the crawlers request the catalog of every target node with DSP
+catalog requests, page by page, including the catalogs linked from it, and replace the node's entry in the cache. A
+node that can't be reached is retried, then left out until the next run; its previous entry is removed at the start of
+the next run.
+
+| Setting | Default | Description |
+|---|---|---|
+| `edc.catalog.cache.execution.enabled` | `true` | whether the crawlers run |
+| `edc.catalog.cache.execution.period.seconds` | `60` | interval between two crawls |
+| `edc.catalog.cache.execution.delay.seconds` | `0` | delay before the first crawl |
+| `edc.catalog.cache.partition.num.crawlers` | `2` | number of crawlers running in parallel |
+| `edc.catalog.cache.retry.retries.max` | `5` | attempts per node and crawl |
+| `edc.catalog.cache.retry.delay.seconds` | `10` | delay between two attempts |
+| `edc.sql.store.federatedcatalog.datasource` | `default` | datasource of the catalog cache |
+| `edc.sql.store.targetnodedirectory.datasource` | `default` | datasource of the target nodes |
+
+### Querying the cache
+
+Clients query the cached catalogs on the Management API context, which is secured like the Management API of a single
+participant runtime (see [Management API](../control-plane/management-api/_index.md)):
+
+```http
+POST /api/management/v4/catalogs/request?flatten=false
+```
+
+The optional body is a `QuerySpec` to filter the catalogs. The answer is the list of the cached DSP catalogs, as they
+were at the last crawl; with `flatten=true`, the datasets of linked catalogs are returned in their parent catalog.
 
