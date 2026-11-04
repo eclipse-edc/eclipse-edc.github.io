@@ -111,8 +111,8 @@ retries of a protocol message.
 ### Task-based state machine (NATS)
 
 Instead of polling the store, the transfer processes and the contract negotiations can be driven by tasks published to
-NATS JetStream for every state change. The settings above about iterations and batches don't apply to it; the
-following ones do:
+NATS JetStream for every state change (see [Task-based State Machines](../control-plane/task-based-state-machines/_index.md)).
+The settings above about iterations and batches don't apply to it; the following ones do:
 
 - **Workers:** a subscriber handles the messages it fetches with `edc.nats.tp.subscriber.workers` /
   `edc.nats.cn.subscriber.workers` workers (default 1), i.e. the number of messages handled concurrently. With a single

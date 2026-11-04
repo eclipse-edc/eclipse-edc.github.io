@@ -69,7 +69,8 @@ lists the accepted ones: what happens, when, the impact, and how to mitigate it 
 
 ## Task-based state machine (NATS)
 
-The provisioning of the NATS streams and consumers, the task store and the retry settings are described in
+How the task-based state machines work and how to set them up is described in
+[Task-based State Machines](../task-based-state-machines/_index.md); their tuning in
 [Tuning](../../tuning/_index.md#task-based-state-machine-nats).
 
 - **Lost tasks.** A task is published before its transaction commits. A replica that does not see it yet retries with
