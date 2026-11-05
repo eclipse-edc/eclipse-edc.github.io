@@ -30,7 +30,8 @@ jobs:
           if [[ `git status --porcelain` ]]; then
             git add .
             git commit -m "docs: update autodoc markdowns"
-            git push origin update-autodoc
+            # the branch is recreated from main on every run: overwrite the one left by a previous run, if any
+            git push --force origin update-autodoc
           else
             echo "No changes detected. Skipping commit and PR creation."
             echo "no_changes=true" >> $GITHUB_ENV
@@ -41,6 +42,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # a PR left open by a previous run already shows the force-pushed branch
+          if [[ -n "$(gh pr list --head update-autodoc --state open --json number --jq '.[].number')" ]]; then
+            echo "A pull request for update-autodoc is already open, it has been updated."
+            exit 0
+          fi
           gh pr create \
             --head update-autodoc \
             --base main \
