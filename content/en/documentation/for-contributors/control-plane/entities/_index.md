@@ -1198,6 +1198,8 @@ Currently, we support the following events:
 - `transfer.process.resuming`
 - `transfer.process.completed`
 - `transfer.process.terminated`
+- `transfer.process.dataflow.errored`: the data plane reported a non-recoverable error of the data flow; the transfer
+  process doesn't change state
 
 The connector's event dispatcher will send invoke the webhook specified in the `uri` field passing the event
 payload as JSON object.
