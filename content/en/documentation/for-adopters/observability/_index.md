@@ -358,8 +358,8 @@ java -javaagent:opentelemetry-javaagent.jar \
 The agent traces the incoming and outgoing HTTP requests (Jetty, Jersey, OkHttp) and the database calls, and EDC adds
 spans for the incoming DSP messages, the processing of the contract negotiation and transfer process states, and the
 negotiations started through the Management API. The trace context of a negotiation or transfer is stored with it, so
-that its later steps belong to the same trace with the poll-based state machines; the task-based state machines don't
-carry it over yet. Events published to NATS carry the trace context of the step that emitted them.
+that its later steps belong to the same trace, with both the poll-based and the task-based state machines. Events
+published to NATS carry the trace context of the step that emitted them.
 
 Tracing has a cost: in load tests, the agent with full instrumentation reduced the throughput of the control plane
 noticeably. Sample traces (`otel.traces.sampler`) in production.

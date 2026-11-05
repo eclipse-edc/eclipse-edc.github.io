@@ -128,8 +128,8 @@ How to size workers, prefetch and the database pool is described in [Tuning](../
 
 Each subscriber contributes a liveness check, which fails when it stopped consuming (see
 [Health checks](../../observability/_index.md#health-checks)). The tasks pending in NATS can be inspected with the NATS
-tools, e.g. `nats consumer info tp-stream tp-subscriber`. The trace context of a negotiation or transfer process is not
-carried over to its tasks yet, so each task starts a new trace.
+tools, e.g. `nats consumer info tp-stream tp-subscriber`. Each task is processed within the trace context of its
+negotiation or transfer process, so all its steps belong to the trace in which it was created.
 
 ## Related
 
