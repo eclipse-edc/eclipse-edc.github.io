@@ -134,8 +134,10 @@ The data plane notifies the control plane through the Signaling API, a dedicated
 - `POST /transfers/{transferId}/dataflow/started`: an asynchronous `start` is done, with the data address if any;
 - `POST /transfers/{transferId}/dataflow/completed`: the data flow is complete, the control plane completes the transfer
   process and notifies the counter-party;
-- `POST /transfers/{transferId}/dataflow/errored`: the data flow failed. The control plane logs the error, the transfer
-  process doesn't change state.
+- `POST /transfers/{transferId}/dataflow/errored`: the data flow failed for good. As defined by DPS, the transfer
+  process doesn't change state and the counter-party is not notified: the control plane logs the error and emits the
+  event `transfer.process.dataflow.errored`, with the error, so that callbacks or operators can decide how to recover,
+  e.g. by terminating the transfer process or starting a new one.
 
 The data plane must be configured with the URL of this API: the control plane doesn't send it in the `prepare` and
 `start` messages.
