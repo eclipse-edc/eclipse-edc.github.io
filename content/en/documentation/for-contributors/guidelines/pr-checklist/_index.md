@@ -15,7 +15,7 @@ requires a significant change or touches on critical code paths (e.g. security-r
 
 ### Coding Style
 
-All code contributions must strictly adhere to the [Style Guide](styleguide.md) and design principles outlined in the
+All code contributions must strictly adhere to the [Style Guide](../styleguide/_index.md) and design principles outlined in the
 Contributor Technical Documentation. **PRs that do not adhere to these rules will be rejected.**
 
 All artifacts must include the following copyright header, replacing the fields enclosed by curly brackets "{}" with

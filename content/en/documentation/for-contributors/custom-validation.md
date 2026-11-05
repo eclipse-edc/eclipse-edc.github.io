@@ -18,7 +18,7 @@ themselves.
 ## When to use it
 
 This feature is intended for use cases where the standard DTO validation, that ships with EDC's APIs is not sufficient.
-Please check out the [OpenAPI spec](../../resources/openapi/yaml) to find out more about the object schema.
+Please check out the [OpenAPI spec](https://eclipse-edc.github.io/Connector/openapi/management-api/) to find out more about the object schema.
 
 EDC features various data types that do not have a strict schema but are *extensible*, for example `Asset`/`AssetDto`,
 or a `DataRequest`/`DataRequestDto`. This was done by design, to allow for maximum flexibility and openness. However,
@@ -66,7 +66,7 @@ following ways:
    logging*
 
 Please check
-out [this test](../../extensions/common/http/jersey-core/src/test/java/org/eclipse/edc/web/jersey/validation/integrationtest/ValidationIntegrationTest.java)
+out [this test](https://github.com/eclipse-edc/Connector/blob/main/extensions/common/http/jersey-core/src/test/java/org/eclipse/edc/web/jersey/validation/integrationtest/ValidationIntegrationTest.java)
 for a comprehensive example how validation can be enabled. All functions are registered during the extension's
 initialization phase.
 
