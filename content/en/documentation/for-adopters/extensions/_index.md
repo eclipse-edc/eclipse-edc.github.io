@@ -48,7 +48,7 @@ Finally, the EDC module system is not a framework like [Spring](https://spring.i
 
 ## Extension Basics
 
-If you are unfamiliar with bundling EDC runtimes, please read the chapter on [Distributions, Deployment, and Operations](distributions-deployment-operations.md). Let's assume we have already enabled a runtime build that packages all EDC classes into a single executable JAR deployed in a Docker container.
+If you are unfamiliar with bundling EDC runtimes, please read the chapter on [Distributions, Deployment, and Operations](../distributions-deployment-operations/_index.md). Let's assume we have already enabled a runtime build that packages all EDC classes into a single executable JAR deployed in a Docker container.
 
 An EDC extension can be created by implementing the `ServiceExtension` interface:
 

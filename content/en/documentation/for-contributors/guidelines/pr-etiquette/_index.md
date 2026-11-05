@@ -47,7 +47,7 @@ Sponsorship can be obtained through engagement on discussions or issues.
 
 PRs should adhere to the following rules.
 
-- Familiarize yourself with [coding style](./styleguide.md), [./architectural patterns](coding-principles.md),
+- Familiarize yourself with [coding style](../styleguide/_index.md), architectural patterns,
   and other contribution guidelines.
 - No surprise PRs. Before submitting a PR, open a discussion or an issue outlining the planned work and give
   people time to comment. Unsolicited PRs may get ignored or rejected.
@@ -58,7 +58,7 @@ PRs should adhere to the following rules.
   the `age` field changed from `long` to `String`".
 - If 3rd party dependencies are introduced, note them in the PR description and explain why they are necessary.
 - Stick to the established code style, please refer to
-  the [styleguide document](./styleguide.md).
+  the [styleguide document](../styleguide/_index.md).
 - All tests should be green, especially when your PR is in `"Ready for review"`
 - Mark PRs as `"Ready for review"` only when the PR is complete. No additional commits should be pushed other than to
   incorporate review comments.
@@ -66,7 +66,7 @@ PRs should adhere to the following rules.
   force-pushing. Do this when your PR is ready to review.
 - If you require a reviewer's input while it's still in draft, please contact the designated reviewer using
   the `@mention` feature and let them know what you'd like them to look at.
-- Request a review from one of the [technical committers](pr_etiquette.md#the-technical-committers). Requesting a review
+- Request a review from one of the [technical committers](#the-technical-committers). Requesting a review
   from anyone else is still possible, and sometimes may be advisable, but only committers can merge PRs, so be sure to
   include them early on.
 - Re-request reviews after all remarks have been adopted. This helps reviewers track their work in GitHub. Failing to do

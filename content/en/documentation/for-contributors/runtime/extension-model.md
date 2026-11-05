@@ -96,7 +96,7 @@ the extension, for example:
 
 To achieve this, the [EDC Runtime Metamodel](https://github.com/eclipse-edc/Runtime-Metamodel) defines several
 annotations. These are not required for compilation, but they should be added to the appropriate classes and fields with
-proper attributes to enable good documentation. For detailed information please read [this chapter](../contributor-handbook.md#62-autodoc).
+proper attributes to enable good documentation. For detailed information please read [this chapter](../developer-tools.md#3-autodoc).
 
 Note that `@Provider`, `@Inject`, `@Provides` and `@Requires` are used by Autodoc to resolve the dependency graph for
 documentation, but they are also used by the runtime to resolve service dependencies. Read more about that
