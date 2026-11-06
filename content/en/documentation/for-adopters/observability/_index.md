@@ -338,9 +338,10 @@ By default, the runtime logs to the standard output, one line per message, with 
 The level is set with the program argument `--log-level` (`SEVERE`, `WARNING`, `INFO`, the default, or `DEBUG`), e.g.
 `java -jar controlplane.jar --log-level=DEBUG`; `--no-color` disables the colors. Errors (`SEVERE`) are always logged.
 
-Logs can be sent to an OpenTelemetry collector instead, with the `otel-monitor` extension (not part of the BOMs) and the
-OpenTelemetry Java agent: each log message becomes an OpenTelemetry log record of the logger `org.eclipse.edc`, with the
-exception, if any, as attributes. Other log formats are provided by extensions implementing `MonitorExtension`.
+Logs can be sent to an OpenTelemetry collector instead, with the `otel-monitor` extension (in
+`controlplane-feature-observability-bom`) and the OpenTelemetry Java agent: each log message becomes an OpenTelemetry
+log record of the logger `org.eclipse.edc`, with the exception, if any, as attributes. Other log formats are provided by
+extensions implementing `MonitorExtension`.
 
 ## Tracing
 
@@ -366,8 +367,14 @@ noticeably. Sample traces (`otel.traces.sampler`) in production.
 
 ## Metrics
 
-The Micrometer extensions `micrometer-core`, `jetty-micrometer` and `jersey-micrometer` (not part of the BOMs) collect
-JVM, HTTP client, executor, Jetty and Jersey metrics, see
-[Instrumentation with Micrometer](../../for-contributors/metrics.md). EDC doesn't expose them itself: export them with the
-OpenTelemetry Java agent, e.g. with `-Dotel.instrumentation.micrometer.enabled=true` and
-`-Dotel.metrics.exporter=prometheus`, which serves them for Prometheus on port `9464`.
+The Micrometer extensions `micrometer-core`, `jetty-micrometer` and `jersey-micrometer` collect JVM, HTTP client,
+executor, Jetty and Jersey metrics, see [Instrumentation with Micrometer](../../for-contributors/metrics.md). Add them,
+together with `otel-monitor`, with the `controlplane-feature-observability-bom`, which works with both the single and the
+multi-participant control planes.
+
+The Jersey metrics measure the requests of the `default` API context; list the contexts to measure in
+`edc.metrics.jersey.contexts`, e.g. `management,protocol,signaling`, or `*` for all of them.
+
+EDC doesn't expose the metrics itself: export them with the OpenTelemetry Java agent, e.g. with
+`-Dotel.instrumentation.micrometer.enabled=true` and `-Dotel.metrics.exporter=prometheus`, which serves them for
+Prometheus on port `9464`.

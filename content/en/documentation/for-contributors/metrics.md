@@ -56,4 +56,11 @@ The following properties can use used to configure which metrics will be collect
 - `edc.metrics.jetty.enabled`: enables/disables collection of Jetty metrics
 - `edc.metrics.jersey.enabled`: enables/disables collection of Jersey metrics
 
-Default values are always "true", switch to "false" to disable the corresponding feature.
+Default values are always "true", switch to "false" to disable the corresponding feature. `edc.metrics.enabled` applies
+to all of them: a source is measured only if both its own setting and `edc.metrics.enabled` are "true".
+
+- `edc.metrics.jersey.contexts`: comma-separated aliases of the API contexts whose requests the Jersey metrics measure,
+  e.g. `default,management,protocol,signaling`, or `*` for all of them. Default: `default`. An alias without port
+  mapping is ignored with a warning.
+
+The extensions are part of `controlplane-feature-observability-bom`.
