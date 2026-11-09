@@ -20,7 +20,7 @@ describes what the EDC control plane expects of it; the protocol itself is defin
 
 ## 1. Where to start
 
-- **Use an existing data plane.** [`siglet`](https://github.com/eclipse-dataplane-core/dsdk-facet-rs/tree/main/siglet),
+- **Use an existing data plane.** [`siglet`](https://github.com/eclipse-dataplane-core/siglet),
   from the Data Plane Core project, is driven by DPS and issues, verifies and renews the access tokens of the data flows,
   so that existing APIs and data infrastructure can serve the data.
 - **Build one with a Data Plane SDK.** The [Data Plane SDKs](https://github.com/eclipse-dataplane-core) implement the

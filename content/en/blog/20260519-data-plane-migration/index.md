@@ -45,7 +45,7 @@ The current EDC-DataPlane implementation will be removed soon. DPS support will 
 downstream projects that still rely on it must fork the codebase and own the implementation going forward.
 
 Data-plane implementations that already speak DPS are expected to emerge, such as
-[`siglet`](https://github.com/eclipse-dataplane-core/dsdk-facet-rs/tree/main/siglet).
+[`siglet`](https://github.com/eclipse-dataplane-core/siglet).
 
 ## Seamless upgrade
 
@@ -191,7 +191,7 @@ and compatibility work with no upstream support.
 
 The recommended long-term approach is to adopt a data-plane built on the
 [Data Plane SDKs](https://github.com/eclipse-dataplane-core) and the DPS protocol natively — for example
-[`siglet`](https://github.com/eclipse-dataplane-core/dsdk-facet-rs/tree/main/siglet). These implementations are
+[`siglet`](https://github.com/eclipse-dataplane-core/siglet). These implementations are
 designed around the DPS specification from the ground up and are the supported path forward.
 
 Plan to retire the shim-based data-plane as soon as the migration window closes.
