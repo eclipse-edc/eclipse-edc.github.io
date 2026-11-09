@@ -11,7 +11,7 @@ including the data address and the credentials of the data flow.
 
 Any application that implements DPS and registers with the control plane can be a data plane: one built with the
 [Data Plane SDKs](https://github.com/eclipse-dataplane-core), an existing one such as
-[`siglet`](https://github.com/eclipse-dataplane-core/dsdk-facet-rs/tree/main/siglet), or one written directly on the
+[`siglet`](https://github.com/eclipse-dataplane-core/siglet), or one written directly on the
 specification.
 
 This section covers:

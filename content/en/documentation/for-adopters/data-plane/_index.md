@@ -21,7 +21,7 @@ plane registers with a control plane, which in turn directs the data plane throu
 EDC doesn't include a data plane. Any application that implements DPS can be one:
 
 - an existing data plane that speaks DPS, such as
-  [`siglet`](https://github.com/eclipse-dataplane-core/dsdk-facet-rs/tree/main/siglet);
+  [`siglet`](https://github.com/eclipse-dataplane-core/siglet);
 - a data plane of your own, built with one of the [Data Plane SDKs](https://github.com/eclipse-dataplane-core)
   ([Java](https://github.com/eclipse-dataplane-core/dataplane-sdk-java),
   [Go](https://github.com/eclipse-dataplane-core/dataplane-sdk-go),
