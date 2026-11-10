@@ -81,8 +81,13 @@ replicas:
 
 With `edc.nats.cn.subscriber.autocreate=true` and `edc.nats.tp.subscriber.autocreate=true` (or the specific
 `…stream.autocreate` and `…consumer.autocreate`), the subscribers create missing streams and consumers at startup.
-These are meant for testing: memory storage, and the defaults of the server for everything else. In production, create
-them beforehand, e.g. with the [NATS CLI](https://github.com/nats-io/natscli) or the NATS operator, with:
+These are meant for testing: memory storage, and the defaults of the server for everything else. Streams in memory are
+lost when NATS restarts, together with their consumers and the tasks they hold, and they are created again only when
+the runtime restarts. Until then, publishing a task fails (`503 No Responders Available For Request`), and so do the
+API requests and protocol messages that create one.
+
+Streams and consumers are provisioned infrastructure, like a database schema: in production, create them beforehand,
+e.g. with the [NATS CLI](https://github.com/nats-io/natscli) or the NATS operator, with:
 
 - **file storage**, so that tasks survive a restart of NATS, and replicas in a NATS cluster;
 - a **work queue** or limits retention: an acknowledged task is not needed anymore;
@@ -126,9 +131,11 @@ How to size workers, prefetch and the database pool is described in [Tuning](../
 
 ## Monitoring
 
-Each subscriber contributes a liveness check, which fails when it stopped consuming (see
-[Health checks](../../observability/_index.md#health-checks)). The tasks pending in NATS can be inspected with the NATS
-tools, e.g. `nats consumer info tp-stream tp-subscriber`. Each task is processed within the trace context of its
+Each subscriber contributes a liveness check, which fails when it stopped consuming or its connection is closed for
+good (see [Health checks](../../observability/_index.md#health-checks)). It does not check that the stream and the
+consumer exist: a missing one shows up as failures to publish tasks, in the logs and in the API responses, and can be
+checked with `nats stream info tp-stream`. The tasks pending in NATS can be inspected with the NATS tools, e.g.
+`nats consumer info tp-stream tp-subscriber`. Each task is processed within the trace context of its
 negotiation or transfer process, so all its steps belong to the trace in which it was created.
 
 ## Related
