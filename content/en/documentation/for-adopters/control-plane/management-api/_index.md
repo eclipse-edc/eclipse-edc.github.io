@@ -49,7 +49,7 @@ with the participant context, and v5 adds the endpoints of the features that onl
 - discovery of the dataspace profiles usable with a counter-party (from its DID document and DSP version metadata):
   `/v5/participants/{participantContextId}/discover`.
 
-`/v4/secrets` and `/v4/catalogs` (the federated catalog) exist only in v4.
+`/v4/secrets` exists only in v4.
 
 The versions a runtime serves are listed by `GET /v1/version` on the default API context (`web.http.path`), with their
 version number, path and maturity.
@@ -108,6 +108,7 @@ Scopes have the form `management-api[:resource]:action`, where `action` is `read
 | `management-api:policies:read`, `:write` | policy definitions |
 | `management-api:contractdefinitions:read`, `:write` | contract definitions |
 | `management-api:catalog:read` | catalog and dataset requests |
+| `management-api:catalogs:read` | the [Federated Catalog](../../federated-catalog/_index.md) cache |
 | `management-api:negotiations:read`, `:write` | contract negotiations, including [approval](../policy-engine/negotiation-approval/_index.md) |
 | `management-api:agreements:read`, `:write` | contract agreements, including retirement |
 | `management-api:transfers:read`, `:write` | transfer processes |

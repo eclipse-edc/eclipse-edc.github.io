@@ -44,27 +44,29 @@ The Federated Catalog is assembled from `federatedcatalog-base-bom` (crawler, qu
 `federatedcatalog-dcp-bom` (with DCP, to authenticate to the crawled connectors) and `federatedcatalog-feature-sql-bom`
 (PostgreSQL storage of the cache and of the crawl targets). The single participant control plane BOMs
 (`controlplane-base-bom`, `controlplane-feature-sql-bom`) contain it too, so a connector can also act as a Federated
-Catalog.
+Catalog. In a multi-participant control plane, add the modules `catalog-crawler-core`, `federated-catalog-api` and,
+for PostgreSQL, `federated-catalog-cache-sql` and `target-node-directory-sql`.
 
-The crawler requests the catalogs as a single participant, the one configured with `edc.participant.id` (see
-[Participant Contexts](../control-plane/participant-contexts/_index.md)): the Federated Catalog is not available in
-multi-participant runtimes.
+The crawl targets and the cache belong to a [participant context](../control-plane/participant-contexts/_index.md):
+the crawler requests the catalogs of each participant context's targets with that participant's identity, and keeps
+a separate cache for each. Deactivated participant contexts are skipped. A single participant runtime has one
+participant context, configured with `edc.participant.id`.
 
 ### Crawl targets
 
 The connectors to crawl are the _target nodes_ of the `TargetNodeDirectory`, each with a `name`, an `id` (the
-participant id of the connector), a `url` (its DSP endpoint) and its `supportedProtocols`
-(`dataspace-protocol-http:2025-1`). The default directory is in memory and empty; with
-`federatedcatalog-feature-sql-bom`, the targets are read from the `edc_target_node_directory` table. There is no API to
+participant id of the connector), a `url` (its DSP endpoint), its `supportedProtocols`
+(`dataspace-protocol-http:2025-1`) and the `participantContextId` it is crawled for. The default directory is in memory
+and empty; with the SQL store, the targets are read from the `edc_target_node_directory` table. There is no API to
 register targets: insert them into that table, or provide a `TargetNodeDirectory` of your own in an extension, e.g. one
 that reads the participants of the dataspace from a registry. The node whose `name` is the runtime id is skipped.
 
 ### Crawling
 
-Every `edc.catalog.cache.execution.period.seconds`, the crawlers request the catalog of every target node with DSP
-catalog requests, page by page, including the catalogs linked from it, and replace the node's entry in the cache. A
-node that can't be reached is retried, then left out until the next run; its previous entry is removed at the start of
-the next run.
+Every `edc.catalog.cache.execution.period.seconds`, the crawlers request the catalog of every target node of every
+active participant context with DSP catalog requests, page by page, including the catalogs linked from it, and replace
+the node's entry in the cache. A node that can't be reached is retried, then left out until the next run; its previous
+entry is removed at the start of the next run.
 
 | Setting | Default | Description |
 |---|---|---|
@@ -79,13 +81,16 @@ the next run.
 
 ### Querying the cache
 
-Clients query the cached catalogs on the Management API context, which is secured like the Management API of a single
-participant runtime (see [Management API](../control-plane/management-api/_index.md)):
+Clients query the cached catalogs on the Management API (see
+[Management API](../control-plane/management-api/_index.md)):
 
 ```http
-POST /api/management/v4/catalogs/request?flatten=false
+POST /api/management/v4/catalogs/request?flatten=false                                    # single participant runtime
+POST /api/management/v5/participants/{participantContextId}/catalogs/request?flatten=false # multi-participant runtime
 ```
 
-The optional body is a `QuerySpec` to filter the catalogs. The answer is the list of the cached DSP catalogs, as they
-were at the last crawl; with `flatten=true`, the datasets of linked catalogs are returned in their parent catalog.
+In a multi-participant runtime, the v5 endpoint returns the cache of the participant context in the path and requires
+the scope `management-api:catalogs:read`. The optional body is a `QuerySpec` to filter the catalogs. The answer is the
+list of the cached DSP catalogs, as they were at the last crawl; with `flatten=true`, the datasets of linked catalogs
+are returned in their parent catalog.
 
