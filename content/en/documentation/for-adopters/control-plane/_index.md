@@ -388,6 +388,19 @@ EDC has an eventing system that code can plug into and receive events when somet
 
 EDC implements reliable messaging for all interactions, so it is important to understand how this quality of service works. First, all messages have a unique ID and are idempotent. If a particular message is not acknowledged, it will be resent. Therefore, it is expected the receiving endpoint will perform de-duplication (which all EDC components do). Second, reliable messaging works across restarts. For example, if a runtime crashes before it can send a response, the response will be sent either by another instance (if running in a cluster) or by the runtime when it comes back online. Reliability is achieved by recording the state of all interactions using state machines to a transactional store such as Postgres. State transitions are initiated in the context of a transaction by sending a message to the counterparty, which is only committed after an acknowledgment is received.
 
+How the counter-party answers a message decides what happens next:
+
+- **2xx:** the message is acknowledged, and the state machine moves on.
+- **4xx:** the message is rejected for good, and the negotiation or transfer process is terminated. As required by the
+  Dataspace Protocol, a connector answers `400` to a message that is not valid in the current state of the process, and
+  `404` when the process does not exist or the client is not authorized (catalog requests get `401`).
+- **5xx, or no answer** (timeout, unreachable counter-party): the message is sent again with a growing delay
+  (`edc.negotiation.send.retry.*`, `edc.transfer.send.retry.*`, see [Tuning](../tuning/_index.md#state-machines)), until
+  the retry limit is reached. A connector answers `503` when it can't process a message now but may later: the
+  negotiation or transfer process is being modified, e.g. by an earlier copy of the same message, or the token of the
+  counter-party couldn't be verified because its credential service or DID document was not reachable. The copy that
+  arrives after the first one was processed is recognized by its message id and acknowledged.
+
 ## Transfer Processes
 
 After a Contract Negotiation has been finalized, a consumer can request data associated with an asset by initiating a *Transfer Process* via the Management API.
