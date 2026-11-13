@@ -73,6 +73,13 @@ A data plane can also answer asynchronously, and report the outcome later throug
 response to events. For example, the control plane policy monitor could send a TERMINATE message if a policy violation
 is encountered.
 
+A signal that can't be delivered (timeout, connection error), or that the data plane answers with a 5xx, is sent again
+by the transfer process state machine, with the delays and the limit of `edc.transfer.send.retry.*`. A signal the data
+plane rejects with a 4xx fails the transfer process. A data plane that needs long to prepare or start a data flow should
+answer asynchronously: when the response to `prepare` or `start` is lost, e.g. because it takes longer than
+`edc.http.client.timeout.read` (30 s), the signal is sent again, and the data plane rejects it for the data flow it
+already created (see [State Machines Known Limitations](../control-plane/state-machines/_index.md#common-to-both-state-machines)).
+
 ### Securing the Signaling API
 
 The data plane notifies the control plane of the progress of a transfer (prepared, started, completed, errored) by

@@ -46,6 +46,12 @@ lists the accepted ones: what happens, when, the impact, and how to mitigate it 
 - **State changed before a step that can fail.** `processProviderInitial` transitions the transfer process before
   storing the data address of the data plane; a retryable failure of that store would make the retry transition fail.
   It is not reachable with `VaultDataAddressStore`, whose failures are fatal.
+- **Lost response of a data plane signal.** When the response to a `prepare` or `start` signal is lost (e.g. it times
+  out) after the data plane created the data flow, the signal is sent again, by the HTTP client or by the state
+  machine. As defined by Data Plane Signaling, the data plane rejects it for the existing data flow, and the transfer
+  process fails while its data flow exists. Each attempt also selects the data plane again: with several data planes
+  matching the transfer, a retry may go to another one. Mitigation: have slow data planes answer asynchronously, and
+  keep `edc.http.client.timeout.read` above the time a data plane takes to answer.
 
 ## Poll-based state machine
 

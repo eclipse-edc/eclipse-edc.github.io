@@ -111,7 +111,7 @@ transfer process is sent as the `profile`, together with the `labels` and the `m
 | Transfer process step | Side | DPS call |
 |---|---|---|
 | INITIAL | consumer | `POST {endpoint}/prepare` |
-| STARTING | provider | `POST {endpoint}/start` |
+| INITIAL | provider | `POST {endpoint}/start` |
 | STARTED received from the provider | consumer | `POST {endpoint}/{flowId}/started` |
 | SUSPENDING | both | `POST {endpoint}/{flowId}/suspend` |
 | RESUMING | both | `POST {endpoint}/{flowId}/resume` |
@@ -124,6 +124,12 @@ A data plane answers `prepare`, `start` and `resume` either synchronously, with 
 `STARTED`) and possibly a data address, or asynchronously, with a pending state (e.g. `STARTING`). In the asynchronous
 case, the transfer process waits in `PREPARATION_REQUESTED` or `STARTUP_REQUESTED` until the data plane notifies the
 control plane.
+
+A signal fails with `ERROR_RETRY` when it couldn't be delivered (timeout, I/O error), when the data plane answers with a
+5xx, or when the authorization profile couldn't obtain a token, and the transfer process state machine sends it again
+with its backoff and retry limit (`edc.transfer.send.retry.*`). A 4xx answer fails with `FATAL_ERROR`, which ends the
+step: e.g. a failed `prepare` terminates the consumer transfer process, a failed `start` makes the provider terminate
+it.
 
 ### 4.2 Notifications from the data plane
 
