@@ -398,7 +398,9 @@ How the counter-party answers a message decides what happens next:
   (`edc.negotiation.send.retry.*`, `edc.transfer.send.retry.*`, see [Tuning](../tuning/_index.md#state-machines)), until
   the retry limit is reached. A connector answers `503` when it can't process a message now but may later: the
   negotiation or transfer process is being modified, e.g. by an earlier copy of the same message, or the token of the
-  counter-party couldn't be verified because its credential service or DID document was not reachable. A copy that
+  counter-party couldn't be verified for a reason that has nothing to do with the token: the counter-party's credential
+  service, its DID document or a status list of its credentials could not be reached, or the connector couldn't create
+  its own token for the presentation request (e.g. the vault or the STS was not available). A copy that
   arrives after the first one was processed is accepted when the process already is in the state the message leads
   to, e.g. a repeated agreement or finalization, and is otherwise rejected.
 
