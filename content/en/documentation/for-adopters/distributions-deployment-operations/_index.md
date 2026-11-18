@@ -16,6 +16,8 @@ In the Maven/Gradle world, _bills-of-material_ are meta-modules with the sole pu
 
 The single participant and the multi-participant BOMs can't be combined in one runtime.
 
+**Credential formats in the DCP BOMs:** the DCP BOMs verify JWT-based presentations and credentials only (VCDM 1.1 JWT and VCDM 2.0 JOSE). Linked-Data proof (LDP) credentials are not a first-class citizen in EDC and are not supported out of the box: a runtime that has to accept LDP presentations must add the `org.eclipse.edc:decentralized-claims-ldp` extension explicitly. Without it, LDP presentations are rejected. The LDP support is provided as is: adopters who enable it are responsible for assessing and hardening it for their deployment.
+
 **FederatedCatalog:**
 
 - `federatedcatalog-base-bom`: base BOM for FC modules. Does not contain any `IdentityService` implementation
