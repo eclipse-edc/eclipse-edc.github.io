@@ -113,6 +113,8 @@ The presentation format follows the format of the credentials:
 
 Presentations are valid for `edc.iam.presentation.validity` seconds (default `60`). JWT-based formats are recommended:
 in testing, they performed an order of magnitude better than Linked-Data proofs.
+Linked-Data proof presentations are only accepted by connectors that include the `decentralized-claims-ldp` extension,
+which is not part of the DCP BOMs (see [Using Bills-of-Material](../distributions-deployment-operations/_index.md#using-bills-of-material-boms)).
 
 ### Issuance Flow
 
