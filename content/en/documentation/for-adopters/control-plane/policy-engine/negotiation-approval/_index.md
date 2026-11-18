@@ -6,7 +6,7 @@ weight: 30
 
 <!-- TOC -->
   * [Overview](#overview)
-  * [Enabling approval](#enabling-approval)
+  * [Activation](#activation)
   * [Writing approval rules](#writing-approval-rules)
     * [The approval scope](#the-approval-scope)
     * [What approval rules can use](#what-approval-rules-can-use)
@@ -37,16 +37,14 @@ Approval works with both control plane flavours: the classic runtime (state mach
 [decision record](https://github.com/eclipse-edc/Connector/tree/main/docs/developer/decision-records/2026-10-07-contract-negotiation-approval)
 for the rationale.
 
-## Enabling approval
+## Activation
 
-Approval is opt-in and disabled by default:
+Approval needs no configuration: it is always active, in every runtime and for every participant context. Only
+negotiations whose contract policy contains [approval constraints](#the-approval-scope) can be held, so offers without
+them are approved automatically, as before.
 
-| Setting                            | Default | Description                                                                 |
-|------------------------------------|---------|-----------------------------------------------------------------------------|
-| `edc.negotiation.approval.enabled` | `false` | Holds provider negotiations whose contract policy fails the approval scope |
-
-The setting applies to the whole runtime. In a virtual runtime it is enabled for all participant contexts, but
-only negotiations whose contract policy contains approval constraints can actually be held (see below).
+The asset and the contract definition used by the approval rules are looked up only when a rule reads them, so
+negotiations of offers without approval constraints cause no additional lookup.
 
 ## Writing approval rules
 
@@ -343,4 +341,3 @@ held by custom guards in other states need to be resumed by the extension itself
   states and transfer process approval are not supported.
 - The claims used for approval are the ones of the latest contract request received by the provider: they are not
   verified again when the negotiation is approved.
-- `edc.negotiation.approval.enabled` applies to the whole runtime.
