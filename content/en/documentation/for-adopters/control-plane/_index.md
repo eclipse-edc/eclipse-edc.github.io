@@ -396,13 +396,20 @@ How the counter-party answers a message decides what happens next:
   `404` when the process does not exist or the client is not authorized (catalog requests get `401`).
 - **5xx, or no answer** (timeout, unreachable counter-party): the message is sent again with a growing delay
   (`edc.negotiation.send.retry.*`, `edc.transfer.send.retry.*`, see [Tuning](../tuning/_index.md#state-machines)), until
-  the retry limit is reached. A connector answers `503` when it can't process a message now but may later: the
-  negotiation or transfer process is being modified, e.g. by an earlier copy of the same message, or the token of the
-  counter-party couldn't be verified for a reason that has nothing to do with the token: the counter-party's credential
-  service, its DID document or a status list of its credentials could not be reached, or the connector couldn't create
-  its own token for the presentation request (e.g. the vault or the STS was not available). A copy that
-  arrives after the first one was processed is accepted when the process already is in the state the message leads
-  to, e.g. a repeated agreement or finalization, and is otherwise rejected.
+  the retry limit is reached. A connector answers `503` when it can't process a message now but may later:
+  - the negotiation or transfer process is being modified, e.g. by an earlier copy of the same message;
+  - the message arrived before the connector finished its own preceding step, e.g. a `TransferStartMessage` that
+    arrives while the consumer hasn't received the acknowledgement of its transfer request yet, or a contract agreement
+    that arrives while the consumer is still sending its acceptance;
+  - the token of the counter-party couldn't be verified for a reason that has nothing to do with the token: the
+    counter-party's credential service, its DID document or a status list of its credentials could not be reached, or
+    the connector couldn't create its own token for the presentation request (e.g. the vault or the STS was not
+    available).
+
+  A copy that arrives after the first one was processed is accepted when the process already is in the state the
+  message leads to, e.g. a repeated agreement or finalization, and is otherwise rejected. A repeated initial contract
+  request (one without `providerPid`, e.g. sent again because its acknowledgement was lost) gets the negotiation the
+  first request created, as a repeated transfer request gets the existing transfer process.
 
 ## Transfer Processes
 
