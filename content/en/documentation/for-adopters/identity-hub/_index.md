@@ -103,6 +103,66 @@ The mapping from scopes to credentials can be customized:
 
 - An extension can replace the mapping entirely with its own `ScopeToCriterionTransformer`.
 
+##### Serving several dataspaces
+
+An Identity Hub that holds the credentials of a participant in several dataspaces must present only the credentials of
+the dataspace a verifier asks in. Dataspaces often use the same credential types: if the Aurora and the Borealis
+dataspaces both issue a `MembershipCredential`, the scope `org.eclipse.dspace.dcp.vc.type:MembershipCredential:read`
+selects both. The scopes a verifier requests are defined by its dataspace (in EDC, the
+[DCP scopes of a dataspace profile](../control-plane/dataspace-profiles/_index.md#configuring-dcp-scopes)), so each
+dataspace has to request scopes that tell its credentials apart, in one of these ways:
+
+1. **Qualify the type with a JSON-LD context.** If the credentials of each dataspace have a context of their own, a
+   scope of the form `org.eclipse.dspace.dcp.vc.type:https://w3id.org/aurora/credentials/v1#MembershipCredential:read`
+   selects only the credentials that have both the type and the context. No configuration of the Identity Hub is needed.
+2. **Use an alias for the qualified type.** The dataspace requests a short scope like
+   `org.eclipse.dspace.dcp.vc.type:AuroraMembership:read`, and the Identity Hub resolves the alias with a discriminator
+   mapping to `https://w3id.org/aurora/credentials/v1#MembershipCredential`:
+
+   ```properties
+   edc.identityhub.discriminator.aurora.alias=AuroraMembership
+   edc.identityhub.discriminator.aurora.value=https://w3id.org/aurora/credentials/v1#MembershipCredential
+   ```
+
+   A participant's own alias, set through the Identity API, takes precedence over a configured one. It is kept in
+   memory only, so it has to be set again after a restart.
+3. **Select the credentials by issuer.** If the credentials of the dataspaces only differ by their issuer, the dataspace
+   requests a discriminator of its own, e.g. `org.eclipse.dspace.dcp.vc.type:aurora.MembershipCredential:read`, and
+   scope mappings select the type and the issuer. All the mappings that match a scope apply together, so two mappings
+   with the same pattern select the credentials that have the type **and** were issued by the dataspace's issuer:
+
+   ```properties
+   edc.identityhub.scope.aurora-type.pattern=org\\.eclipse\\.dspace\\.dcp\\.vc\\.type:aurora\\.(.+):read
+   edc.identityhub.scope.aurora-type.leftoperand=verifiableCredential.credential.type
+   edc.identityhub.scope.aurora-type.operator=contains
+   edc.identityhub.scope.aurora-type.rightoperand=$1
+   edc.identityhub.scope.aurora-issuer.pattern=org\\.eclipse\\.dspace\\.dcp\\.vc\\.type:aurora\\.(.+):read
+   edc.identityhub.scope.aurora-issuer.leftoperand=issuerId
+   edc.identityhub.scope.aurora-issuer.operator==
+   edc.identityhub.scope.aurora-issuer.rightoperand=did:web:issuer.aurora.example
+   ```
+
+   The pattern must match only the dataspace's own discriminators, as a matched scope is no longer resolved by the
+   default format. A dataspace can also use a scope alias of its own, e.g. `org.aurora.vc.type:MembershipCredential:read`,
+   with the same mappings on that alias.
+
+Only the first way works with any wallet that resolves scopes by credential type and context. The discriminators of the
+other two are resolved by the configuration of the Identity Hub: a wallet of another implementation would look for a
+credential of type `AuroraMembership`, for instance.
+
+How scopes are resolved:
+
+- In the default format, a scope of the `org.eclipse.dspace.dcp.vc.type` alias ends with the operation `read` (or `*`,
+  `all`), as in all the examples above. A scope without it, such as `org.eclipse.dspace.dcp.vc.type:MembershipCredential`,
+  is not resolved unless a scope mapping matches it.
+- The criteria of one scope apply together, and the credentials of several scopes are presented together.
+- A scope that a scope mapping matches is resolved by the mappings only, not by the default format. Scope mappings apply
+  to all the participant contexts of an Identity Hub.
+- The scopes of the verifier's access token are resolved the same way: a credential is presented only if the token's
+  scopes select it as well.
+- `contains` checks an element of a list, such as `verifiableCredential.credential.type` or
+  `verifiableCredential.credential.@context`. For single values like `issuerId`, use `=` or `in`.
+
 The presentation format follows the format of the credentials:
 
 | Credential format | Presentation |
@@ -190,7 +250,7 @@ cryptographic primitives, Json-Ld processing, and DID resolution. This architect
 
 ### Organizational Component
 
-Many organizations prefer to manage identity resources centrally, as strict security and control can be enforced over these sensitive resources. Identity Hub can be deployed as a centrally managed component in an organization that other EDC components use. In this scenario, Identity Hub will manage all identity resources for an organization for all dataspaces it participates in. For example, If an organization is a member of two dataspaces, DS1 and DS2, that issue membership credentials, both credentials will be managed by the central deployment. Connectors deployed for DS1 and DS2 will use their respective membership credentials from the central Identity Hub.
+Many organizations prefer to manage identity resources centrally, as strict security and control can be enforced over these sensitive resources. Identity Hub can be deployed as a centrally managed component in an organization that other EDC components use. In this scenario, Identity Hub will manage all identity resources for an organization for all dataspaces it participates in. For example, If an organization is a member of two dataspaces, DS1 and DS2, that issue membership credentials, both credentials will be managed by the central deployment. Connectors deployed for DS1 and DS2 will use their respective membership credentials from the central Identity Hub. See [Serving several dataspaces](#serving-several-dataspaces) for how each dataspace gets only its own credentials.
 
 ### Per Dataspace Component
 

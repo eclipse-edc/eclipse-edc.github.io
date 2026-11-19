@@ -229,6 +229,12 @@ Two categories exist:
 - `POLICY` — requested only when a constraint whose left operand matches the scope's prefix mapping appears in
   the policy being evaluated.
 
+The counterparty's wallet resolves a scope to the credentials it presents. When participants hold credentials of
+several dataspaces, the scopes of a profile have to select only that dataspace's credentials, e.g. by qualifying the
+credential type with the dataspace's JSON-LD context. See
+[Serving several dataspaces](../../identity-hub/_index.md#serving-several-dataspaces) for how Identity Hub resolves
+scopes.
+
 ### With the Management API
 
 Scopes are managed under `/v5beta/dcpscopes` (`POST` to create, `PUT /{id}` to update, `DELETE /{id}` to
