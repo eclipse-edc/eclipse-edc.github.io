@@ -231,6 +231,19 @@ _tuning suggestion:_ size `edc.did.resolver.cache.size` above the number of DIDs
 issuers) the hosted participants talk to. The expiry bounds how long a changed DID document, e.g. after a key rotation,
 goes unnoticed.
 
+The `did:web` documents are fetched with their own limits, so that a slow or unreachable host can't hold the request for
+long:
+
+| Setting                             | Default   | Description                                                                              |
+|-------------------------------------|-----------|------------------------------------------------------------------------------------------|
+| `edc.iam.did.web.timeout.call`      | `PT5S`    | maximum duration of one request for a DID document, connecting and reading included (ISO-8601) |
+| `edc.iam.did.web.retries.max`       | `1`       | retries of a request that failed with a connection error or a `5xx` answer                |
+| `edc.iam.did.web.response.size.max` | `1048576` | maximum size of a DID document, in bytes                                                  |
+
+With the defaults, resolving an unreachable DID takes at most about 11 s (two attempts and the backoff between them).
+The verification then fails as retryable, so the counter-party gets `503` and sends the message again later (see
+[Reliable Messaging](../control-plane/_index.md#reliable-messaging)).
+
 ### Credential service
 
 With DCP, every incoming protocol message, on the provider and on the consumer side, is verified with a presentation
@@ -241,6 +254,17 @@ limit of the whole platform in a load test.
 
 _tuning suggestion:_ size the credential service's database pool (`edc.datasource.default.pool.connections.*` of the
 IdentityHub) like the connector's, and scale it with the connector's protocol traffic.
+
+The presentation query has its own limits:
+
+| Setting                                        | Default    | Description                                                                  |
+|------------------------------------------------|------------|------------------------------------------------------------------------------|
+| `edc.iam.credentialservice.timeout.call`       | `PT10S`    | maximum duration of a presentation query, connecting and reading included (ISO-8601) |
+| `edc.iam.credentialservice.retries.max`        | `0`        | retries of a presentation query that failed with a connection error           |
+| `edc.iam.credentialservice.response.size.max`  | `10485760` | maximum size of a presentation query response, in bytes                       |
+
+A query that times out fails as retryable (`503`), and the counter-party sends its message again. Raise the timeout if
+the counter-parties' credential services are known to answer slowly, e.g. with many or large credentials.
 
 ### Finding the limit
 

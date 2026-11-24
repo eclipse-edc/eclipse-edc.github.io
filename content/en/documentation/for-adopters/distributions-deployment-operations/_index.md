@@ -18,6 +18,8 @@ The single participant and the multi-participant BOMs can't be combined in one r
 
 **Credential formats in the DCP BOMs:** the DCP BOMs verify JWT-based presentations and credentials only (VCDM 1.1 JWT and VCDM 2.0 JOSE). Linked-Data proof (LDP) credentials are not a first-class citizen in EDC and are not supported out of the box: a runtime that has to accept LDP presentations must add the `org.eclipse.edc:decentralized-claims-ldp` extension explicitly. Without it, LDP presentations are rejected. The LDP support is provided as is: adopters who enable it are responsible for assessing and hardening it for their deployment.
 
+**Self-issued ID tokens in the DCP BOMs:** as required by the [DCP specification](https://eclipse-dataspace-dcp.github.io/decentralized-claims-protocol/#self-issued-id-tokens), tokens without a `jti` or an `iat` claim are rejected, and a token is accepted only once (`edc.iam.accesstoken.jti.validation`, default `true`). The EDC and IdentityHub STS set both claims. To accept tokens from counter-parties whose token issuer doesn't, set `edc.iam.accesstoken.claims.required=false`.
+
 **FederatedCatalog:**
 
 - `federatedcatalog-base-bom`: base BOM for FC modules. Does not contain any `IdentityService` implementation

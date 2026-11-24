@@ -404,7 +404,8 @@ How the counter-party answers a message decides what happens next:
   - the token of the counter-party couldn't be verified for a reason that has nothing to do with the token: the
     counter-party's credential service, its DID document or a status list of its credentials could not be reached, or
     the connector couldn't create its own token for the presentation request (e.g. the vault or the STS was not
-    available).
+    available). The message is sent again with the same token, which is accepted: the token's `jti` is only recorded
+    as used once the verification succeeded.
 
   A copy that arrives after the first one was processed is accepted when the process already is in the state the
   message leads to, e.g. a repeated agreement or finalization, and is otherwise rejected. A repeated initial contract
