@@ -64,6 +64,13 @@ A profile is a `DataspaceProfile` object with the following fields:
 | `jsonLdContextsUrl` | no       | The JSON-LD contexts loaded for compaction/expansion under the profile.                                |
 | `trustedIssuers`    | no       | The issuers accepted under the profile, each `{ "@id": <did>, "supportedTypes": [<credential type>...] }`. |
 
+A credential is accepted only if its issuer is a trusted issuer that supports **every** type of the credential. The base
+`VerifiableCredential` type doesn't need to be listed, and `*` accepts any type. For example, an issuer with
+`supportedTypes: ["MembershipCredential"]` is accepted for a credential of type
+`["VerifiableCredential", "MembershipCredential"]`, but not for one that also has the type `DataProcessorCredential`.
+Setting `edc.iam.vc.validation.issuer.types.match-any=true` restores the behaviour of earlier versions, where one
+supported type was enough.
+
 ## Registering a profile
 
 A profile can be created at runtime through the Management API, or seeded from configuration at boot. Both
