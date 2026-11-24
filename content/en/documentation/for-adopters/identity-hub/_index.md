@@ -146,6 +146,17 @@ dataspace has to request scopes that tell its credentials apart, in one of these
    default format. A dataspace can also use a scope alias of its own, e.g. `org.aurora.vc.type:MembershipCredential:read`,
    with the same mappings on that alias.
 
+Discriminator mappings and scope mappings solve different cases:
+
+| | Discriminator mappings | Scope mappings |
+|---|---|---|
+| Tell credentials apart by | their JSON-LD context: an alias always resolves to a type, optionally qualified with a context | any field of the credential, e.g. the issuer or a claim, with any operator |
+| Match | the discriminator of the `org.eclipse.dspace.dcp.vc.type` alias, exactly | the whole scope, with a regular expression |
+| Defined | in the configuration, and per participant through the Identity API | in the configuration, for all the participants |
+
+So credentials that differ by their context only need a discriminator mapping (or none, with the first way), and
+credentials that differ in anything else, such as their issuer, need scope mappings.
+
 Only the first way works with any wallet that resolves scopes by credential type and context. The discriminators of the
 other two are resolved by the configuration of the Identity Hub: a wallet of another implementation would look for a
 credential of type `AuroraMembership`, for instance.
