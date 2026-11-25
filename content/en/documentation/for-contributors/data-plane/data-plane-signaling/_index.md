@@ -167,11 +167,17 @@ and how it authenticates the data plane's notifications:
 
 - `oauth2_client_credentials` (`data-plane-signaling-oauth2`): the control plane gets a token with the client credentials
   (`tokenEndpoint`, `clientId`, `clientSecret`) for its signals, and validates the tokens of the notifications against
-  `jwksUri` or `jwks`.
+  `jwksUri` or `jwks`. Without either, the signature of the notifications' tokens is not verified, as allowed by the
+  DPS profiles, and the control plane logs a warning when the data plane registers.
 - `oauth2_token_exchange` (`data-plane-signaling-oauth2-token-exchange`): the control plane exchanges its workload
   credential (by default the Kubernetes service account token, `edc.dps.oauth2.tokenexchange.subjecttokenpath`) for a
-  token at `tokenExchangeEndpoint`; the notifications are validated against the `issuer` and `jwksUri` or `jwks` of the
-  profile.
+  token at `tokenExchangeEndpoint`, for the `resource` of the profile; the notifications are validated against the
+  `issuer` and `jwksUri` of the profile. All four properties are required, and inline `jwks` are not permitted.
+
+The registration APIs validate the profile before registering the data plane: the registration is rejected with `400`
+when no `SignalingAuthorization` is registered for the profile type, or when the profile is invalid for its type. An
+extension that adds a profile type checks its profiles in `SignalingAuthorization#validate`, which can also log a
+warning for a profile that is valid but weakens the authorization.
 
 Without an `authorization` object the signals and the notifications are not authenticated. The control plane logs a
 warning when such a data plane registers, see
