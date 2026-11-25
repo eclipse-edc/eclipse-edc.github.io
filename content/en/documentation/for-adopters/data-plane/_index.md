@@ -88,7 +88,12 @@ default `8182`, and `web.http.signaling.path`, default `/api/signaling`). How th
 on the authorization profile a data plane provides when it registers:
 
 - **With an authorization profile** (e.g. `oauth2_client_credentials` or `oauth2_token_exchange`), the control plane
-  authenticates every call and checks that it comes from the data plane that handles the transfer.
+  authenticates every call and checks that it comes from the data plane that handles the transfer. The profile is
+  checked when the data plane registers: the registration is rejected with `400` if the runtime has no support for the
+  profile type, or if the profile lacks properties the type requires.
+- **With an `oauth2_client_credentials` profile without `jwks` or `jwksUri`**, the calls carry a token, but its signature
+  is not verified, as allowed by the [DPS authorization profiles](https://eclipse-dataplane-signaling.github.io/profiles).
+  The control plane logs a warning when such a data plane registers.
 - **Without an authorization profile**, the calls are not authenticated: any client that can reach the Signaling API
   and knows the id of a transfer process can change its state. This fits a deployment in which the control plane and
   its data planes run in the same trusted network. The control plane logs a warning when such a data plane registers.
