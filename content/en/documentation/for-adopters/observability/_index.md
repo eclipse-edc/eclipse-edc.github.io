@@ -182,7 +182,9 @@ edc.callback.audit.auth.codeid=my-api-key-alias
 Static callbacks belong to the runtime, so their secrets are always resolved from the **default vault partition**,
 even for events of a specific participant context. Per-request webhooks and
 [participant callbacks](#4-participant-callbacks) resolve their secrets from the vault partition of the participant
-context that owns the event instead.
+context that owns the event instead. This keeps a participant from using the secrets of other participant contexts or
+of the runtime only if the vault partitions are isolated from each other (see
+[Vault partitions](../control-plane/participant-contexts/_index.md#vault-partitions)).
 
 ### 3.3 Transactional callbacks
 
