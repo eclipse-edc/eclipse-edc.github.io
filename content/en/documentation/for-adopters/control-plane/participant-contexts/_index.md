@@ -179,8 +179,24 @@ The keys registered by the extensions shipped with EDC:
 | `edc.iam.sts.type` | the STS issuing the participant's self-issued tokens: `oauth` (a remote STS, e.g. IdentityHub's) or `signature` (signed by the control plane's signature service, e.g. Vault Transit, so that the key never leaves it); defaults to `edc.iam.sts.default.type` (`oauth`) |
 | `edc.iam.sts.oauth.token.url`, `edc.iam.sts.oauth.client.id`, `edc.iam.sts.oauth.client.secret.alias` | token endpoint, client id and vault alias of the client secret, required for the `oauth` STS |
 | `edc.iam.sts.signature.keyname`, `edc.iam.sts.signature.kid` | name of the signing key in the signature service and key id set on the tokens, required for the `signature` STS (token validity: `edc.iam.sts.signature.token.expiration`, 600 s) |
-| `edc.vault.hashicorp.config` | secret: JSON settings of the participant's HashiCorp Vault partition |
+| `edc.vault.hashicorp.config` | secret: JSON settings of the participant's HashiCorp Vault partition (see [Vault partitions](#vault-partitions)) |
 | `edc.callbacks` | JSON array of the [callbacks](../../observability/_index.md) notified of the participant's events |
+
+### Vault partitions
+
+`edc.vault.hashicorp.config` gives a participant context its own partition of the HashiCorp Vault, a folder in which its
+secrets are stored (see the
+[extension's documentation](https://github.com/eclipse-edc/Connector/blob/main/extensions/common/vault/vault-hashicorp/README.md#vault-partitions)
+for the format). The folder only tells the connector where to read and write; the isolation between participant
+contexts comes from the Vault token each partition authenticates with. Partitions are isolated from each other and from
+the runtime only when:
+
+- each partition authenticates with its own token, through token exchange (`edc.vault.hashicorp.auth.tokenexchange.*`),
+  and the policies of the Vault JWT auth role only allow the participant's own folder;
+- `edc.vault.hashicorp.allowfallback=false`, so that a participant context without `edc.vault.hashicorp.config` is not
+  served from the runtime's default partition.
+
+With a static Vault token, all partitions share the runtime's access.
 
 ## Related
 
