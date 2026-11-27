@@ -407,10 +407,29 @@ How the counter-party answers a message decides what happens next:
     available). The message is sent again with the same token, which is accepted: the token's `jti` is only recorded
     as used once the verification succeeded.
 
-  A copy that arrives after the first one was processed is accepted when the process already is in the state the
-  message leads to, e.g. a repeated agreement or finalization, and is otherwise rejected. A repeated initial contract
-  request (one without `providerPid`, e.g. sent again because its acknowledgement was lost) gets the negotiation the
-  first request created, as a repeated transfer request gets the existing transfer process.
+  A copy of a message for an existing negotiation or transfer process that arrives after the first one was processed
+  is recognized by its message identifier (see below) and acknowledged without changing the process. A repeated initial
+  contract request (one without `providerPid`, e.g. sent again because its acknowledgement was lost) gets the
+  negotiation the first request created, as a repeated transfer request gets the existing transfer process.
+
+#### Message identifiers
+
+The Dataspace Protocol doesn't define a message identifier, so EDC gives the message `@id`, which the protocol allows,
+that meaning:
+
+- EDC sets the `@id` of every contract negotiation and transfer process message it sends to `urn:uuid:` followed by a
+  random UUID, and keeps the same `@id` when it sends that message again.
+- A received message for an existing negotiation or transfer process whose `@id` is a `urn:uuid:` value, different
+  from the message's `consumerPid` and `providerPid`, is a copy when a message with the same `@id` was already
+  processed for that process. The copy is acknowledged, after the counter-party has been authenticated, and doesn't
+  change the process. A repeated initial contract request or transfer request is recognized by its `consumerPid`
+  instead, as described above.
+- A message with any other `@id`, or without one, is processed as before: a copy that arrives after the first one was
+  processed is accepted only when the process already is in the state the message leads to, e.g. a repeated agreement
+  or finalization, and is otherwise rejected with `400`.
+
+A connector of another vendor gets its copies recognized by EDC when it sets the `@id` of its messages following the
+same rules.
 
 ## Transfer Processes
 
